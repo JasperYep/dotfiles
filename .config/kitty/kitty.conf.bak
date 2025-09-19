@@ -1,0 +1,75 @@
+# =========================
+# 字体设置（保持不变）
+# =========================
+font_family      JetBrainsMono NF SemiBold
+font_size        13.0
+bold_font        auto
+italic_font      auto
+bold_italic_font auto
+
+# =========================
+# 窗口布局和边距
+# =========================
+window_margin_width 0
+single_window_margin_width 0
+remember_window_size no
+initial_window_width  80c
+initial_window_height 24c
+
+# =========================
+# 背景透明（透出壁纸）
+# =========================
+background_opacity 0.64
+background_image none
+background #fcfcfc
+
+# =========================
+# 光标
+# =========================
+cursor            #5a5a5a
+cursor_text_color #ffffff
+
+# =========================
+# 终端文本
+# =========================
+foreground #454545 
+
+# =========================
+# 浅色素雅 16 色表
+# =========================
+# 黑色/亮黑色
+color0  #d0d0d0
+color8  #e8e8e8
+
+# 红色/亮红色
+color1  #e88d84
+color9  #ffb8af
+
+# 绿色/亮绿色
+color2  #8dc890
+color10 #a8e3aa
+
+# 黄色/亮黄色
+color3  #e3d386
+color11 #f0e3a5
+
+# 蓝色/亮蓝色
+color4  #8cb6e8
+color12 #a8c8ff
+
+# 紫色/亮紫色
+color5  #b88fe8
+color13 #d0a5ff
+
+# 青色/亮青色
+color6  #8cd3d3
+color14 #a5e3e3
+
+# 白色/亮白色
+color7  #858585
+color15 #aaaaaa
+
+# =========================
+# 其他设置
+# =========================
+allow_remote_control yes
