@@ -178,4 +178,13 @@ function lazygit_widget() {
 }
 
 zle -N lazygit_widget
-bindkey '^g' lazygit_widget
+bindkey '^[g' lazygit_widget
+
+
+function lazygit_widget_1() {
+    lazygit
+    zle reset-prompt
+}
+
+zle -N lazygit_widget_1
+bindkey '^g' lazygit_widget_1
