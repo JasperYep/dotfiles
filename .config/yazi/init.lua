@@ -2,10 +2,11 @@ require("full-border"):setup()
 require("bunny"):setup({
 	hops = {
 		{ key = "/", path = "/" },
-		{ key = "t", path = "/tmp" },
+		{ key = "t", path = "~/todo/" },
 		{ key = "u", path = "/run/media/jasper", desc = "USB" },
 		{ key = { "c", "y" }, path = "~/.config/yazi", desc = "yazi Config files" },
 		{ key = { "c", "i" }, path = "~/.config/i3/", desc = "i3 Config files" },
+		{ key = { "c", "n" }, path = "~/.config/nvim/", desc = "Nvim Config files" },
 		{ key = { "l", "s" }, path = "~/.local/share", desc = "Local share" },
 		{ key = { "l", "b" }, path = "~/.local/bin", desc = "Local bin" },
 		{ key = { "l", "t" }, path = "~/.local/state", desc = "Local state" },

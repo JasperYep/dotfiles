@@ -64,6 +64,6 @@ zmodule Aloxaf/fzf-tab
 # source ~/.zim/vi.zsh
 # source ~/.zim/fzf.zsh
 
-zmodule minimal
+zmodule bira
 
 zmodule prompt-pwd

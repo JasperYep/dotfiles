@@ -17,4 +17,4 @@ source "${HOME}/.zim/modules/zsh-history-substring-search/zsh-history-substring-
 source "${HOME}/.zim/modules/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "${HOME}/.zim/modules/zfm/zfm.zsh"
 source "${HOME}/.zim/modules/fzf-tab/fzf-tab.zsh"
-source "${HOME}/.zim/modules/minimal/minimal.zsh-theme"
+source "${HOME}/.zim/modules/bira/bira.zsh-theme"

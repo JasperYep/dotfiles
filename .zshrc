@@ -181,6 +181,7 @@ zle -N lazygit_widget
 bindkey '^[g' lazygit_widget
 
 
+# shortcut for lazygit
 function lazygit_widget_1() {
     lazygit
     zle reset-prompt
