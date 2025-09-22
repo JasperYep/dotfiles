@@ -1,0 +1,40 @@
+#!/bin/sh
+
+# 极简主义配色 - 低饱和度单色系
+BLANK='#00000000'      # 完全透明
+BACKGROUND='#0a0a0add' # 深灰背景，轻微透明
+ACCENT='#a0a0a0ff'     # 中灰色，主要强调色
+TEXT='#000000ff'       # 浅灰色文字，高可读性
+ERROR='#ff6b6bee'      # 低饱和度红棕错误色
+
+# 判断大小周
+WEEKNUM=$(date +%V)
+SIZE=$([ $((WEEKNUM % 2)) -eq 1 ] && echo "I" || echo "II")
+
+i3lock \
+    --insidever-color=$BLANK      \
+    --ringver-color=$ACCENT       \
+    --insidewrong-color=$BLANK    \
+    --ringwrong-color=$ERROR      \
+    --inside-color=$BLANK         \
+    --ring-color=$ACCENT          \
+    --line-color=$BLANK           \
+    --separator-color=$ACCENT     \
+    --verif-color=$TEXT           \
+    --wrong-color=$TEXT           \
+    --time-color=$TEXT            \
+    --date-color=$TEXT            \
+    --layout-color=$TEXT          \
+    --keyhl-color=$ERROR          \
+    --bshl-color=$ERROR           \
+    --screen 1                    \
+    --blur 8                      \
+    --clock                       \
+    --indicator                   \
+    --time-str="%H:%M"            \
+    --date-str="%m/%d %A · $SIZE" \
+    --time-size=32                \
+    --date-size=18                \
+    --modif-size=16               \
+    --radius 160                  \
+    --ring-width 5
