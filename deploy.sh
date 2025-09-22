@@ -32,8 +32,13 @@ echo "✅ basic commands found"
 echo "Installing base packages..."
 # 只安装需要的，不做全局升级
 sudo pacman -Sy --needed --noconfirm \
-    git yazi zsh vim neovim kitty i3-wm i3status fzf fd ripgrep
+    git yazi zsh vim neovim kitty i3 fzf fd ripgrep rofi \
+    adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-jetbrains-mono-nerd \
+    firefox lightdm \
+    fcitx5-im fcitx5-rime rime-double-pinyin
 
+# git clone https://github.com/LazyVim/starter ~/.config/nvim
+# rm -rf ~/.config/nvim/.git
 # ------------------- 克隆裸仓库 -------------------
 if [ -e "$BARE_REPO" ]; then
     echo "⚠️  Existing repo detected: $BARE_REPO"
@@ -54,16 +59,7 @@ dog config --local status.showUntrackedFiles no
 echo "Bare repository configured."
 
 # ------------------- 备份冲突文件 -------------------
-mkdir -p "$BACKUP_DIR"
-echo "Checking for conflicting files..."
-if ! dog checkout; then
-    echo "Backing up conflicting files to $BACKUP_DIR"
-    dog checkout 2>&1 | grep -oP '(?<=\s)[^ ]+$' | while read -r f; do
-        mkdir -p "$(dirname "$BACKUP_DIR/$f")"
-        mv "$HOME/$f" "$BACKUP_DIR/$f"
-    done
-    dog checkout
-fi
+dog checkout -f
 echo "Dotfiles checked out successfully."
 
 # ------------------- 设置 exclude -------------------
@@ -71,22 +67,29 @@ echo ".zim/modules/" >>"$BARE_REPO/info/exclude"
 echo ".cache/" >>"$BARE_REPO/info/exclude"
 echo "Git exclude setup done."
 
+# ------------------- 安装 Neovim (LazyVim) 插件 -------------------
+
+# if command -v nvim &>/dev/null && [ -d "$HOME/.config/nvim" ]; then
+#     echo "Detected Neovim config. Assuming LazyVim setup."
+#     echo "Triggering Lazy.nvim sync..."
+#     nvim --headless "+Lazy! sync" +qa || true
+# else
+#     echo "⚠️  Neovim not installed or config not found at ~/.config/nvim"
+# fi
+
 # ------------------- 安装 Zim Framework -------------------
 if [ ! -d "$HOME/.zim" ]; then
     echo "Installing Zim framework..."
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh)" "" --skip-yes
 fi
 
-# ------------------- 安装 Neovim (LazyVim) 插件 -------------------
-if command -v nvim &>/dev/null && [ -d "$HOME/.config/nvim" ]; then
-    echo "Detected Neovim config. Assuming LazyVim setup."
-    echo "Triggering Lazy.nvim sync..."
-    nvim --headless "+Lazy! sync" +qa || true
-else
-    echo "⚠️  Neovim not installed or config not found at ~/.config/nvim"
-fi
+chsh -s /usr/bin/zsh
+exec zsh
+
+zimfw install
 
 # ------------------- 提示 -------------------
+
 echo "Bootstrap complete!"
 echo "- Conflicting files backed up in $BACKUP_DIR"
 echo "- Dotfiles restored in $HOME"
