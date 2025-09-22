@@ -1,11 +1,25 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -euo pipefail
 
+echo "🚀 Starting deployment script..."
+
 # ------------------- 配置 -------------------
-DOTFILES_REPO="https://github.com/username/dotfiles.git"
+DOTFILES_REPO="https://github.com/JasperYep/dotfiles.git"
 BARE_REPO="$HOME/.cfg"
 BACKUP_DIR="$HOME/.config-backup"
 
+# ------------------- 检查命令是否存在 -------------------
+check_command() {
+    if ! command -v "$1" &>/dev/null; then
+        log_error "Required command '$1' not found. Please install it first."
+        exit 1
+    fi
+}
+
+check_command git
+check_command curl
+
+echo "✅ git found"
 # ------------------- 安装基础工具 -------------------
 echo "Installing base packages..."
 # Arch Linux 示例，如果是其他系统需要改包管理器
@@ -13,16 +27,31 @@ sudo pacman -Syu --needed git yazi zsh vim neovim kitty i3 i3status fzf fd ripgr
 
 # ------------------- 克隆裸仓库 -------------------
 echo "Cloning bare repository..."
-git clone --bare "$DOTFILES_REPO" "$BARE_REPO"
+if [ -e "$BARE_REPO" ]; then
+    echo "Removing existing repo: $BARE_REPO"
+    rm -rf "$BARE_REPO"
+fi
+
+if ! git clone --bare "$DOTFILES_REPO" "$BARE_REPO" 2>/dev/null; then
+    log_error "Failed to clone repository. Please check your internet connection and repository URL."
+    exit 1
+fi
 
 # ------------------- 创建 dog alias -------------------
 echo "Creating 'dog' alias..."
+
+if [ ! -f "$HOME/.zshrc" ]; then
+    touch "$HOME/.zshrc"
+fi
+
 if ! grep -q "alias dog=" "$HOME/.zshrc"; then
     echo "alias dog='/usr/bin/git --git-dir=$BARE_REPO/ --work-tree=$HOME'" >>"$HOME/.zshrc"
 fi
 alias dog="/usr/bin/git --git-dir=$BARE_REPO/ --work-tree=$HOME"
 
-dog config --local status.showUntrackedFiles no
+/usr/bin/git --git-dir="$BARE_REPO" --work-tree="$HOME" config --local status.showUntrackedFiles no
+
+echo "Bare repository configured successfully"
 
 # ------------------- 备份冲突文件 -------------------
 mkdir -p "$BACKUP_DIR"
@@ -70,3 +99,5 @@ echo "- Conflicting files backed up in $BACKUP_DIR"
 echo "- Dotfiles restored in $HOME"
 echo "- Use 'dog status', 'dog add', 'dog commit', 'dog push' to manage dotfiles"
 echo "- Zsh/Zim and Vim plugins installed"
+
+echo "🎉 Deployment complete!"
