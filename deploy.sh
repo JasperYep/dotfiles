@@ -34,7 +34,7 @@ echo "Installing base packages..."
 sudo pacman -Sy --needed --noconfirm \
     git yazi zsh vim neovim kitty i3 fzf fd ripgrep rofi \
     adobe-source-han-sans-cn-fonts adobe-source-han-serif-cn-fonts ttf-jetbrains-mono-nerd \
-    firefox lightdm picom feh \
+    firefox lightdm lightdm-gtk-greeter picom feh \
     fcitx5-im fcitx5-rime rime-double-pinyin
 
 # git clone https://github.com/LazyVim/starter ~/.config/nvim
