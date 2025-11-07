@@ -1,0 +1,24 @@
+# [open]
+# prepend_rules = [
+# 	{ name = "*.json", use = "edit" },
+#
+# 	# Multiple openers for a single rule
+# 	{ name = "*.html", use = [ "open", "edit" ] },
+# ]
+# append_rules = [
+# 	{ name = "*", use = "my-fallback" },
+# ]
+#
+
+[opener]
+play = [
+	{ run = 'mpv "$@"', orphan = true, for = "unix" },
+]
+edit = [
+	{ run = '$EDITOR "$@"', block = true, for = "unix" },
+]
+open = [
+	{ run = 'xdg-open "$@"', desc = "Open" },
+]
+# ...
+

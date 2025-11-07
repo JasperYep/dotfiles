@@ -1,0 +1,80 @@
+# what size
+[[mgr.prepend_keymap]]
+on = [ "^", "s" ]
+run  = "plugin what-size"
+desc = "Calc size of selection or cwd" 
+
+# Mount
+[[mgr.prepend_keymap]]
+on  = "M"
+run = "plugin mount"
+
+# copy selected files to the system clipboard
+[[mgr.prepend_keymap]]
+on  = "y"
+run = [ 'shell -- echo "$@" | xclip -i -selection clipboard -t text/uri-list', "yank" ]
+# open current folder
+[[mgr.prepend_keymap]]
+on   = "S"
+run  = 'shell "$SHELL" --block --confirm' 
+# samrt Enter
+[[mgr.prepend_keymap]]
+on   = "l"
+run  = "plugin smart-enter"
+desc = "Enter the child directory, or open the file"
+# # smart-paste
+# [[mgr.prepend_keymap]]
+# on   = "p"
+# run  = "plugin smart-paste"
+# desc = "Paste into the hovered directory or CWD"
+
+# dragon
+[[mgr.prepend_keymap]]
+on   = "<C-n>"
+run  = 'shell -- dragon -x -i -T "$1"' 
+
+# compress
+[[mgr.prepend_keymap]]
+on   = [ "c", "a", "a" ]
+run  = "plugin compress"
+desc = "Archive selected files"
+
+[[mgr.prepend_keymap]]
+on   = [ "c", "a", "p" ]
+run  = "plugin compress -p"
+desc = "Archive selected files (password)"
+
+[[mgr.prepend_keymap]]
+on   = [ "c", "a", "h" ]
+run  = "plugin compress -ph"
+desc = "Archive selected files (password+header)"
+
+[[mgr.prepend_keymap]]
+on   = [ "c", "a", "l" ]
+run  = "plugin compress -l"
+desc = "Archive selected files (compression level)"
+
+[[mgr.prepend_keymap]]
+on   = [ "c", "a", "u" ]
+run  = "plugin compress -phl"
+desc = "Archive selected files (password+header+level)"
+
+# vim-like f-<char>
+
+[[mgr.prepend_keymap]]
+on   = "f"
+run  = "plugin jump-to-char"
+desc = "Jump to char"
+
+
+# bookmark
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi"
+on = ";"
+run = "plugin bunny"
+
+# Optionally, add another keymap to immediately fuzzy search bookmarks
+[[mgr.prepend_keymap]]
+desc = "Start bunny.yazi fuzzy search"
+on = "'"
+run = "plugin bunny fuzzy"

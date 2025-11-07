@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM    # 以LLVM风格为基础，可改为 Google / Chromium / Mozilla / WebKit
+IndentWidth: 4        # 缩进空格数
+TabWidth: 4           # Tab 宽度
+UseTab: Never         # 使用空格而不是 Tab
+
+ColumnLimit: 0      # 每行最大长度
+IndentCaseLabels: true
+# PointerAlignment: Right
