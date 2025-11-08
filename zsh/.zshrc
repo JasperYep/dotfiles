@@ -199,3 +199,12 @@ export FZF_CTRL_T_COMMAND="find $HOME -name '.Trash' -prune -o -type f -print 2>
 . "$HOME/.local/bin/env"
 
 export PATH=$PATH:/home/jasper/liteos/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/
+
+
+# Add user's local bin directory to PATH
+if [ -d "$HOME/.local/bin" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+
+alias cblue="bluetoothctl connect 1C:7A:43:82:5A:B3"

@@ -59,13 +59,19 @@ while true; do
 	    WEEK_TAG="II"
 	fi
 
-	xsetroot -name "$(date '+%Y-%m-%d %H:%M') | $WEEK_TAG"
+	xsetroot -name "$(date '+%Y-%m-%d %H:%M')  $WEEK_TAG"
 sleep 60
 done &
 
 # autostart
 picom -b
-feh --bg-fill --randomize ~/Pictures/Wallpapers/*
+
+
+while true; do
+	feh --bg-fill --randomize ~/Pictures/Wallpapers/*
+sleep 300
+done &
+
 fcitx5 &
 
 exec dwm
