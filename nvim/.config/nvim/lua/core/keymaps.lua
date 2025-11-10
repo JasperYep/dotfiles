@@ -48,10 +48,7 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
--- 垂直分屏 (右侧)
-vim.keymap.set("n", "<C-v>", "<C-w>v", { desc = "Vertical split (right)" })
--- 水平分屏 (下方)
-vim.keymap.set("n", "<C-s>", "<C-w>s", { desc = "Horizontal split (down)" })
+vim.keymap.set("n", "<C-s>", ":w<CR>", { desc = "[S]ave" })
 vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "[B]uffer [D]elete" })
 
 -- 调整窗口大小的快捷键

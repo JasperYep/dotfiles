@@ -208,3 +208,4 @@ fi
 
 
 alias cblue="bluetoothctl connect 1C:7A:43:82:5A:B3"
+alias t="task"

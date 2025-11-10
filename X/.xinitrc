@@ -72,6 +72,9 @@ while true; do
 sleep 300
 done &
 
+# pomodoro
+~/pomodoro/pom_status.sh &
+
 fcitx5 &
 
 exec dwm
