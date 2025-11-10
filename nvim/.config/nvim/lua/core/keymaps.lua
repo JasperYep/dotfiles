@@ -48,6 +48,12 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
+-- 垂直分屏 (右侧)
+vim.keymap.set("n", "<C-v>", "<C-w>v", { desc = "Vertical split (right)" })
+-- 水平分屏 (下方)
+vim.keymap.set("n", "<C-s>", "<C-w>s", { desc = "Horizontal split (down)" })
+vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "[B]uffer [D]elete" })
+
 -- 调整窗口大小的快捷键
 vim.keymap.set("n", "<C-M-Left>", "<C-w><", { desc = "Decrease window width" })
 vim.keymap.set("n", "<C-M-Right>", "<C-w>>", { desc = "Increase window width" })
@@ -59,7 +65,7 @@ vim.keymap.set("n", "<C-M-Up>", "<C-w>+", { desc = "Increase window height" })
 -- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
 -- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
---
+
 -- NOTE: 浮动Terminal
 -- 创建一个变量来保存终端缓冲区ID，以便复用
 local term_buf = nil
