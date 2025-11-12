@@ -1,3 +1,8 @@
+-- tab
+vim.opt.shiftwidth = 4
+vim.opt.tabstop = 4
+vim.opt.expandtab = true
+
 vim.opt.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
 -- vim.opt.showtabline = 2 -- 2 表示始终显示 Tab Line (Bufferline 会覆盖它)
 vim.opt.cmdheight = 0 -- 0 表示cmd line的行高为0, 不需要因为会复用mini.statusline显示一些必要的命令
@@ -8,7 +13,7 @@ vim.opt.termguicolors = true
 -- [[ Setting options ]]
 -- Make line numbers default
 vim.o.number = true
-vim.o.relativenumber = true
+vim.o.relativenumber = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = "a"

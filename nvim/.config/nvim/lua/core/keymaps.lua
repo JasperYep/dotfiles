@@ -1,6 +1,10 @@
 vim.g.mapleader = " " -- 或者你喜欢的任何键，比如 ";"
 vim.g.maplocalleader = " "
 
+-- 连续缩进，保持 V-line 模式
+vim.api.nvim_set_keymap("v", ">", ">gv", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("v", "<", "<gv", { noremap = true, silent = true })
+
 -- 禁用Neovim原生的s键功能，以防和mini surround冲突
 vim.keymap.set({ "n", "x" }, "s", "<Nop>", { silent = true, desc = "Disable 's' for mini.surround" })
 

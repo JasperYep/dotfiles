@@ -63,9 +63,6 @@ while true; do
 sleep 60
 done &
 
-# autostart
-picom -b
-
 
 while true; do
 	feh --bg-fill --randomize ~/Pictures/Wallpapers/*
@@ -76,5 +73,13 @@ done &
 ~/pomodoro/pom_status.sh &
 
 fcitx5 &
+
+# 禁用屏幕保护和显示器关闭
+xset s off
+xset s noblank
+xset -dpms
+
+# autostart
+picom -b
 
 exec dwm

@@ -129,6 +129,7 @@ unset key
 
 # Created by newuser for 5.9
 alias vim="nvim"
+alias vi="vim"
 alias lg="lazygit"
 # yazi
 function y() {
@@ -140,7 +141,7 @@ function y() {
 }
 
 export EDITOR="nvim"
-alias dog='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+# alias dog='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
 
 # different block style in different modes
@@ -168,17 +169,6 @@ precmd_functions+=(_fix_cursor)
 
 KEYTIMEOUT=1
 
-source $HOME/.zim/fzf.zsh
-
-
-# shortcut for lazygit
-function lazygit_widget() {
-    lazygit --git-dir=$HOME/.cfg/ --work-tree=$HOME
-    zle reset-prompt
-}
-
-zle -N lazygit_widget
-bindkey '^[g' lazygit_widget
 
 
 # shortcut for lazygit
@@ -194,18 +184,14 @@ bindkey '^g' lazygit_widget_1
 # use xdg-open 
 alias open='(){ xdg-open "$@" > /dev/null 2>&1 & }'
 
-export FZF_CTRL_T_COMMAND="find $HOME -name '.Trash' -prune -o -type f -print 2>/dev/null"
-
+# fzf
+source $HOME/fzf.zsh && export FZF_CTRL_T_COMMAND="find $HOME -name '.Trash' -prune -o -path '$HOME/.local/share/Trash' -prune -o -path '$HOME/.vscode-server' -prune -o -path '$HOME/.cache' -prune -o -path '$HOME/.vscode' -prune -o -type f -print 2>/dev/null"
+#
+# 载入环境变量配置
 . "$HOME/.local/bin/env"
 
+# 添加用户的本地 bin 目录和 ARM 工具链路径到 PATH
 export PATH=$PATH:/home/jasper/liteos/arm-gnu-toolchain-14.3.rel1-x86_64-arm-none-eabi/bin/
-
-
-# Add user's local bin directory to PATH
-if [ -d "$HOME/.local/bin" ]; then
-    export PATH="$HOME/.local/bin:$PATH"
-fi
-
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
 alias cblue="bluetoothctl connect 1C:7A:43:82:5A:B3"
-alias t="task"

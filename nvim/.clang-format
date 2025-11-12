@@ -6,3 +6,11 @@ UseTab: Never         # 使用空格而不是 Tab
 ColumnLimit: 0      # 每行最大长度
 IndentCaseLabels: true
 # PointerAlignment: Right
+#
+
+
+# # 关键：对齐连续的赋值操作符（包括初始化列表中的 '='）
+# AlignConsecutiveAssignments: true
+#
+# # 对齐连续的声明（虽然在这里不是主要作用，但保持一致性是好的）
+# AlignConsecutiveDeclarations: true
