@@ -24,18 +24,29 @@ static const char *colors[][3]      = {
 
 /* tagging */
 // static const char *tags[] = { "", "", "", "󰷈", "", "󰨞", "", "", "" };
-static const char *tags[] = { " ", " ", " ", " ", " " };
+// static const char *tags[] = { " ", " ", " ", " ", " " };
+
+static const char *tags[] = {
+    " ", // 1 Terminal
+    " ", // 2 Web
+    " ", // 3 Code
+    " ", // 4 Docs
+    " ", // 5 System / Tools
+    " ", // 6 Media
+    " ", // 7 Chat / Comm
+};
+
 static const Rule  rules[] = {
     /* xprop(1):
      *	WM_CLASS(STRING) = instance, class
      *	WM_NAME(STRING) = title
      */
     /* class      instance    title       tags mask     isfloating   monitor */
-    {"Google-chrome", NULL, NULL, 1 << 1, 0, -1},
-    {"Code", NULL, NULL, 1 << 2, 0, -1},
-    {"qqmusic", NULL, NULL, 1 << 4, 0, -1},
-    {"QQ", NULL, NULL, 1 << 4, 1, -1},
-    {"wechat", NULL, NULL, 1 << 4, 1, -1},
+    // {"Google-chrome", NULL, NULL, 1 << 1, 0, -1},
+    // {"Code", NULL, NULL, 1 << 2, 0, -1},
+    {"qqmusic", NULL, NULL, 1 << 5, 0, -1},
+    {"QQ", NULL, NULL, 1 << 6, 0, -1},
+    {"wechat", NULL, NULL, 1 << 6, 0, -1},
     {"obsidian", NULL, NULL, 1 << 3, 0, -1},
 };
 
