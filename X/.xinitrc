@@ -64,10 +64,16 @@ sleep 60
 done &
 
 
+WALLPAPER_DIR=~/Pictures/Wallpapers
+
 while true; do
-	feh --bg-fill --randomize ~/Pictures/Wallpapers/*
-sleep 300
+    WALLPAPER_PATH=$(find "$WALLPAPER_DIR" -type f | shuf -n 1)
+    if [ -n "$WALLPAPER_PATH" ]; then
+        feh --bg-fill "$WALLPAPER_PATH"
+    fi
+    sleep 1800
 done &
+
 
 # pomodoro
 ~/pomodoro/pom_status.sh &
@@ -81,5 +87,6 @@ xset -dpms
 
 # autostart
 picom -b
+
 
 exec dwm

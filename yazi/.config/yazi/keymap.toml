@@ -1,3 +1,10 @@
+
+[[mgr.prepend_keymap]]
+on = [ "<C-n>" ]
+run = '''
+    shell 'dragon -x -i -T "$1"' --confirm
+''' 
+
 # what size
 [[mgr.prepend_keymap]]
 on = [ "^", "s" ]

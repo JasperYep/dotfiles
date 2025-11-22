@@ -3,7 +3,8 @@ return {
     { "folke/todo-comments.nvim", event = "VimEnter", dependencies = { "nvim-lua/plenary.nvim" }, opts = { signs = false } },
 
     { -- Collection of various small independent plugins/modules
-        "echasnovski/mini.nvim",
+        -- "echasnovski/mini.nvim",
+        "nvim-mini/mini.nvim",
         -- 为了让 statusline 在启动时立即可见，设置 lazy=false 和高优先级
         lazy = false,
         priority = 1000,

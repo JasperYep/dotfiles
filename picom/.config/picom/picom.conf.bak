@@ -1,0 +1,101 @@
+# ########################## The death of my "Functional Aesthetic Minimalism"
+# # 后端选择
+# backend = "glx"
+# vsync = true;
+#
+#
+# unredir-if-possible = true; # 全屏应用（如游戏）直接绕过混成器，提升帧数。
+# unredir-if-possible-exclude = [
+#     "class_g = 'Google-chrome' && _NET_WM_STATE@:a = 'FULLSCREEN'"
+# ];
+#
+# # 阴影参数
+# shadow = true;
+# shadow-radius = 16;         # 阴影模糊半径，越大越模糊
+# shadow-opacity = 0.4;      # 阴影不透明度
+# shadow-offset-x = -8;      # 阴影 X 轴偏移
+# shadow-offset-y = -6;      # 阴影 Y 轴偏移
+#
+# # 排除规则 (非常重要！)
+# # 不希望给桌面背景、Dock 栏或特殊窗口添加阴影
+# shadow-exclude = [
+#     "name = 'Notification'",           # 排除名为 Notification 的窗口
+#     "class_g = 'flameshot'", 
+#     "class_g = 'fcitx'",                
+#     "class_g = 'wemeetapp'",           
+#     "class_g = 'Google-chrome'",                # 排除 slop (截图工具)
+#     "_NET_WM_WINDOW_TYPE@:a = 'MENU'", # 排除菜单
+#     "window_type = 'menu'",
+#     "window_type = 'dropdown_menu'",
+#     "window_type = 'popup_menu'",
+#     "_NET_WM_STATE@:a = 'FULLSCREEN'", # 排除全屏窗口
+#     "_GTK_FRAME_EXTENTS@:c"  
+# ];
+#
+#
+# # 全局开关
+# fading = true;
+#
+# # 淡入淡出参数
+# fade-delta = 3;              # 淡入淡出的速度（步长），越小越慢
+# fade-in-step = 0.028;         # 淡入时的透明度变化步长
+# fade-out-step = 0.03;        # 淡出时的透明度变化步长
+# # 排除规则
+# fade-exclude = [ ];
+#
+# # 透明
+# inactive-opacity = 0.72;      # 非活动窗口的透明度
+# active-opacity = 0.92;        # 活动窗口的透明度
+# frame-opacity = 0.6;         # 窗口边框的透明度
+# inactive-opacity-override = true; # 强制应用非活动窗口透明度
+#
+# opacity-rule = [
+#     "100:class_g = 'Google-chrome'",  # Chrome 不透明
+#     "100:class_g = 'Firefox'",        # Firefox 不透明
+#     "100:class_g = 'mpv'",            # 视频播放器不透明
+#     # "100:class_g = 'vlc'",            
+#     "100:class_g = 'sxiv'",      # 图片查看器不透明(根据你用的软件修改)
+#     "100:class_g = 'feh'",            # feh 查看图片时不透明
+#     "100:_NET_WM_STATE@[0]:32a = '_NET_WM_STATE_FULLSCREEN'",
+#     "0:_NET_WM_STATE@:32c *= '_NET_WM_STATE_HIDDEN'",   # 最小化时淡出
+# ];
+# # 排除规则
+# opacity-exclude = [
+#     "class_g = 'flameshot'",      # 截图工具必须完全不透明
+#     "class_g = 'slop'",           # slop（如果flameshot依赖它）也需要排除
+#     "_GTK_FRAME_EXTENTS@:c",       # 同样，排除 GTK CSD
+#     "class_g = 'xterm'"      # 排除 xterm
+#
+#     # 排除 DWM 的状态栏
+#     # "class_g = 'dwm'", 
+#     # "name = 'bar'"
+# ];
+#
+#
+# # 全局开关
+# blur = {
+#   method = "dual_kawase";     # 模糊算法，可选: "gaussian", "box", "kernel", "dual_kawase"
+#                               # dual_kawase 性能最好，效果也很好
+#   strength = 6;               # 模糊强度
+#   background = true;          # 模糊窗口背后的背景
+#   background-frame = true;    # 模糊窗口边框背后的背景
+#   background-fixed = false;   # 模糊固定背景
+# };
+#
+# # 排除规则
+# # 绝对要排除全屏窗口，否则性能灾难
+# blur-background-exclude = [
+#     "window_type = 'dock'",
+#     "window_type = 'desktop'",
+#     "_NET_WM_STATE@:a = 'FULLSCREEN'",
+#     "window_type = 'menu'",
+#     "window_type = 'dropdown_menu'",
+#     "window_type = 'popup_menu'",
+#     "class_g = 'flameshot'",
+#     "_GTK_FRAME_EXTENTS@:c"
+# ];
+#
+#
+# # 检测窗口圆角，用于优化阴影和模糊的形状
+# detect-client-opacity = true;
+# detect-client-leader = true;
