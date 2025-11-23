@@ -52,17 +52,16 @@ fi
 # slstatus &
 # status
 while true; do
-	WEEK_NUM=$(date '+%V') # %V 是 ISO 8601 标准的周数
-	if [ $((WEEK_NUM % 2)) -eq 1 ]; then
-	    WEEK_TAG="I"
-	else
-	    WEEK_TAG="II"
-	fi
+    WEEK_NUM=$(date '+%V') # %V 是 ISO 8601 标准的周数
+    if [ $((WEEK_NUM % 2)) -eq 1 ]; then
+        WEEK_TAG="I"
+    else
+        WEEK_TAG="II"
+    fi
 
-	xsetroot -name "$(date '+%Y-%m-%d %H:%M')  $WEEK_TAG"
-sleep 60
+    xsetroot -name "$(date '+%Y-%m-%d %H:%M')  $WEEK_TAG"
+    sleep 60
 done &
-
 
 WALLPAPER_DIR=~/Pictures/Wallpapers
 
@@ -74,9 +73,8 @@ while true; do
     sleep 1800
 done &
 
-
-# pomodoro
-~/pomodoro/pom_status.sh &
+# # pomodoro
+# ~/pomodoro/pom_status.sh &
 
 fcitx5 &
 
@@ -87,6 +85,5 @@ xset -dpms
 
 # autostart
 picom -b
-
 
 exec dwm

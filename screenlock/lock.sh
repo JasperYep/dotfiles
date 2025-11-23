@@ -11,7 +11,7 @@ WEEKNUM=$(date +%V)
 SIZE=$([ $((WEEKNUM % 2)) -eq 1 ] && echo "I" || echo "II")
 
 i3lock \
-    --image=/home/jasper/Pictures/lockscreen_bg.jpg \
+    --image=/home/jasper/Pictures/lockscreen_bg.png \
     \
     --insidever-color=$BLANK \
     --ringver-color=$BLANK \
