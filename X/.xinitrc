@@ -85,5 +85,7 @@ xset -dpms
 
 # autostart
 picom -b
+# GNOME 的认证代理
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 
 exec dwm

@@ -183,9 +183,9 @@ bindkey '^g' lazygit_widget_1
 
 # use xdg-open 
 alias open='(){ xdg-open "$@" > /dev/null 2>&1 & }'
-
+alias op='find ~ -type f -not -path "*/.*" -print0 | fzf --read0 --reverse --height 40% | xargs -0 -r -n1 xdg-open >/dev/null 2>&1'
 # fzf
-source $HOME/fzf.zsh && export FZF_CTRL_T_COMMAND="find $HOME -name '.Trash' -prune -o -path '$HOME/.local/share/Trash' -prune -o -path '$HOME/.vscode-server' -prune -o -path '$HOME/.cache' -prune -o -path '$HOME/.vscode' -prune -o -type f -print 2>/dev/null"
+source $HOME/dotfiles/zsh/fzf.zsh && export FZF_CTRL_T_COMMAND="find $HOME -name '.Trash' -prune -o -path '$HOME/.wine' -prune  -o -path '$HOME/.local/share/Trash' -prune -o -path '$HOME/.vscode-server' -prune -o -path '$HOME/.cache' -prune -o -path '$HOME/.vscode' -prune -o -type f -print 2>/dev/null"
 #
 # 载入环境变量配置
 . "$HOME/.local/bin/env"
@@ -195,3 +195,19 @@ export PATH=$PATH:/home/jasper/liteos/arm-gnu-toolchain-14.3.rel1-x86_64-arm-non
 [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
 alias cblue="bluetoothctl connect 1C:7A:43:82:5A:B3"
+alias k="kudo"
+alias s="fastfetch"
+
+# pnpm
+export PNPM_HOME="/home/jasper/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+
+
+export WASMTIME_HOME="$HOME/.wasmtime"
+
+export PATH="$WASMTIME_HOME/bin:$PATH"

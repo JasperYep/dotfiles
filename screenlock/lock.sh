@@ -1,8 +1,10 @@
 #!/bin/sh
 
 BLANK='#00000000'
-TEXT='#ffffffee'
-SUBTEXT='#ffffffaa'
+TEXT='#000000cc'
+SUBTEXT='#000000aa'
+# TEXT='#ffffffee'
+# SUBTEXT='#ffffffaa'
 SUCCESS='#ffffffdd'
 ERROR='#ff5c5cff'
 
