@@ -1,16 +1,14 @@
 require("full-border"):setup()
 require("bunny"):setup({
 	hops = {
-		{ key = "/", path = "/" },
-		{ key = "t", path = "~/todo/" },
+		{ key = "c", path = "~/code" },
+		{ key = "~", path = "~", desc = "Home" },
+		{ key = "d", path = "~/Desktop", desc = "Desktop" },
+		{ key = "D", path = "~/Documents", desc = "Documents" },
+		{ key = { "l" }, path = "~/Downloads/", desc = "Downloads" },
+		{ key = { "s" }, path = "~/code/slides/workspace", desc = "Slides Workspace" },
 		{ key = "u", path = "/run/media/jasper", desc = "USB" },
-		{ key = { "c", "y" }, path = "~/.config/yazi", desc = "yazi Config files" },
-		{ key = { "c", "i" }, path = "~/.config/i3/", desc = "i3 Config files" },
-		{ key = { "c", "n" }, path = "~/.config/nvim/", desc = "Nvim Config files" },
-		{ key = { "l", "s" }, path = "~/.local/share", desc = "Local share" },
-		{ key = { "l", "b" }, path = "~/.local/bin", desc = "Local bin" },
-		{ key = { "l", "t" }, path = "~/.local/state", desc = "Local state" },
-		-- key and path attributes are required, desc is optional
+		{ key = { "y" }, path = "~/dotfiles/yazi/.config/yazi/", desc = "yazi config" },
 	},
 	desc_strategy = "path", -- If desc isn't present, use "path" or "filename", default is "path"
 	ephemeral = false, -- Enable ephemeral hops, default is true

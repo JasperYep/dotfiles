@@ -210,4 +210,16 @@ esac
 
 export WASMTIME_HOME="$HOME/.wasmtime"
 
+export ASTUDIO="$HOME/bin/android-studio/bin"
+
+export UV_CACHE_DIR="/mnt/data/cache/uv"
+
+export PATH="$ASTUDIO:$PATH"
+
 export PATH="$WASMTIME_HOME/bin:$PATH"
+export CAPACITOR_ANDROID_STUDIO_PATH=~/bin/android-studio/bin/studio.sh
+
+trans() {
+  pdf2zh "$1" -s zhipu -t 8 -o ~/Desktop/ --prompt /home/jasper/bin/prompt.txt
+}
+

@@ -36,7 +36,7 @@ static const char *tags[] = {
     " ", // 7 Chat / Comm
 };
 
-static const Rule  rules[] = {
+static const Rule rules[] = {
     /* xprop(1):
      *	WM_CLASS(STRING) = instance, class
      *	WM_NAME(STRING) = title
@@ -48,6 +48,9 @@ static const Rule  rules[] = {
     {"QQ", NULL, NULL, 1 << 6, 0, -1},
     {"wechat", NULL, NULL, 1 << 6, 0, -1},
     {"obsidian", NULL, NULL, 1 << 3, 0, -1},
+    {"Zotero", NULL, NULL, 1 << 3, 0, -1},
+    {"Zenity", NULL, NULL, 0, 1, -1},
+    {"xfreerdp", NULL, NULL, 0, 0, -1},
 };
 
 /* layout(s) */
