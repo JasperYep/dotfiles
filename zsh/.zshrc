@@ -184,8 +184,15 @@ bindkey '^g' lazygit_widget_1
 # use xdg-open 
 alias open='(){ xdg-open "$@" > /dev/null 2>&1 & }'
 alias op='find ~ -type f -not -path "*/.*" -print0 | fzf --read0 --reverse --height 40% | xargs -0 -r -n1 xdg-open >/dev/null 2>&1'
+
 # fzf
-source $HOME/dotfiles/zsh/fzf.zsh && export FZF_CTRL_T_COMMAND="find $HOME -name '.Trash' -prune -o -path '$HOME/.wine' -prune  -o -path '$HOME/.local/share/Trash' -prune -o -path '$HOME/.vscode-server' -prune -o -path '$HOME/.cache' -prune -o -path '$HOME/.vscode' -prune -o -type f -print 2>/dev/null"
+source $HOME/dotfiles/zsh/fzf.zsh 
+# source $HOME/dotfiles/zsh/fzf.zsh && export FZF_CTRL_T_COMMAND="find / -name '.Trash' -prune -o -path '$HOME/.wine' -prune  -o -path '$HOME/.local/share/Trash' -prune -o -path '$HOME/.vscode-server' -prune -o -path '$HOME/.cache' -prune -o -path '$HOME/.vscode' -prune -o -type f -print 2>/dev/null"
+
+export FZF_CTRL_T_COMMAND="
+fd -t f . /home/jasper /mnt/data
+"
+
 #
 # 载入环境变量配置
 . "$HOME/.local/bin/env"
