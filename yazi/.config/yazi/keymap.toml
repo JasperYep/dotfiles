@@ -19,7 +19,7 @@ run = "plugin mount"
 # copy selected files to the system clipboard
 [[mgr.prepend_keymap]]
 on  = "y"
-run = [ 'shell -- echo "$@" | xclip -i -selection clipboard -t text/uri-list', "yank" ]
+run = [ 'shell --orphan -- echo "$@" | wl-copy -t text/uri-list', "yank" ]
 # open current folder
 [[mgr.prepend_keymap]]
 on   = "S"
@@ -85,3 +85,8 @@ run = "plugin bunny"
 desc = "Start bunny.yazi fuzzy search"
 on = "'"
 run = "plugin bunny fuzzy"
+
+[[mgr.prepend_keymap]]
+on   = [ "G" ]
+run  = 'shell "nemo . >/dev/null 2>&1 &" --orphan'
+desc = "Open current directory in Nemo (Silent)"

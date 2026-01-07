@@ -1,42 +1,42 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-enter"
-rev = "d7588f6"
+rev = "03cdd4b"
 hash = "56fdabc96fc1f4d53c96eb884b02a5be"
 
 [[plugin.deps]]
 use = "KKV9/compress"
-rev = "c264639"
-hash = "e17c11b605d989568a1d1741ca17c584"
+rev = "f9208fe"
+hash = "45791332b981cefd629e31c8bc1df4dd"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:full-border"
-rev = "d7588f6"
+rev = "03cdd4b"
 hash = "3996fc74044bc44144b323686f887e1"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:jump-to-char"
-rev = "d7588f6"
-hash = "d2f04875bbd4ed3dd5696e8c4b094fde"
+rev = "03cdd4b"
+hash = "ce67445ebb1bf3d97b8e44f50904b2c5"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mount"
-rev = "d1c8baa"
-hash = "435a2af56ecfb3d05755fd5e24977d8b"
+rev = "03cdd4b"
+hash = "e2d4bfccf31e5ab05f46fee4797c5215"
 
 [[plugin.deps]]
 use = "pirafrank/what-size"
-rev = "d896656"
-hash = "62251f94eb67648d42cdfcfb8be0fad2"
+rev = "6fd634a"
+hash = "c740548feff5d3523e4633363541fcd1"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:smart-paste"
-rev = "d1c8baa"
+rev = "03cdd4b"
 hash = "75fd60b2df7115e0a6ca31a6a804d320"
 
 [[plugin.deps]]
 use = "stelcodes/bunny"
-rev = "bd8a767"
-hash = "5dded0f0f40142f99dda23aedd76b2bf"
+rev = "7137a44"
+hash = "58bfa473bcac8574400e573787954512"
 
 [flavor]
 deps = []

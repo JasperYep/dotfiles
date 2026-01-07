@@ -1,0 +1,143 @@
+@import "latte.css";
+
+* {
+    font-family: "JetBrainsMono Nerd Font", "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 0;
+}
+
+window#waybar {
+    background-color: transparent;
+}
+
+/* 1. Arch 信仰标 - 最左侧 */
+#custom-arch {
+    color: @base;
+    background-color: @blue; /* 经典的 Arch 蓝 */
+    margin: 4px 4px;
+    padding: 0 12px;
+    border-radius: 15px; /* 完整的胶囊圆角 */
+    font-size: 16px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1); /* 浮起感 */
+}
+
+/* 2. 工作区 - 保持第一版的质感 */
+#workspaces {
+    background-color: @surface0;
+    margin: 4px 4px;
+    padding: 0 6px;
+    border-radius: 15px;
+    color: @text;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: @subtext0;
+    background: transparent;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+#workspaces button.active {
+    color: @blue;
+    background-color: rgba(30, 102, 245, 0.15); /* 激活时淡淡的蓝光 */
+    min-width: 30px; 
+}
+
+#workspaces button:hover {
+    color: @text;
+    background-color: @surface1;
+}
+
+
+/* 定义闪烁动画 */
+@keyframes blink {
+    to {
+        background-color: rgba(229, 152, 155, 0.2); /* 浅珊瑚色，透明度低 */
+        color: #e5989b;
+    }
+}
+
+#workspaces button.urgent {
+    background-color: rgba(229, 152, 155, 0.8); /* 初始警示色 */
+    color: white;
+    /* 绑定动画：1秒切换一次，无限循环 */
+    animation-name: blink;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+/* 3. 中间窗口标题 */
+#window {
+    color: @text;
+    background-color: @mantle; /* 比背景稍深，突出层次 */
+    margin: 4px 4px;
+    padding: 0 16px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+window#waybar.empty #window {
+    background-color: transparent;
+}
+
+/* 4. 右侧模块通用样式 - 糖果胶囊 */
+#cpu, #memory, #pulseaudio, #clock, #tray {
+    background-color: @surface0;
+    color: @text;
+    margin: 4px 3px;
+    padding: 0 12px;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+/* 让 CPU 和 Memory 看起来像连在一起，但又是独立的 */
+#cpu {
+    margin-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-right: 6px;
+    background-color: @base; /* 稍微亮一点 */
+}
+#memory {
+    margin-left: 0;
+    margin-right: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    /* padding-left: 6px; */
+    background-color: @base;
+}
+
+/* 音量 */
+#pulseaudio {
+    margin-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 6px;
+
+    color: @pink; /* 字体微粉 */
+    background-color: @base;
+}
+#pulseaudio.muted {
+    background-color: @red;
+    color: @base;
+}
+
+/* 时钟 - 最右侧强调 */
+#clock {
+    background-color: @blue;
+    color: @base;
+    margin-right: 10px; /* 离屏幕边缘远一点 */
+    font-weight: 800;
+}
+
+/* 托盘 */
+#tray {
+    background-color: @mantle;
+    padding: 0 10px;
+}

@@ -15,10 +15,17 @@ play = [
 	{ run = 'mpv "$@"', orphan = true, for = "unix" },
 ]
 edit = [
-	{ run = '$EDITOR "$@"', block = true, for = "unix" },
+	{ run = 'nvim "$@"', block = true, desc = "Edit with Neovim" }
 ]
 open = [
 	{ run = 'xdg-open "$@"', desc = "Open" },
 ]
 # ...
+
+
+[preview]
+image_filter = "lanczos3"
+image_quality = 90
+max_width = 1500
+max_height = 1500
 
