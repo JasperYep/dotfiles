@@ -88,5 +88,5 @@ run = "plugin bunny fuzzy"
 
 [[mgr.prepend_keymap]]
 on   = [ "G" ]
-run  = 'shell "nemo . >/dev/null 2>&1 &" --orphan'
+run  = 'shell "nautilus . >/dev/null 2>&1 &" --orphan'
 desc = "Open current directory in Nemo (Silent)"
