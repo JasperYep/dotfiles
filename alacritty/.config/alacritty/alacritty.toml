@@ -1,0 +1,100 @@
+# ==============================================================================
+# Alacritty Configuration (TOML format)
+# ==============================================================================
+
+[general]
+# 导入外部配色文件(可选)，这里直接写在下面减少文件数量
+import = []
+
+[env]
+TERM = "xterm-256color"
+
+[window]
+# 这种透明度配合 picom 的 blur 效果极佳，极具科幻感
+opacity = 0.98
+padding = { x = 10, y = 10 }
+dynamic_padding = true
+decorations = "None"  # 极简：不需要终端自带的边框
+startup_mode = "Maximized"
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[font]
+# 4K 下，如果 .Xresources 设置了 DPI=144，这里 size=11-12 即可
+# 如果觉得小，调整 size 到 14-15
+size = 12.0
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+# --- Nord Color Scheme (北极冰蓝风格，非常适合长时间阅读代码) ---
+[colors.primary]
+background = "#FAFAFA"  # 护眼浅灰白
+foreground = "#383A42"  # 深灰墨水色
+dim_foreground = "#A5ABB6"
+
+[colors.cursor]
+text = "#FAFAFA"
+cursor = "#528BFF"      # 蓝色光标，显眼
+
+[colors.selection]
+text = "CellForeground"
+background = "#E5E5E6"  # 浅灰高亮
+
+[colors.vi_mode_cursor]
+text = "#2E3440"
+cursor = "#D8DEE9"
+
+[colors.search]
+matches = { foreground = "CellBackground", background = "#88C0D0" }
+focused_match = { foreground = "CellBackground", background = "#D8DEE9" }
+
+[colors.normal]
+black   = "#383A42"
+red     = "#E45649"
+green   = "#50A14F"
+yellow  = "#C18401"
+blue    = "#4078F2"
+magenta = "#A626A4"
+cyan    = "#0184BC"
+white   = "#A0A1A7"
+
+[colors.bright]
+black   = "#4F525D"
+red     = "#DF6C75"
+green   = "#98C379"
+yellow  = "#E5C07B"
+blue    = "#61AFEF"
+magenta = "#C678DD"
+cyan    = "#56B6C2"
+white   = "#FFFFFF"
+
+[colors.dim]
+black = "#373e4d"
+red = "#94545d"
+green = "#809575"
+yellow = "#b29e75"
+blue = "#68809a"
+magenta = "#8c738c"
+cyan = "#6d96a5"
+white = "#aeb3bb"
+
+# --- 键盘微调 ---
+[keyboard]
+# 允许使用 Alt 键作为 Meta 键（这对 Vim 用户很重要）
+bindings = [
+    { key = "Paste", action = "Paste" },
+    { key = "Copy", action = "Copy" },
+    { key = "N", mods = "Control|Shift", action = "SpawnNewInstance" }
+]

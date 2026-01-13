@@ -1,0 +1,30 @@
+general {
+    colors = true
+    color_good = "#A3BE8C"
+    color_degraded = "#EBCB8B"
+    color_bad = "#BF616A"
+    interval = 5
+}
+
+order += "disk /"
+order += "memory"
+order += "cpu_usage"
+order += "tztime local"
+
+disk "/" {
+    format = " SSD: %avail "
+}
+
+memory {
+    format = " RAM: %used / %total "
+    threshold_degraded = "10%"
+    format_degraded = "MEMORY < %available"
+}
+
+cpu_usage {
+    format = " CPU: %usage "
+}
+
+tztime local {
+    format = " %Y-%m-%d %H:%M "
+}
