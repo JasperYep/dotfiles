@@ -1,0 +1,43 @@
+#!/bin/bash
+
+VM_NAME="win10-office"
+VM_IP="192.168.122.67"
+USER="jasper"
+PASS="123456"
+VIRSH_CMD="virsh --connect qemu:///system"
+
+# 1. 如果虚拟机未运行则启动
+if ! $VIRSH_CMD list --name | grep -q "^${VM_NAME}$"; then
+  echo "🚀 Starting VM: $VM_NAME..."
+  $VIRSH_CMD start "$VM_NAME"
+fi
+
+# 2. 等待网络和 RDP 服务就绪
+echo -n "⏳ Waiting for VM ($VM_IP) to be ready..."
+for i in {1..60}; do
+  # # 优先使用 nc (netcat) 检测 RDP 端口 (3389) 是否开放
+  # if nc -z -w 1 $VM_IP 3389 &>/dev/null; then
+    # 优先使用 nc (netcat) 检测 RDP 端口 (3389) 是否开放
+    if ping -c 1 -W 1 $VM_IP &>/dev/null; then
+    echo " ✅ Ready!"
+    break
+  fi
+
+  echo -n "."
+  sleep 2
+
+  if [ $i -eq 60 ]; then
+    echo " ❌ Timeout: VM RDP service is not reachable."
+    exit 1
+  fi
+done
+
+# 3. 启动远程桌面
+xfreerdp3 /v:$VM_IP /u:$USER /p:$PASS \
+/network:lan /gfx:avc420:on /gdi:hw /bpp:32 \
+/audio-mode:1 /sound:sys:pulse /microphone:sys:pulse \
+/size:95% /scale:180 /dynamic-resolution \
+/frame-ack:0 /compression-level:0 \
+-wallpaper -themes -fonts -menu-anims -decorations \
++clipboard +window-drag +auto-request-control \
+> /dev/null 2>&1 &

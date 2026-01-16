@@ -38,10 +38,9 @@ client.background       #FFFFFF
 
 # --- 3. 核心快捷键 ---
 # 启动终端 (Alacritty)
-bindsym $mod+Return exec alacritty
+bindsym $mod+Return exec kitty
 bindsym $mod+Tab workspace back_and_forth
-# 启动程序启动器 (dmenu, 顶部显示, 颜色适配)
-bindsym $mod+space exec --no-startup-id dmenu_run -fn 'JetBrainsMono Nerd Font-12' -nb '#2E3440' -nf '#D8DEE9' -sb '#81A1C1' -sf '#2E3440'
+bindsym $mod+space exec --no-startup-id "rofi -show drun -matching fuzzy -dpi 1 -font 'JetBrainsMono Nerd Font 12' -theme-str 'window { width: 30%; }'"
 
 # 关闭窗口
 bindsym $mod+Shift+q kill
@@ -74,12 +73,13 @@ bindsym $mod+Shift+space floating toggle
 # bindsym $mod+space focus mode_toggle
 
 # --- 6. 工作区 (Workspaces) ---
-set $ws1 "1: Term"
-set $ws2 "2: Web"
-set $ws3 "3: Code"
-set $ws4 "4: Read"
-set $ws5 "5: Chat"
-set $ws6 "6: Misc"
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws0 "X"
 
 # 切换工作区
 bindsym $mod+1 workspace $ws1
@@ -88,6 +88,7 @@ bindsym $mod+3 workspace $ws3
 bindsym $mod+4 workspace $ws4
 bindsym $mod+5 workspace $ws5
 bindsym $mod+6 workspace $ws6
+bindsym $mod+0 workspace $ws0
 
 # 移动窗口到工作区
 bindsym $mod+Shift+1 move container to workspace $ws1
@@ -96,6 +97,7 @@ bindsym $mod+Shift+3 move container to workspace $ws3
 bindsym $mod+Shift+4 move container to workspace $ws4
 bindsym $mod+Shift+5 move container to workspace $ws5
 bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+0 move container to workspace $ws0
 
 # --- 7. 系统管理快捷键 ---
 # 重载配置
@@ -120,8 +122,6 @@ exec_always --no-startup-id picom -b
 exec_always --no-startup-id feh --bg-fill ~/Pictures/wallpaper.jpg
 # 输入法
 exec_always --no-startup-id fcitx5
-# 锁屏 (配合 xss-lock)
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock -c 2E3440 --nofork
 
 # 底部状态栏
 bar {
@@ -145,9 +145,11 @@ bar {
 
 
 # 禁用休眠/黑屏
-exec --no-startup-id xset s off
-exec --no-startup-id xset s noblank
-exec --no-startup-id xset -dpms
+exec_always xset s off
+exec_always xset s noblank
+exec_always xset -dpms
+# redshift
+exec --no-startup-id redshift
 
 # Window rules
 ## WPS
@@ -155,6 +157,15 @@ for_window [class="wps" title="WPS Office"] floating disable
 for_window [class="wps" title="^$"] floating enable, resize set 1100 700, move position center
 for_window [class="wps" title="^wpsoffice$"] floating enable, resize set 1100 700, move position center
 
-# file chooser
+## file chooser
 for_window [window_role="GtkFileChooserDialog"] floating enable, resize set 1100 700, move position center
 for_window [window_type="dialog"] floating enable, move position center
+
+
+# 自定义App快捷键
+bindsym $mod+Shift+w exec --no-startup-id wihotspot
+bindsym $mod+Shift+m exec --no-startup-id i3lock-fancy-rapid 10 3
+bindsym $mod+Shift+s exec --no-startup-id maim -s | xclip -selection clipboard -t image/png
+# CapsLock切换中英 
+#exec_always --no-startup-id setxkbmap -option caps:none
+exec_always --no-startup-id xmodmap -e "keycode 66 = F13"
