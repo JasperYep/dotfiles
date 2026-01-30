@@ -29,3 +29,44 @@ export FZF_CTRL_R_OPTS="--sort --exact"
 alias vi='/usr/bin/vim'
 alias vim='nvim'
 alias cblue='bluetoothctl connect 1C:7A:43:82:5A:B3'
+
+# Keep your existing local env loader
+[ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+# --- Begin Tools Config ---
+export TOOLS="$HOME/tools"
+
+# 1. Android
+export ANDROID_HOME="$TOOLS/Android/Sdk"
+export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH"
+
+# 2. CodeQL
+export CODEQL_HOME="$TOOLS/codeql"
+export PATH="$CODEQL_HOME:$PATH"
+
+# 3. Flutter
+export PATH="$TOOLS/flutter/bin:$PATH"
+
+# 4. Other
+export CHROME_EXECUTABLE=/usr/bin/google-chrome-stable
+
+# --- End Tools Config ---
+
+
+
+
+# # >>> conda initialize >>>
+# # !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/home/jasper/tools/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#     eval "$__conda_setup"
+# else
+#     if [ -f "/home/jasper/tools/miniconda3/etc/profile.d/conda.sh" ]; then
+#         . "/home/jasper/tools/miniconda3/etc/profile.d/conda.sh"
+#     else
+#         export PATH="/home/jasper/tools/miniconda3/bin:$PATH"
+#     fi
+# fi
+# unset __conda_setup
+# # <<< conda initialize <<<
+#

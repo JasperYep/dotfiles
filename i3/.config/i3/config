@@ -40,6 +40,7 @@ client.background       #FFFFFF
 # 启动终端 (Alacritty)
 bindsym $mod+Return exec kitty
 bindsym $mod+Tab workspace back_and_forth
+bindsym $mod+w exec --no-startup-id google-chrome-stable
 bindsym $mod+space exec --no-startup-id "rofi -show drun -matching fuzzy -dpi 1 -font 'JetBrainsMono Nerd Font 12' -theme-str 'window { width: 30%; }'"
 
 # 关闭窗口
@@ -58,12 +59,22 @@ bindsym $mod+Shift+j move down
 bindsym $mod+Shift+k move up
 bindsym $mod+Shift+l move right
 
+# Resize
+mode "resize" {
+        bindsym h resize shrink width 10 px or 10 ppt
+        bindsym j resize grow height 10 px or 10 ppt
+        bindsym k resize shrink height 10 px or 10 ppt
+        bindsym l resize grow width 10 px or 10 ppt
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
 # --- 5. 布局控制 ---
 # 分割模式 (水平/垂直)
 bindsym $mod+b split h
 bindsym $mod+v split v
-
-# 全屏切换
 bindsym $mod+f fullscreen toggle
 
 # 浮动/平铺切换
@@ -71,6 +82,13 @@ bindsym $mod+Shift+space floating toggle
 
 # 在浮动和铺满之间切换焦点
 # bindsym $mod+space focus mode_toggle
+
+
+# --- Scratchpad (隐藏挂起窗口，非常适合终端/音乐) ---
+# 将当前窗口送入“抽屉”
+bindsym $mod+Shift+minus move scratchpad
+# 召唤“抽屉”窗口
+bindsym $mod+minus scratchpad show
 
 # --- 6. 工作区 (Workspaces) ---
 set $ws1 "1"
@@ -88,7 +106,6 @@ bindsym $mod+3 workspace $ws3
 bindsym $mod+4 workspace $ws4
 bindsym $mod+5 workspace $ws5
 bindsym $mod+6 workspace $ws6
-bindsym $mod+0 workspace $ws0
 
 # 移动窗口到工作区
 bindsym $mod+Shift+1 move container to workspace $ws1
@@ -97,7 +114,6 @@ bindsym $mod+Shift+3 move container to workspace $ws3
 bindsym $mod+Shift+4 move container to workspace $ws4
 bindsym $mod+Shift+5 move container to workspace $ws5
 bindsym $mod+Shift+6 move container to workspace $ws6
-bindsym $mod+Shift+0 move container to workspace $ws0
 
 # --- 7. 系统管理快捷键 ---
 # 重载配置
@@ -150,7 +166,7 @@ exec_always xset s noblank
 exec_always xset -dpms
 # redshift
 exec --no-startup-id redshift
-
+exec --no-startup-id dunst
 # Window rules
 ## WPS
 for_window [class="wps" title="WPS Office"] floating disable
@@ -161,11 +177,22 @@ for_window [class="wps" title="^wpsoffice$"] floating enable, resize set 1100 70
 for_window [window_role="GtkFileChooserDialog"] floating enable, resize set 1100 700, move position center
 for_window [window_type="dialog"] floating enable, move position center
 
-
 # 自定义App快捷键
+bindsym $mod+e exec --no-startup-id thunar
 bindsym $mod+Shift+w exec --no-startup-id wihotspot
 bindsym $mod+Shift+m exec --no-startup-id i3lock-fancy-rapid 10 3
-bindsym $mod+Shift+s exec --no-startup-id maim -s | xclip -selection clipboard -t image/png
+
+#screen shot
+bindsym $mod+shift+s exec --no-startup-id maim -s | xclip -selection clipboard -t image/png
+for_window [class="pinshot"] floating enable, sticky enable, border pixel 0
+bindsym $mod+Shift+a exec --no-startup-id ~/.config/i3/pinshot.sh
+
+
+# search words
+bindsym $mod+t exec --no-startup-id ~/.config/i3/dict.sh
+
+# 强制 Zenity 弹窗浮动并在屏幕中央（针对 i3 布局优化）
+for_window [class="Zenity"] floating enable, move position center
 # CapsLock切换中英 
 #exec_always --no-startup-id setxkbmap -option caps:none
 exec_always --no-startup-id xmodmap -e "keycode 66 = F13"
