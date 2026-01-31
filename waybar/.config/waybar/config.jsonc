@@ -12,10 +12,10 @@
     
     "modules-left": [
         "custom/arch",        // 新增：Arch 信仰标
-      "hyprland/workspaces"
+      "niri/workspaces"
     ],
     "modules-center": [
-      "hyprland/window"
+      "niri/window"
     ],
     "modules-right": [
         "tray",
@@ -44,11 +44,9 @@
         }
     },
 
-    "hyprland/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "on-click": "activate",
+    "niri/workspaces": {
         "format": "{icon}",
+        "on-click": "activate",
         "format-icons": {
             "1": "",
             "2": "",
@@ -59,10 +57,30 @@
             "7": "󱗆",
             "8": "󱓡",
             "9": "󰚀",
+            "active": "",    // 当前工作区（实心圆）
             "urgent": "",
-            "default": "",
+            "default": ""    // 其他工作区（空心圆，如果有的话）
         }
     },
+    // "hyprland/workspaces": {
+    //     "disable-scroll": true,
+    //     "all-outputs": true,
+    //     "on-click": "activate",
+    //     "format": "{icon}",
+    //     "format-icons": {
+    //         "1": "",
+    //         "2": "",
+    //         "3": "󰨞",
+    //         "4": "󰦨",
+    //         "5": "󰐊",
+    //         "6": "󱔗",
+    //         "7": "󱗆",
+    //         "8": "󱓡",
+    //         "9": "󰚀",
+    //         "urgent": "",
+    //         "default": "",
+    //     }
+    // },
 
     // --- 硬件状态 (极简版) ---
     "cpu": {

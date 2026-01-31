@@ -1,0 +1,147 @@
+input {
+    keyboard {
+        xkb {
+            layout "us"
+            // 如果你想交换 CapsLock 和 Ctrl (对 Vimmer 很重要)，解开下面这行
+            // options "ctrl:nocaps"
+        }
+    }
+
+    // 禁用鼠标加速，虽然你少用，但保持默认线性手感最好
+    mouse {
+        accel-profile "flat"
+    }
+
+    mod-key "Alt"
+}
+
+// --- 显示器 ---
+output "DP-3" { // 请替换为你台式机的输出名称 (运行 niri msg outputs 查看，通常是 HDMI-A-1 或 DP-1)
+    scale 2    // 4K 24寸推荐 1.5 或 1.75
+    mode "3840x2160@60"
+    position x=0 y=0
+}
+
+// --- 布局逻辑 (无鼠标优化的关键) ---
+layout {
+    gaps 8 // 紧凑布局
+    
+    // [键盘流核心] 
+    // "on-overflow" 保证你用键盘快速移动光标时，屏幕会像卷轴一样自然滚动
+    // center-focused-column "on-overflow"
+    center-focused-column "never"
+
+    // 三种预设宽度，完全不需要鼠标去拖动边缘
+    preset-column-widths {
+        proportion 0.5      // 1/2 屏宽 (默认)
+        proportion 0.66667  // 2/3 屏宽 (黄金比例，适合主程序)
+        proportion 1.0      // 全宽 (伪全屏，专注模式)
+    }
+
+    default-column-width { proportion 0.5; }
+
+    // 高亮当前窗口，键盘操作时需要一眼看到焦点在哪
+    focus-ring {
+        width 4
+        active-color "#7fc8ff"
+        inactive-color "#444444"
+    }
+    border { off; }
+
+    shadow {
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0007"
+    }
+}
+
+// --- 基础启动项 ---
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+// 建议加上剪贴板管理，纯键盘操作离不开它
+spawn-at-startup "wl-paste --watch cliphist store" 
+spawn-at-startup "swaybg" "-m" "fill" "-i" "/home/jasper/Pictures/wallpaper.jpg"
+// --- 截图 ---
+screenshot-path "~/Pictures/Screenshots/%Y-%m-%d_%H-%M-%S.png"
+
+// --- 动画 ---
+animations {
+    // slowdown 0.9 // 稍微加快动画，键盘操作响应感更强
+}
+
+// --- 快捷键 (纯键盘工作流) ---
+binds {
+    // === 1. 核心应用 ===
+    // 既然你是 Mac 习惯，Alt+Space 启动器是肌肉记忆
+    Mod+Space  { spawn-sh "fuzzel"; } 
+    Mod+Return { spawn "kitty"; }
+    Mod+Ctrl+L { spawn "hyprlock"; }
+    // Mac 风格关闭窗口 (Cmd+Q -> Alt+Q)
+    Mod+Q repeat=false { close-window; } 
+    Mod+O repeat=false { toggle-overview; }
+
+    // 剪贴板历史 (需安装 cliphist)
+    Mod+V { spawn-sh "cliphist list | fuzzel --dmenu  | cliphist decode | wl-copy"; }
+
+    // === 2. 窗口导航 (Vim 风格 + 方向键) ===
+    // 建议主要用 HJKL，这样手指不离开主键区
+    Mod+H     { focus-column-left; }
+    Mod+J     { focus-window-down; }
+    Mod+K     { focus-window-up; }
+    Mod+L     { focus-column-right; }
+
+    // === 3. 窗口搬运 (不碰鼠标移动窗口) ===
+    Mod+Shift+H     { move-column-left; }
+    Mod+Shift+J     { move-window-down; }
+    Mod+Shift+K     { move-window-up; }
+    Mod+Shift+L     { move-column-right; }
+    
+    // 快速把当前窗口扔到最左边或最右边 (归档用)
+    Mod+Shift+I { move-column-to-first; }
+    Mod+Shift+A  { move-column-to-last; }
+
+    // === 4. 窗口形态控制 (替代鼠标拖拽) ===
+    // 切换宽度：1/2 -> 2/3 -> 1.0 循环
+    Mod+R { switch-preset-column-width; }
+    // 最大化/全屏
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+    
+    // [微调] 如果预设宽度不合适，用键盘微调宽度
+    Mod+Minus { set-column-width "-5%"; }
+    Mod+Equal { set-column-width "+5%"; }
+
+    // === 5. 堆叠操作 (窗口吞噬) ===
+    // 把右边的窗口“吸”到当前窗口下面，组成垂直堆叠
+    Mod+BracketLeft  { consume-window-into-column; }
+    // 把当前窗口下面那个“踢”到右边去，拆分堆叠
+    Mod+BracketRight { expel-window-from-column; }
+
+    // === 6. 工作区/标签页切换 ===
+    // 类似 Mac 的 Space 切换
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+
+    // 将窗口发送到指定工作区
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+
+    // === 7. 系统控制 ===
+    Mod+Shift+S { screenshot; }
+
+    Ctrl+Alt+Delete { quit; }
+    // Mod+Shift+P { power-off-monitors; }
+    
+    // 音量 (台式机一般有媒体键，如果没有可以绑定到 F区)
+    XF86AudioRaiseVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+"; }
+    XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"; }
+    XF86AudioMute        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+}
+
