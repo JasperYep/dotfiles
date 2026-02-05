@@ -4,6 +4,7 @@ input {
             layout "us"
             // 如果你想交换 CapsLock 和 Ctrl (对 Vimmer 很重要)，解开下面这行
             // options "ctrl:nocaps"
+            options "caps:ctrl_modifier"
         }
     }
 
@@ -16,8 +17,8 @@ input {
 }
 
 // --- 显示器 ---
-output "DP-3" { // 请替换为你台式机的输出名称 (运行 niri msg outputs 查看，通常是 HDMI-A-1 或 DP-1)
-    scale 2    // 4K 24寸推荐 1.5 或 1.75
+output "DP-1" { // 请替换为你台式机的输出名称 (运行 niri msg outputs 查看，通常是 HDMI-A-1 或 DP-1)
+    scale 2.0
     mode "3840x2160@60"
     position x=0 y=0
 }
@@ -28,8 +29,8 @@ layout {
     
     // [键盘流核心] 
     // "on-overflow" 保证你用键盘快速移动光标时，屏幕会像卷轴一样自然滚动
-    // center-focused-column "on-overflow"
-    center-focused-column "never"
+    center-focused-column "on-overflow"
+    // center-focused-column "never"
 
     // 三种预设宽度，完全不需要鼠标去拖动边缘
     preset-column-widths {
@@ -87,10 +88,11 @@ binds {
     // === 2. 窗口导航 (Vim 风格 + 方向键) ===
     // 建议主要用 HJKL，这样手指不离开主键区
     Mod+H     { focus-column-left; }
-    Mod+J     { focus-window-down; }
-    Mod+K     { focus-window-up; }
+    Mod+J     { focus-workspace-down; }
+    Mod+K     { focus-workspace-up; }
     Mod+L     { focus-column-right; }
-
+    // Mod+WheelScrollDown cooldown-ms=150 { focus-workspace-down; }
+    // Mod+WheelScrollUp   cooldown-ms=150 { focus-workspace-up; }
     // === 3. 窗口搬运 (不碰鼠标移动窗口) ===
     Mod+Shift+H     { move-column-left; }
     Mod+Shift+J     { move-window-down; }
@@ -144,4 +146,6 @@ binds {
     XF86AudioLowerVolume { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-"; }
     XF86AudioMute        { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
 }
-
+debug {
+    render-drm-device "/dev/dri/renderD128"
+}

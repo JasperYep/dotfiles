@@ -1,52 +1,44 @@
 {
     "layer": "top",
     "position": "top",
-    "mod": "dock",
+    "mode": "dock",
     "exclusive": true,
     "passthrough": false,
     "gtk-layer-shell": true,
-    "height": 0,
-    "margin-top": 6,  // 顶部留白，增加悬浮感
+    "height": 0, 
+    "margin-top": 2,
+    "margin-bottom": 2,
     "margin-left": 10,
     "margin-right": 10,
-    
+
     "modules-left": [
-        "custom/arch",        // 新增：Arch 信仰标
-      "niri/workspaces"
+        "custom/arch",
+        "hyprland/workspaces"
     ],
     "modules-center": [
-      "niri/window"
+        "hyprland/window"
     ],
     "modules-right": [
         "tray",
         "cpu",
-        // "memory",
+        "memory",
         "pulseaudio",
         "clock"
     ],
 
-    // --- 信仰 Logo ---
+    
+
     "custom/arch": {
-        "format": "  ",
+        "format": "",  
         "tooltip": false,
-        "on-click": "fuzzel" // 或 wlogout
+        "on-click": "wofi" 
     },
 
-    "hyprland/window": {
-        "format": "{}",
-        "max-length": 40,
-        "rewrite": {
-            "(.*) - Google Chrome": " $1",
-            "(.*) - Mozilla Firefox": "🌎 Firefox",
-            "(.*) - Visual Studio Code": "💙 VSCode",
-            "(.*) - Kitty": " Kitty",
-            "^$": " Arch Linux" // 空闲时显示
-        }
-    },
-
-    "niri/workspaces": {
-        "format": "{icon}",
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
         "on-click": "activate",
+        "format": "{icon}",
         "format-icons": {
             "1": "",
             "2": "",
@@ -54,47 +46,33 @@
             "4": "󰦨",
             "5": "󰐊",
             "6": "󱔗",
-            "7": "󱗆",
-            "8": "󱓡",
-            "9": "󰚀",
-            "active": "",    // 当前工作区（实心圆）
             "urgent": "",
-            "default": ""    // 其他工作区（空心圆，如果有的话）
+            "default": ""  
         }
     },
-    // "hyprland/workspaces": {
-    //     "disable-scroll": true,
-    //     "all-outputs": true,
-    //     "on-click": "activate",
-    //     "format": "{icon}",
-    //     "format-icons": {
-    //         "1": "",
-    //         "2": "",
-    //         "3": "󰨞",
-    //         "4": "󰦨",
-    //         "5": "󰐊",
-    //         "6": "󱔗",
-    //         "7": "󱗆",
-    //         "8": "󱓡",
-    //         "9": "󰚀",
-    //         "urgent": "",
-    //         "default": "",
-    //     }
-    // },
 
-    // --- 硬件状态 (极简版) ---
+    "hyprland/window": {
+        "format": "{}",
+        "max-length": 50,
+        "separate-outputs": true,
+        "rewrite": {
+            "(.*) - Google Chrome": "  Chrome",
+            "(.*) - Visual Studio Code": "󰨞  Code",
+            "(.*) - Kitty": "  Terminal",
+            "^$": "Arch Linux"
+        }
+    },
+
     "cpu": {
-        "format": "<span color='#8839ef'></span> {usage}%", // 紫色图标
-        "tooltip": false,
+        "format": " {usage}%",
         "interval": 2
     },
     "memory": {
-        "format": "<span color='#40a02b'></span> {}%", // 绿色图标
+        "format": " {}%",
         "interval": 2
     },
-
     "pulseaudio": {
-        "format": "<span color='#ea76cb'>{icon}</span> {volume}%", // 粉色图标
+        "format": "{icon} {volume}%",
         "format-muted": "",
         "on-click": "pavucontrol",
         "format-icons": {
@@ -103,9 +81,9 @@
     },
 
     "clock": {
-        "format": " {:%H:%M}",
-        "format-alt": " {:%Y-%m-%d}",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>"
+        "format": "{:%H:%M}",
+        "format-alt": "{:%Y-%m-%d}",
+        "tooltip-format": "<tt>{calendar}</tt>"
     },
 
     "tray": {

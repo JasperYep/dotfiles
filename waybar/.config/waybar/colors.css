@@ -1,3 +1,4 @@
+/* Catppuccin Latte Palette */
 @define-color rosewater #dc8a78;
 @define-color flamingo #dd7878;
 @define-color pink #ea76cb;
@@ -25,3 +26,9 @@
 @define-color base #eff1f5;
 @define-color mantle #e6e9ef;
 @define-color crust #dce0e8;
+
+/* 自定义透明背景色 - 冰川玻璃的核心 */
+/* 纯白带透明度，让 Hyprland 的 blur 透出来 */
+@define-color glass-bg rgba(255, 255, 255, 0.35);
+@define-color glass-border rgba(255, 255, 255, 0.4);
+@define-color glass-hover rgba(255, 255, 255, 0.7);
