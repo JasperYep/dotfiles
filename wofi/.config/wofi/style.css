@@ -1,0 +1,43 @@
+window {
+    margin: 0px;
+    /* 使用极细的浅色边框增加精致感 */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* 调低透明度（0.6），让 Hyprland 的 blur 效果更明显 */
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    font-family: "Inter", "Noto Sans SC", sans-serif;
+}
+
+#input {
+    margin: 15px;
+    border: none;
+    border-radius: 10px;
+    /* 输入框使用稍微深一点的白色，形成层次 */
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #222;
+    padding: 10px;
+}
+
+#inner-box {
+    margin: 0px 15px 15px 15px;
+}
+
+#entry {
+    padding: 10px;
+    border-radius: 10px;
+    color: #444;
+}
+
+/* 选中效果：半透明白色，模拟毛玻璃上的光亮 */
+#entry:selected {
+    background-color: rgba(255, 255, 255, 0.7);
+    color: #222;
+    outline: none;
+}
+
+#text {
+    margin-left: 12px;
+    /* 稍微加粗字体 */
+    font-weight: 500;
+    color: #222
+}

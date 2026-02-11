@@ -50,6 +50,9 @@ export PATH="$TOOLS/flutter/bin:$PATH"
 # 4. Other
 export CHROME_EXECUTABLE=/usr/bin/google-chrome-stable
 
+
+export PATH="$TOOLS/pycharm/bin:$PATH"
+
 # --- End Tools Config ---
 
 
@@ -70,3 +73,7 @@ export CHROME_EXECUTABLE=/usr/bin/google-chrome-stable
 # unset __conda_setup
 # # <<< conda initialize <<<
 #
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# OpenClaw Completion
+source "/home/jasper/.openclaw/completions/openclaw.zsh"

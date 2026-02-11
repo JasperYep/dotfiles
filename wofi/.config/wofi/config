@@ -1,0 +1,15 @@
+width=400
+height=350
+layer=top
+location=center
+show=drun
+prompt=Search...
+filter_rate=100
+allow_images=true
+# 隐藏滚动条
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+insensitivty=true
+print_command=true
