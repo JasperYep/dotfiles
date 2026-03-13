@@ -2,32 +2,26 @@ vim.g.mapleader = " " -- 或者你喜欢的任何键，比如 ";"
 vim.g.maplocalleader = " "
 
 -- 连续缩进，保持 V-line 模式
-vim.api.nvim_set_keymap("v", ">", ">gv", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<", "<gv", { noremap = true, silent = true })
-
--- 禁用Neovim原生的s键功能，以防和mini surround冲突
-vim.keymap.set({ "n", "x" }, "s", "<Nop>", { silent = true, desc = "Disable 's' for mini.surround" })
+vim.keymap.set("v", ">", ">gv", { silent = true, desc = "Indent and keep selection" })
+vim.keymap.set("v", "<", "<gv", { silent = true, desc = "Outdent and keep selection" })
+vim.keymap.set("i", "jk", "<Esc>", { silent = true, desc = "Exit insert mode" })
 
 -- 将 <leader>r 映射为重新加载配置
-vim.keymap.set("n", "<leader>r", function()
-    -- 先保存当前文件（如果已修改）
-    vim.cmd("w")
-    -- 重新加载 init.lua
-    vim.cmd("source %")
-    -- 打印一条提示信息，告诉你配置已重载
-    print("Configuration reloaded!")
-end, { desc = "Reload configuration" })
+vim.keymap.set("n", "<leader>r", "<cmd>source $MYVIMRC<CR>", { desc = "Reload Neovim config" })
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
-vim.keymap.set({ "n", "x" }, "J", "5j", { desc = "move 5 line down" })
-vim.keymap.set({ "n", "x" }, "K", "5k", { desc = "move 5 line up" })
+vim.keymap.set({ "n", "x" }, "J", "5j", { desc = "Move 5 lines down" })
+vim.keymap.set({ "n", "x" }, "K", "5k", { desc = "Move 5 lines up" })
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "gl", vim.diagnostic.open_float, { desc = "Line diagnostics" })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -35,13 +29,13 @@ vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagn
 --
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("t", "jk", "<C-\\><C-n>", { silent = true, desc = "Exit terminal mode" })
 
--- TIP: Disable arrow keys in normal mode
-vim.keymap.set("n", "<left>", '<cmd>echo "Use h to move!!"<CR>')
-vim.keymap.set("n", "<right>", '<cmd>echo "Use l to move!!"<CR>')
-vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
-vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
+-- -- TIP: Disable arrow keys in normal mode
+-- vim.keymap.set("n", "<left>", '<cmd>echo "Use h to move!!"<CR>')
+-- vim.keymap.set("n", "<right>", '<cmd>echo "Use l to move!!"<CR>')
+-- vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
+-- vim.keymap.set("n", "<down>", '<cmd>echo "Use j to move!!"<CR>')
 
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
@@ -51,9 +45,31 @@ vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left wind
 vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+vim.keymap.set("t", "<C-g>h", "<C-\\><C-n><C-w>h", { silent = true, desc = "Move focus to the left window" })
+vim.keymap.set("t", "<C-g>l", "<C-\\><C-n><C-w>l", { silent = true, desc = "Move focus to the right window" })
+vim.keymap.set("t", "<C-g>j", "<C-\\><C-n><C-w>j", { silent = true, desc = "Move focus to the lower window" })
+vim.keymap.set("t", "<C-g>k", "<C-\\><C-n><C-w>k", { silent = true, desc = "Move focus to the upper window" })
 
 vim.keymap.set("n", "<C-s>", ":w<CR>", { desc = "[S]ave" })
-vim.keymap.set("n", "<leader>bd", ":bd<CR>", { desc = "[B]uffer [D]elete" })
+vim.keymap.set("n", "[b", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
+
+local function delete_current_buffer()
+    local current = vim.api.nvim_get_current_buf()
+    local listed_buffers = vim.fn.getbufinfo({ buflisted = 1 })
+
+    if #listed_buffers > 1 then
+        vim.cmd.bprevious()
+    else
+        vim.cmd.enew()
+    end
+
+    if vim.api.nvim_buf_is_valid(current) then
+        vim.api.nvim_buf_delete(current, { force = false })
+    end
+end
+
+vim.keymap.set("n", "<leader>bd", delete_current_buffer, { desc = "[B]uffer [D]elete" })
 
 -- 调整窗口大小的快捷键
 vim.keymap.set("n", "<C-M-Left>", "<C-w><", { desc = "Decrease window width" })
@@ -129,14 +145,3 @@ end
 
 -- 设置快捷键，比如 <leader>ft (floating terminal)
 vim.keymap.set("n", "<leader>ft", toggle_floating_terminal, { desc = "Toggle Floating Terminal" })
-
--- 可选：在终端模式下设置快捷键，让它更易用
--- 例如，在终端模式下按 <Esc> 或 jk 返回普通模式
-vim.api.nvim_create_autocmd("TermOpen", {
-    pattern = "*",
-    callback = function()
-        local opts = { buffer = 0 }
-        vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", opts)
-        vim.keymap.set("t", "jk", "<C-\\><C-n>", opts)
-    end,
-})

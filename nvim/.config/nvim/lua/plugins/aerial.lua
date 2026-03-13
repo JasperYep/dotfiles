@@ -1,18 +1,16 @@
 return {
     "stevearc/aerial.nvim",
-    -- Optional dependencies
+    cmd = { "AerialOpen", "AerialToggle", "AerialNavToggle" },
     dependencies = {
         "nvim-treesitter/nvim-treesitter",
         "nvim-tree/nvim-web-devicons",
     },
-    event = { "BufReadPost", "BufWritePost", "BufNewFile" },
     opts = {
-        -- your options... For example:
-        attach_mode = "global",
+        attach_mode = "window",
         backends = { "lsp", "treesitter", "markdown", "man" },
         show_guides = true,
     },
     keys = {
-        { "<leader>tb", "<cmd>AerialToggle<cr>", desc = "Aerial: Toggle" },
+        { "<leader>o", "<cmd>AerialToggle!<cr>", desc = "Toggle [O]utline" },
     },
 }

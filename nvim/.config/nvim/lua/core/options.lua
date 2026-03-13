@@ -3,9 +3,8 @@ vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
 
-vim.opt.winbar = "%{%v:lua.require'nvim-navic'.get_location()%}"
 -- vim.opt.showtabline = 2 -- 2 表示始终显示 Tab Line (Bufferline 会覆盖它)
-vim.opt.cmdheight = 0 -- 0 表示cmd line的行高为0, 不需要因为会复用mini.statusline显示一些必要的命令
+vim.opt.cmdheight = 1 -- Keep command feedback visible to reduce surprise.
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 vim.opt.termguicolors = true
@@ -46,7 +45,7 @@ vim.o.signcolumn = "yes"
 vim.o.updatetime = 250
 
 -- Decrease mapped sequence wait time
--- vim.o.timeoutlen = 1000
+vim.o.timeoutlen = 400
 
 -- Configure how new splits should be opened
 vim.o.splitright = true

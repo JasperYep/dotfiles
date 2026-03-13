@@ -9,6 +9,7 @@ return {
         {
             "s",
             mode = { "n", "x", "o" },
+            nowait = true,
             function()
                 require("flash").jump()
             end,
