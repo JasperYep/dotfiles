@@ -75,5 +75,3 @@ export PATH="$TOOLS/pycharm/bin:$PATH"
 #
 export PATH="$HOME/.npm-global/bin:$PATH"
 
-# OpenClaw Completion
-source "/home/jasper/.openclaw/completions/openclaw.zsh"
