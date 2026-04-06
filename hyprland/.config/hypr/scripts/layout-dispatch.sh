@@ -2,7 +2,14 @@
 
 set -eu
 
-layout="$(hyprctl activeworkspace -j | jq -r '.tiledLayout // "master"')"
+workspace_json="$(hyprctl activeworkspace -j)"
+layout="master"
+
+case "$workspace_json" in
+    *'"tiledLayout"'*'"scrolling"'*)
+        layout="scrolling"
+        ;;
+esac
 
 dispatch() {
     hyprctl dispatch "$@"

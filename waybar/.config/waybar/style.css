@@ -151,7 +151,7 @@ window#waybar.empty #window {
     border-left: none; 
     border-right: none;
     
-    color: @green;
+    color: @yellow;
 }
 
 /* --- 右边：PulseAudio --- */

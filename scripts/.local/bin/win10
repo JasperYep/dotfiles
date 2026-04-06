@@ -1,0 +1,117 @@
+#!/bin/bash
+
+set -u
+
+VM_NAME="win10-office"
+VM_IP="192.168.122.67"
+USER="jasper"
+PASS="123456"
+VIRSH_CMD=(virsh --connect qemu:///system)
+RDP_PORT=3389
+WAIT_SECONDS=120
+LOG_FILE="/tmp/win10-rdp.log"
+
+require_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+rdp_ready() {
+  bash -c "exec 3<>/dev/tcp/$VM_IP/$RDP_PORT" >/dev/null 2>&1
+}
+
+ensure_gui_session() {
+  if [[ -n "${WAYLAND_DISPLAY:-}" && "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
+    if [[ -z "${XDG_RUNTIME_DIR:-}" || ! -S "${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" ]]; then
+      echo "Wayland socket ${XDG_RUNTIME_DIR:-<unset>}/${WAYLAND_DISPLAY:-<unset>} is not available." >&2
+      exit 1
+    fi
+    return
+  fi
+
+  if [[ -z "${DISPLAY:-}" ]]; then
+    echo "DISPLAY is not set. Run this script from your desktop terminal." >&2
+    exit 1
+  fi
+
+  if [[ -z "${XAUTHORITY:-}" && -f "$HOME/.Xauthority" ]]; then
+    export XAUTHORITY="$HOME/.Xauthority"
+  fi
+
+  if command -v xdpyinfo >/dev/null 2>&1; then
+    if ! xdpyinfo >/dev/null 2>&1; then
+      echo "Cannot access X display $DISPLAY. Check XAUTHORITY or run inside the logged-in desktop session." >&2
+      exit 1
+    fi
+  fi
+}
+
+existing_rdp_pid() {
+  pgrep -u "$USER" -f "sdl-freerdp3.*/v:$VM_IP" | head -n 1
+}
+
+require_cmd virsh
+require_cmd sdl-freerdp3
+ensure_gui_session
+
+if existing_pid="$(existing_rdp_pid)" && [[ -n "$existing_pid" ]]; then
+  echo "An RDP session to $VM_IP is already running (pid: $existing_pid)." >&2
+  exit 0
+fi
+
+# 1. 如果虚拟机未运行则启动
+if ! "${VIRSH_CMD[@]}" list --name | grep -Fxq "$VM_NAME"; then
+  echo "Starting VM: $VM_NAME..."
+  if ! "${VIRSH_CMD[@]}" start "$VM_NAME"; then
+    echo "Failed to start VM: $VM_NAME" >&2
+    exit 1
+  fi
+fi
+
+# 2. 等待网络和 RDP 服务就绪
+echo -n "Waiting for VM ($VM_IP) RDP to be ready"
+for ((i = 1; i <= WAIT_SECONDS; i++)); do
+  if ping -c 1 -W 1 "$VM_IP" >/dev/null 2>&1 && rdp_ready; then
+    echo " OK"
+    break
+  fi
+
+  echo -n "."
+  sleep 0.5
+
+  if [[ $i -eq $WAIT_SECONDS ]]; then
+    echo
+    echo "Timeout: VM is reachable but RDP port $RDP_PORT is not ready." >&2
+    exit 1
+  fi
+done
+
+# 3. 启动远程桌面
+rdp_args=(
+  /v:"$VM_IP"
+  /u:"$USER"
+  /p:"$PASS"
+  /cert:ignore
+  /dynamic-resolution
+  +clipboard
+  -grab-keyboard
+  /gfx             # 使用标准的图形管道，去掉 avc444
+  +async-update    # 异步画面更新（防闪烁/卡顿）
+  +async-channels  # 异步通道
+  /network:auto
+  /bpp:32
+  /audio-mode:0
+  /wm-class:win10
+)
+
+
+sdl-freerdp3 "${rdp_args[@]}" >"$LOG_FILE" 2>&1 &
+
+sleep 2
+if ! kill -0 "$!" >/dev/null 2>&1; then
+  echo "sdl-freerdp3 exited immediately. Check $LOG_FILE" >&2
+  exit 1
+fi
+echo "Connected with sdl-freerdp3 in a normal window."

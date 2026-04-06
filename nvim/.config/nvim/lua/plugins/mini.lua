@@ -22,9 +22,34 @@ return {
             local statusline = require("mini.statusline")
             statusline.setup({ use_icons = vim.g.have_nerd_font })
 
+            local default_section_mode = statusline.section_mode
+
+            ---@diagnostic disable-next-line: duplicate-set-field
+            statusline.section_mode = function(args)
+                local mode, hl = default_section_mode(args)
+                local labels = {
+                    Normal = "Norm",
+                    Insert = "Edit",
+                    Visual = "Vis",
+                    ["V-Line"] = "V-Line",
+                    ["V-Block"] = "V-Block",
+                    Select = "Sel",
+                    ["S-Line"] = "S-Line",
+                    ["S-Block"] = "S-Block",
+                    Replace = "Repl",
+                    Command = "Cmd",
+                    Prompt = "Prompt",
+                    Shell = "Shell",
+                    Terminal = "Term",
+                    Unknown = "Other",
+                }
+
+                return labels[mode] or mode, hl
+            end
+
             ---@diagnostic disable-next-line: duplicate-set-field
             statusline.section_location = function()
-                return "%2l:%-2v"
+                return "%2l:%-2v | %3p%% | %l/%L"
             end
         end,
     },

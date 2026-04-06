@@ -69,6 +69,11 @@ return {
 
                     local client = vim.lsp.get_client_by_id(event.data.client_id)
 
+                    local ok_navic, navic = pcall(require, "nvim-navic")
+                    if ok_navic and client and client.server_capabilities.documentSymbolProvider then
+                        navic.attach(client, bufnr)
+                    end
+
                     -- 自动高亮引用
                     if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
                         local highlight_augroup = vim.api.nvim_create_augroup("custom-lsp-highlight", { clear = false })

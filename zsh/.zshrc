@@ -15,10 +15,11 @@ fi
 source ${ZIM_HOME}/init.zsh
 
 # FZF
-export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git'
+export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
+export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file "$HOME/.config/fd/ignore"'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS="
-  --height 40% --layout=reverse --border --inline-info 
+  --height 40% --layout=reverse --border --inline-info
   --color='bg+:#dddddd,fg+:#000000,hl:#d7005f,hl+:#d7005f,pointer:#d7005f,info:#878787'
 "
 export FZF_CTRL_T_OPTS="
@@ -26,9 +27,19 @@ export FZF_CTRL_T_OPTS="
   --bind 'ctrl-/:change-preview-window(down|hidden|)'"
 export FZF_CTRL_R_OPTS="--sort --exact"
 
+function j() {
+	z "$@" || y "$@"
+}
+function f() {
+	fd . . --type f --hidden --follow --exclude .git --ignore-file "$HOME/.config/fd/ignore" | fzf
+}
+function fcold() {
+	fd . /mnt/data --type f --hidden --follow --exclude .git | fzf
+}
+
 alias vi='/usr/bin/vim'
 alias vim='nvim'
-alias cblue='bluetoothctl connect 1C:7A:43:82:5A:B3'
+alias cblue='bluetoothctl connect AC:33:28:09:CC:52'
 
 # Keep your existing local env loader
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
@@ -74,4 +85,7 @@ export PATH="$TOOLS/pycharm/bin:$PATH"
 # # <<< conda initialize <<<
 #
 export PATH="$HOME/.npm-global/bin:$PATH"
-
+alias xz="rsync -azvP"
+alias ta="tmux attach -t"
+alias tn="tmux new -s"
+alias tm='tmux new-session -A -s'
