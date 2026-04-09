@@ -1,0 +1,4 @@
+generated/
+subscription.env
+__pycache__/
+*.pyc
