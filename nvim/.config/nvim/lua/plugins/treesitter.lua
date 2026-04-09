@@ -11,6 +11,7 @@ return {
                     'c',
                     'cpp',
                     'json',
+                    'latex',
                     'lua',
                     'markdown',
                     'markdown_inline',
@@ -30,6 +31,7 @@ return {
             'c',
             'cpp',
             'json',
+            'latex',
             'lua',
             'markdown',
             'markdown_inline',
@@ -51,4 +53,3 @@ return {
         })
     end,
 }
-

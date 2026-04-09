@@ -1,0 +1,15 @@
+# editor / shell junk
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Nix
+.direnv/
+result

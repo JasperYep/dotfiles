@@ -84,7 +84,7 @@ export PATH="$TOOLS/pycharm/bin:$PATH"
 # unset __conda_setup
 # # <<< conda initialize <<<
 #
-export PATH="$HOME/.npm-global/bin:$PATH"
+export PATH="$HOME/.npm-global/bin:$HOME/.bun/bin:$PATH"
 alias xz="rsync -azvP"
 alias ta="tmux attach -t"
 alias tn="tmux new -s"

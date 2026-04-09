@@ -1,26 +1,26 @@
 # singbox-sync
 
-A small, imperative subscription pipeline for `sing-box`.
+一个给 `sing-box` 用的、尽量简单直接的订阅同步流水线。
 
-It keeps the stable base config separate from subscription-generated nodes:
-- base layer: `tun`, `dns`, `route`, local `clash_api`, logging
-- generated layer: nodes from a Clash-style subscription, plus `selector` and `urltest`
+它把稳定不常变的基础配置和机场订阅生成的节点配置分开：
+- 基础层：`tun`、`dns`、`route`、本地 `clash_api`、日志等
+- 生成层：从 Clash 风格订阅转换出来的节点，以及 `selector` 和 `urltest`
 
-This folder does **not** change the running service by itself. Your current `/etc/sing-box/config.json` stays untouched until you explicitly run `install-generated-config.sh`.
+这个目录本身**不会**修改当前正在运行的服务。只有你明确执行 `install-generated-config.sh` 时，当前的 `/etc/sing-box/config.json` 才会被替换。
 
-## Files
+## 文件说明
 
-- `base.json`: stable base config that rarely changes
-- `subscription.env.example`: template for the real secret file `subscription.env`
-- `sync_subscription.py`: wrapper that converts the subscription into sing-box outbounds
-- `update-subscription.sh`: fetch, convert, filter fake nodes, build final config, run `sing-box check`
-- `install-generated-config.sh`: optional manual install step to replace `/etc/sing-box/config.json`
-- `generated/config.json`: output file, intentionally gitignored
+- `base.json`：稳定基础配置，平时很少改
+- `subscription.env.example`：真实私密文件 `subscription.env` 的模板
+- `sync_subscription.py`：订阅转换包装脚本，负责把订阅转成 sing-box 的 `outbounds`
+- `update-subscription.sh`：拉取订阅、转换节点、过滤伪节点、生成最终配置并执行 `sing-box check`
+- `install-generated-config.sh`：可选的手动安装步骤，用来替换 `/etc/sing-box/config.json`
+- `generated/config.json`：生成产物，故意不纳入 git
 
-## One-Time Setup
+## 一次性准备
 
-1. Clone this dotfiles repo.
-2. Prepare the converter once:
+1. 先把你的 dotfiles 仓库 clone 下来。
+2. 只做一次 converter 准备：
 
 ```bash
 git clone --depth 1 https://github.com/NiuStar/sing-box-subscribe "$HOME/tools/sing-box-subscribe"
@@ -29,12 +29,12 @@ uv venv .venv
 uv pip install --python .venv/bin/python -r requirements.txt
 ```
 
-Notes:
-- `update-subscription.sh` expects the converter at `$HOME/tools/sing-box-subscribe` by default.
-- You can override it with `CONVERTER_DIR=/some/path`.
-- The script auto-applies the small local parser patch we needed for subscriptions that contain `smux.enabled=true` but omit `smux.protocol`.
+说明：
+- `update-subscription.sh` 默认会去 `$HOME/tools/sing-box-subscribe` 找 converter
+- 如果你放在别处，可以用 `CONVERTER_DIR=/some/path` 覆盖
+- 脚本会自动打上一个很小的本地补丁，用来处理 `smux.enabled=true` 但缺少 `smux.protocol` 的订阅
 
-3. Create your real secret file locally, but do not commit it:
+3. 在本地创建真实的私密配置文件，但不要提交进 git：
 
 ```bash
 cd "$HOME/dotfiles/scripts/singbox-sync"
@@ -42,64 +42,64 @@ cp subscription.env.example subscription.env
 $EDITOR subscription.env
 ```
 
-## Normal Workflow
+## 日常用法
 
-Generate a candidate config from the default subscription in `subscription.env`:
+用 `subscription.env` 里的默认订阅生成一份候选配置：
 
 ```bash
 cd "$HOME/dotfiles/scripts/singbox-sync"
 ./update-subscription.sh
 ```
 
-Or test a URL directly without touching `subscription.env`:
+如果只是临时测试某个订阅链接，不想改 `subscription.env`，可以直接传 URL：
 
 ```bash
 ./update-subscription.sh 'https://example.com/subscription?token=...'
 ```
 
-What the update step does:
-- reads `base.json`
-- downloads or reads the subscription source
-- uses `sing-box-subscribe` to convert nodes
-- filters metadata junk such as `剩余流量`, `官网`, `套餐到期`, and `127.0.0.1:1234` placeholders
-- appends `auto` (`urltest`) and `proxy` (`selector`)
-- writes `generated/config.json`
-- runs `sing-box check`
+更新脚本实际会做这些事：
+- 读取 `base.json`
+- 下载或读取订阅内容
+- 调用 `sing-box-subscribe` 转换节点
+- 过滤掉诸如 `剩余流量`、`官网`、`套餐到期`、`127.0.0.1:1234` 这类伪节点或占位项
+- 追加 `auto`（`urltest`）和 `proxy`（`selector`）
+- 写出 `generated/config.json`
+- 执行 `sing-box check`
 
-## Selector Behavior
+## Selector 规则
 
-Generated config contains:
-- `auto`: `type: urltest`
-- `proxy`: `type: selector`
+生成后的配置里包含：
+- `auto`：`type: urltest`
+- `proxy`：`type: selector`
 
-Current default policy is:
-- `selector.default = first real node after metadata filtering`
-- `auto` is available in the selector, but it is not the default
+当前默认策略是：
+- `selector.default = 过滤伪节点后的第一个真实节点`
+- `auto` 会出现在 selector 里，但它不是默认值
 
-Why:
-- fixed default is better for stable egress IP
-- `auto` is useful as a fallback or temporary test path
+这样设计的原因：
+- 固定默认节点更符合“出口 IP 尽量稳定”的目标
+- `auto` 适合拿来做备用路径或临时测速
 
-If you want a different default later, edit `sync_subscription.py` in `build_final_config()`.
+如果你以后想改默认策略，直接编辑 `sync_subscription.py` 里的 `build_final_config()` 即可。
 
-## Safe Switching
+## 安全切换
 
-Recommended first switch:
+第一次切换时，建议按这个顺序做：
 
-1. Back up your current single-node config outside `/etc/sing-box`:
+1. 先把当前单节点配置备份到 `/etc/sing-box` 目录外：
 
 ```bash
 sudo cp /etc/sing-box/config.json /root/sing-box-config.single-sg1.json
 ```
 
-2. Install the generated candidate config only when you actually want to switch:
+2. 只有当你真的想切过去时，才安装生成好的候选配置：
 
 ```bash
 cd "$HOME/dotfiles/scripts/singbox-sync"
 sudo ./install-generated-config.sh
 ```
 
-3. If needed, switch back:
+3. 如果之后要切回原来的单节点配置：
 
 ```bash
 sudo install -m 640 -o root -g sing-box /root/sing-box-config.single-sg1.json /etc/sing-box/config.json
@@ -107,27 +107,27 @@ sudo rm -f /var/lib/sing-box/cache.db
 sudo systemctl restart sing-box
 ```
 
-Important:
-- do not keep extra `.json` backups inside `/etc/sing-box`
-- your current service uses `sing-box -C /etc/sing-box`, so files in that directory may be loaded together
+注意：
+- 不要把额外的 `.json` 备份文件放在 `/etc/sing-box` 里
+- 你当前的服务是用 `sing-box -C /etc/sing-box` 启动的，这个目录里的配置文件可能会被一起加载
 
-## NixOS Note
+## NixOS 说明
 
-This generator is distro-agnostic. The generation step stays the same on NixOS:
+这套生成器和发行版关系不大。在 NixOS 上，生成步骤保持不变：
 
 ```bash
 cd "$HOME/dotfiles/scripts/singbox-sync"
 ./update-subscription.sh
 ```
 
-Only the final install choice changes:
-- imperative path: still copy the generated file to `/etc/sing-box/config.json`
-- declarative path: keep this folder as the generator and feed `generated/config.json` into your Nix config when you are ready
+真正不同的只有最后安装这一步：
+- 命令式用法：还是把生成文件复制到 `/etc/sing-box/config.json`
+- 声明式用法：保留这个目录作为生成器，等你准备好时，再把 `generated/config.json` 接进你的 Nix 配置
 
-## Current State On This Machine
+## 这台机器当前状态
 
-Current running service was left unchanged on purpose.
-The tested subscription-based candidate config lives here:
+当前正在运行的服务是刻意保持不变的。
+测试过的“订阅版候选配置”在这里：
 - `~/dotfiles/scripts/singbox-sync/generated/config.json`
 
-The current online single-node config is still the manually hardened one unless you run the install script.
+除非你主动执行安装脚本，否则线上仍然是原来那份手工加固过的单节点配置。
