@@ -10,9 +10,19 @@ function y() {
 # Zim
 ZIM_HOME=${ZDOTDIR:-${HOME}}/.zim
 if [[ ! ${ZIM_HOME}/init.zsh -nt ${ZIM_CONFIG_FILE:-${ZDOTDIR:-${HOME}}/.zimrc} ]]; then
-  source /usr/share/zimfw/zimfw.zsh init
+  for candidate in \
+    /usr/share/zimfw/zimfw.zsh \
+    /run/current-system/sw/share/zimfw/zimfw.zsh \
+    "/etc/profiles/per-user/$USER/share/zimfw/zimfw.zsh" \
+    "$HOME/.nix-profile/share/zimfw/zimfw.zsh"
+  do
+    if [[ -f "$candidate" ]]; then
+      source "$candidate" init
+      break
+    fi
+  done
 fi
-source ${ZIM_HOME}/init.zsh
+[[ -r ${ZIM_HOME}/init.zsh ]] && source ${ZIM_HOME}/init.zsh
 
 # FZF
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
@@ -37,7 +47,7 @@ function fcold() {
 	fd . /mnt/data --type f --hidden --follow --exclude .git | fzf
 }
 
-alias vi='/usr/bin/vim'
+alias vi='vim'
 alias vim='nvim'
 alias cblue='bluetoothctl connect AC:33:28:09:CC:52'
 
@@ -59,15 +69,13 @@ export PATH="$CODEQL_HOME:$PATH"
 export PATH="$TOOLS/flutter/bin:$PATH"
 
 # 4. Other
-export CHROME_EXECUTABLE=/usr/bin/google-chrome-stable
-
+if command -v google-chrome-stable >/dev/null 2>/dev/null; then
+  export CHROME_EXECUTABLE="$(command -v google-chrome-stable)"
+fi
 
 export PATH="$TOOLS/pycharm/bin:$PATH"
 
 # --- End Tools Config ---
-
-
-
 
 # # >>> conda initialize >>>
 # # !! Contents within this block are managed by 'conda init' !!

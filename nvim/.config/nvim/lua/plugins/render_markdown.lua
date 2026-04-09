@@ -13,7 +13,7 @@ return {
             },
         },
         latex = {
-            converter = { '/home/jasper/.config/nvim/bin/render_markdown_latex.py' },
+            converter = { vim.fn.stdpath('config') .. '/bin/render_markdown_latex.py' },
             render_modes = true,
         },
     },

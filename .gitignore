@@ -13,3 +13,6 @@ __pycache__/
 # Nix
 .direnv/
 result
+
+# local runtime files
+**/.nvimlog

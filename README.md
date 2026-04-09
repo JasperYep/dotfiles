@@ -1,47 +1,85 @@
 # dotfiles
 
-这份仓库当前以 Arch Linux 为主。
+这个分支是 `nixos`。
 
-原则很简单：
-- `main` 分支继续维护现在这套 Arch 上已经在用的配置
-- NixOS 相关内容单独放到新的分支里演进，不污染当前主线
+目标很明确：
+- 保留 `main` 分支继续服务 Arch
+- 在这个分支上先把通用配置迁到 `flake + NixOS + Home Manager`
+- 暂时不处理 Hyprland、Waybar、Niri、i3、DWM 这类桌面专用配置
 
-## 目录约定
+目前已经接入 Nix 的部分：
+- `nvim`
+- `kitty`
+- `alacritty`
+- `tmux`
+- `yazi`
+- `zsh`
+- `.vimrc`
+- `.clang-format`
+- `.Xresources`
 
-- `X/`：X11 相关配置
-- `alacritty/`、`kitty/`、`tmux/`、`zsh/`、`yazi/`：终端和命令行工具配置
-- `nvim/`：Neovim 配置
-- `i3/`、`i3status/`、`hyprland/`、`niri/`、`waybar/`、`mako/`、`wofi/`、`fuzzel/`：窗口管理器和桌面组件配置
-- `dwm/`：DWM 相关内容
-- `dict/`：词典数据
-- `scripts/`：自用脚本和工具
-- `scripts/singbox-sync/`：sing-box 订阅同步工具，单独有自己的 README
+目前还没有接入 Nix 的部分：
+- `hyprland/`
+- `waybar/`
+- `niri/`
+- `i3/`
+- `i3status/`
+- `dwm/`
+- `mako/`
+- `wofi/`
+- `fuzzel/`
+- `sing-box` 服务本体
 
-## 当前策略
+`scripts/singbox-sync/` 仍然保留在仓库里，但目前只是普通脚本，没有并入 NixOS service。
 
-这个仓库现在不追求“完全声明式”或“Nix 优先”。
+## 目录说明
 
-当前目标只有两个：
-- 保持 Arch 这套配置继续可用
-- 给后续 NixOS 迁移预留分支和整理空间
+- `flake.nix`：Nix 入口
+- `hosts/jasper/default.nix`：当前这套 NixOS 主机配置
+- `home/jasper.nix`：Home Manager 用户配置
 
-所以这里保留现有目录形态，不做大规模搬迁或重写。
+## 第一次迁移到 NixOS
 
-## 使用说明
+1. 安装一台最小 NixOS。
+2. clone 仓库：
 
-这不是一套已经完全自动化的 stow/chezmoi 仓库，而是按配置主题归档的 dotfiles 集合。
+```bash
+git clone git@github.com:JasperYep/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+git switch nixos
+```
 
-迁移或恢复时，按需把对应目录里的文件链接或复制到目标位置。例如：
-- `nvim/.config/nvim` -> `~/.config/nvim`
-- `kitty/.config/kitty` -> `~/.config/kitty`
-- `zsh/.zshrc` -> `~/.zshrc`
-- `X/.xinitrc` -> `~/.xinitrc`
+3. 把目标机器自己的硬件配置复制进来：
 
-## 分支约定
+```bash
+cp /etc/nixos/hardware-configuration.nix ~/dotfiles/hosts/jasper/
+```
 
-- `main`：Arch 主线，保持当前机器可用
-- `nixos`：后续 NixOS / Home Manager / flake 迁移分支
+4. 如果你的用户名或主机名不是 `jasper`，改这两个文件：
+- `hosts/jasper/default.nix`
+- `home/jasper.nix`
 
-如果以后开始做 NixOS：
-- 尽量新增，不直接破坏 `main` 上这套 Arch 目录
-- Nix 入口文件如 `flake.nix`、`hosts/`、`home/` 放到 `nixos` 分支维护
+5. 第一次应用：
+
+```bash
+sudo nixos-rebuild switch --flake ~/dotfiles#jasper
+```
+
+## GNOME
+
+这个分支现在没有启用任何桌面环境。
+
+如果你之后决定用 GNOME，再在 `hosts/jasper/default.nix` 里加：
+
+```nix
+services.xserver.enable = true;
+services.xserver.displayManager.gdm.enable = true;
+services.xserver.desktopManager.gnome.enable = true;
+```
+
+## 注意事项
+
+- `flake` 只会稳定看到已经加入 git 的文件。新建文件后记得 `git add`。
+- 不要把任何 secret 直接写进 `flake.nix` 或其他 Nix 文件。Flake 内容会进 Nix store。
+- `scripts/singbox-sync/subscription.env` 继续只保留本地，不入库。
+- 第一次在 NixOS 上跑完后，建议把 `flake.lock` 和 `hosts/jasper/hardware-configuration.nix` 一并提交。
