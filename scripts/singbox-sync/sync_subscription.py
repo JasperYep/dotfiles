@@ -40,22 +40,16 @@ def build_providers(source: str, user_agent: str, output_path: Path) -> dict:
     }
 
 
-def convert_nodes(converter_dir: Path, providers: dict) -> list[dict]:
-    providers_path = converter_dir / "providers.json"
-    original = providers_path.read_text(encoding="utf-8")
-    try:
-        providers_path.write_text(json.dumps(providers, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-        run(
-            [
-                str(converter_dir / ".venv" / "bin" / "python"),
-                "main.py",
-                "--template_index",
-                "0",
-            ],
-            cwd=converter_dir,
-        )
-    finally:
-        providers_path.write_text(original, encoding="utf-8")
+def convert_nodes(converter_bin: str, providers: dict) -> list[dict]:
+    run(
+        [
+            converter_bin,
+            "--temp_json_data",
+            json.dumps(providers, ensure_ascii=False),
+            "--template_index",
+            "0",
+        ]
+    )
 
     nodes_path = Path(providers["save_config_path"])
     with open(nodes_path, "r", encoding="utf-8") as f:
@@ -128,7 +122,7 @@ def main() -> None:
     parser.add_argument("--source-file")
     parser.add_argument("--user-agent", default="clashmeta")
     parser.add_argument("--base-config", required=True)
-    parser.add_argument("--converter-dir", required=True)
+    parser.add_argument("--converter-bin", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
@@ -140,7 +134,6 @@ def main() -> None:
         source = str(Path(args.source_file).expanduser().resolve())
 
     base_path = Path(args.base_config).expanduser().resolve()
-    converter_dir = Path(args.converter_dir).expanduser().resolve()
     output_path = Path(args.output).expanduser().resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -150,7 +143,7 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="singbox-sync-") as tmpdir:
         nodes_path = Path(tmpdir) / "nodes.json"
         providers = build_providers(source, args.user_agent, nodes_path)
-        nodes = filter_nodes(convert_nodes(converter_dir, providers))
+        nodes = filter_nodes(convert_nodes(args.converter_bin, providers))
 
     final_config = build_final_config(base_config, nodes)
     with open(output_path, "w", encoding="utf-8") as f:

@@ -62,10 +62,6 @@
     "cache_file": {
       "enabled": true,
       "path": "/var/lib/sing-box/cache.db"
-    },
-    "clash_api": {
-      "external_controller": "127.0.0.1:9090",
-      "external_ui": "/var/lib/sing-box/ui"
     }
   }
 }

@@ -9,19 +9,34 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }: {
-    nixosConfigurations.jasper = nixpkgs.lib.nixosSystem {
+  outputs = { nixpkgs, home-manager, ... }:
+    let
       system = "x86_64-linux";
-      modules = [
-        ./hosts/jasper/default.nix
-        home-manager.nixosModules.home-manager
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.backupFileExtension = "hm-backup";
-          home-manager.users.jasper = import ./home/jasper.nix;
-        }
-      ];
+      username = "jasper";
+      hostname = "jasper";
+      pkgs = import nixpkgs { inherit system; };
+      singBoxSubscribe = pkgs.callPackage ./pkgs/sing-box-subscribe.nix { };
+    in {
+      packages.${system}.sing-box-subscribe = singBoxSubscribe;
+
+      nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit hostname username singBoxSubscribe;
+        };
+        modules = [
+          ./hosts/jasper/default.nix
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "hm-backup";
+            home-manager.extraSpecialArgs = {
+              inherit username singBoxSubscribe;
+            };
+            home-manager.users.${username} = import ./home/jasper.nix;
+          }
+        ];
+      };
     };
-  };
 }

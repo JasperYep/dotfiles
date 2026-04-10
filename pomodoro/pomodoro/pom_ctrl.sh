@@ -2,8 +2,8 @@
 # 文件名: pomodoro_ctl.sh - 控制 Python 后端进程
 
 # --- 配置 ---
-# 替换为您的实际路径
-POMO_BACKEND_SCRIPT="/home/jasper/pomodoro/pom_backend.py" 
+SCRIPT_DIR=$(cd -- "$(dirname -- "$0")" && pwd)
+POMO_BACKEND_SCRIPT="$SCRIPT_DIR/pom_backend.py"
 STATUS_FILE="/tmp/pomodoro_status"
 PID_FILE="/tmp/pomodoro_pid"
 
