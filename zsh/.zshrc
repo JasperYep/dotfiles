@@ -89,3 +89,4 @@ alias xz="rsync -azvP"
 alias ta="tmux attach -t"
 alias tn="tmux new -s"
 alias tm='tmux new-session -A -s'
+

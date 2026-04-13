@@ -1,0 +1,15 @@
+android-studio
+antigravity
+bibata-cursor-theme-bin
+clash-verge-rev-bin
+cli-proxy-api-bin
+flclash-bin
+hyprprop-git
+linuxqq
+miniconda3
+qqmusic-bin
+visual-studio-code-bin
+wechat-bin
+wemeet-bin
+wps-office-cn
+wps-office-mui-zh-cn
