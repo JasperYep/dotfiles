@@ -1,4 +1,5 @@
 # --- Plugins ---
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#9ca0b0'  # Catppuccin Latte overlay0
 if [[ "$OSTYPE" == "darwin"* ]]; then
   source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

@@ -44,16 +44,15 @@ cd "$DOTFILES"
 MODULES=(
   hyprland
   waybar
+  rofi
   nvim
   kitty
-  alacritty
   yazi
   tmux
   mako
-  niri
   zsh
+  starship
   scripts
-  X
 )
 
 for mod in "${MODULES[@]}"; do

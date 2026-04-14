@@ -41,19 +41,13 @@ tooltip label {
 /* --- 1. Arch 信仰标 (更紧凑) --- */
 #custom-arch {
     color: @base;
-    background: linear-gradient(135deg, @blue, @blue2);
-    font-size: 16px; /* 稍微调小图标 */
-    
-    /* 核心高度控制：
-       上下 Margin 改为 1px (原来是 4px)
-       上下 Padding 改为 1px (原来是 2px)
-    */
+    background: linear-gradient(135deg, #9D8ECE, #B3A3E0);
+    font-size: 16px;
     margin: 1px 6px 1px 0;
-    padding: 1px 14px 1px 10px; 
-    
+    padding: 1px 14px 1px 10px;
     border-radius: 10px;
     opacity: 0.9;
-    box-shadow: 0 2px 4px rgba(30, 102, 245, 0.2);
+    box-shadow: 0 2px 4px rgba(157, 142, 206, 0.25);
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
@@ -85,9 +79,9 @@ tooltip label {
 }
 
 #workspaces button.active {
-    color: @blue;
+    color: #9D8ECE;
     background: rgba(255, 255, 255, 0.8);
-    min-width: 25px; /* 激活宽度也稍微收窄 */
+    min-width: 25px;
     box-shadow: 0 2px 3px rgba(0,0,0,0.05);
 }
 

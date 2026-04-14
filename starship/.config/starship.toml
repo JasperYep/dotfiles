@@ -18,7 +18,7 @@ truncate_to_repo = true
 
 [git_branch]
 symbol = " "
-style = "mauve"
+style = "purple"
 format = "[$symbol$branch]($style) "
 
 [git_status]
@@ -60,6 +60,7 @@ sky       = "#04a5e5"
 sapphire  = "#209fb5"
 blue      = "#1e66f5"
 lavender  = "#7287fd"
+purple    = "#9D8ECE"
 text      = "#4c4f69"
 subtext1  = "#5c5f77"
 subtext0  = "#6c6f85"
