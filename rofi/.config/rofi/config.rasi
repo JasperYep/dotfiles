@@ -1,0 +1,9 @@
+configuration {
+    font:                "JetBrainsMono Nerd Font 12";
+    show-icons:          true;
+    icon-theme:          "Papirus-Light";
+    drun-display-format: "{name}";
+    modes:               "drun,run,window";
+}
+
+@theme "catppuccin-latte"

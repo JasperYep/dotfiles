@@ -7,6 +7,7 @@ autossh
 axel
 base
 base-devel
+bat
 bc
 bluez
 bluez-utils
@@ -29,6 +30,7 @@ dosfstools
 drawio-desktop
 efibootmgr
 exfatprogs
+eza
 fcitx5
 fcitx5-chinese-addons
 fcitx5-configtool
@@ -85,8 +87,8 @@ nvidia-open-dkms
 nvidia-settings
 nvidia-utils
 nwg-look
-obs-studio
 obsidian
+obs-studio
 ollama
 ollama-cuda
 opencode
@@ -117,6 +119,7 @@ slurp
 snap-pac
 snapper
 sshfs
+starship
 stow
 sunshine
 sway

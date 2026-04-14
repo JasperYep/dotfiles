@@ -96,91 +96,22 @@ tooltip label {
     background: @glass-hover;
 }
 
-/* 3. 窗口标题 (紧凑胶囊) */
-#window {
-    background-color: @glass-bg;
-    color: @text;
-    font-weight: 800;
-    
-    /* 压缩高度 */
-    margin: 1px 10px;
-    padding: 0 12px;
-    
-    border-radius: 10px;
-    border: 1px solid @glass-border;
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-window#waybar.empty #window {
-    background-color: transparent;
-    border-color: transparent;
-    box-shadow: none;
-    color: transparent;
-}
-
-/* 4. 连体硬件胶囊 (压缩版) */
-#cpu, #memory, #pulseaudio {
-    background-color: @glass-bg;
-    border: 1px solid @glass-border;
-    color: @text;
-    padding: 0 12px;
-    transition: all 0.3s ease;
-    
-    /* 核心：先把所有边距清零，让它们紧贴在一起 */
-    margin: 1px 0;
-}
-
-/* --- 左边：CPU --- */
-#cpu {
-    /* 只圆左上和左下 */
-    border-radius: 10px 0 0 10px;
-    /* 去掉右边框，防止和中间模块出现双重边框 */
-    border-right: none;
-    
-    color: @mauve;
-    /* 左边给点距，与托盘隔开 */
-    margin-left: 6px; 
-}
-
-/* --- 中间：Memory --- */
-#memory {
-    /* 变直角 */
-    border-radius: 0;
-    /* 去掉左右边框 */
-    border-left: none; 
-    border-right: none;
-    
-    color: @yellow;
-}
-
-/* --- 右边：PulseAudio --- */
+/* 3. 音量 */
 #pulseaudio {
-    /* 只圆右上和右下 */
-    border-radius: 0 10px 10px 0;
-    /* 去掉左边框 */
-    border-left: none;
-    
+    background-color: @glass-bg;
+    border: 1px solid @glass-border;
     color: @pink;
-    /* 右边给点距，与时钟隔开 */
-    margin-right: 6px; 
+    border-radius: 10px;
+    margin: 1px 6px;
+    padding: 0 12px;
+    transition: all 0.3s ease;
 }
 
-/* --- 悬停效果优化 --- */
-/* 因为是拼接的，为了不让悬停看起来奇怪，最好分别加深背景，或者加一个分隔线 */
-
-#cpu:hover, #memory:hover, #pulseaudio:hover {
+#pulseaudio:hover {
     background-color: @glass-hover;
 }
 
-/* 可选：如果你觉得中间连在一起太糊，分不清，
-   可以给 memory 加一个极淡的左边框来做分割线 
-*/
-#memory {
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-}
-/* 5. 时钟 (变扁) */
+/* 4. 时钟 */
 #clock {
     background-color: @blue;
     color: @base;
@@ -192,7 +123,40 @@ window#waybar.empty #window {
     box-shadow: 0 2px 4px rgba(30, 102, 245, 0.2);
 }
 
-/* 6. 托盘 */
+/* 6. tt 时间管理 */
+#custom-tt {
+    background-color: @glass-bg;
+    color: @text;
+    border: 1px solid @glass-border;
+    border-radius: 10px;
+    margin: 1px 6px;
+    padding: 0 12px;
+    transition: all 0.3s ease;
+}
+
+#custom-tt:hover {
+    background-color: @glass-hover;
+}
+
+/* 深度工作·专注中 — 绿色 */
+#custom-tt.tt-work {
+    color: @green;
+    border-color: rgba(64, 160, 43, 0.35);
+}
+
+/* 深度工作·休息中 — 橙色 */
+#custom-tt.tt-break {
+    color: @peach;
+    border-color: rgba(254, 100, 11, 0.35);
+    background-color: rgba(254, 100, 11, 0.08);
+}
+
+/* 普通时段 — 默认文字色 */
+#custom-tt.tt-normal {
+    color: @subtext1;
+}
+
+/* 7. 托盘 */
 #tray {
     background-color: @glass-bg;
     /* 压缩垂直间距 */
