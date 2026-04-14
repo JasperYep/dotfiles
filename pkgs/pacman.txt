@@ -111,6 +111,7 @@ qutebrowser
 resvg
 rime-emoji
 ripgrep
+rofi
 rsync
 rtkit
 satty
@@ -172,3 +173,5 @@ zen-browser
 zotero
 zoxide
 zsh
+zsh-autosuggestions
+zsh-syntax-highlighting
