@@ -1,3 +1,16 @@
+# --- History ---
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100000
+export SAVEHIST=100000
+
+setopt APPEND_HISTORY
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FCNTL_LOCK
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+
 # --- Plugins ---
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#9ca0b0'  # Catppuccin Latte overlay0
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -43,6 +56,7 @@ alias ll='eza --icons --group-directories-first -l --git'
 alias la='eza --icons --group-directories-first -la --git'
 alias lt='eza --icons --tree --level=2'
 alias xz='rsync -azvP'
+alias cpusb='rsync -avP && sync'
 alias cblue='bluetoothctl connect AC:33:28:09:CC:52'
 
 # --- tmux ---
