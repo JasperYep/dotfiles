@@ -1,0 +1,369 @@
+#!/usr/bin/env python3
+"""Daily schedule and Pomodoro status for Waybar."""
+
+from __future__ import annotations
+
+import datetime as dt
+import fcntl
+import json
+import os
+from pathlib import Path
+import signal
+import subprocess
+import sys
+import time
+from typing import Any
+
+CONFIG_FILE = Path.home() / ".config" / "tt" / "schedule.json"
+DATA_DIR = Path.home() / ".local" / "share" / "tt"
+STATE_FILE = DATA_DIR / "state.json"
+LOG_FILE = DATA_DIR / "tt.log"
+LOCK_FILE = DATA_DIR / "tt.lock"
+CHECK_SECONDS = 10
+WAYBAR_SIGNAL = 8
+VALID_URGENCIES = {"low", "normal", "critical"}
+
+
+def log(message: str) -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    stamp = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with LOG_FILE.open("a", encoding="utf-8") as handle:
+        handle.write(f"[{stamp}] {message}\n")
+
+
+def load_json(path: Path, default: Any) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return default
+
+
+def minute_of_day(value: str) -> int:
+    parsed = dt.datetime.strptime(value, "%H:%M")
+    return parsed.hour * 60 + parsed.minute
+
+
+def validate_config(config: Any) -> None:
+    if not isinstance(config, dict):
+        raise ValueError("schedule root must be an object")
+
+    blocks = config.get("blocks")
+    if not isinstance(blocks, list) or not blocks:
+        raise ValueError("schedule requires a non-empty blocks array")
+
+    for index, block in enumerate(blocks):
+        if not isinstance(block, dict):
+            raise ValueError(f"blocks[{index}] must be an object")
+        for key in ("start", "end", "name"):
+            if not isinstance(block.get(key), str) or not block[key]:
+                raise ValueError(f"blocks[{index}].{key} must be a non-empty string")
+        start = minute_of_day(block["start"])
+        end = minute_of_day(block["end"])
+        if start == end:
+            raise ValueError(f"blocks[{index}] start and end must differ")
+        if "icon" in block and not isinstance(block["icon"], str):
+            raise ValueError(f"blocks[{index}].icon must be a string")
+        pomodoro = block.get("pomodoro")
+        if pomodoro is not None:
+            if not isinstance(pomodoro, dict):
+                raise ValueError(f"blocks[{index}].pomodoro must be an object or null")
+            for key in ("work", "break"):
+                if not isinstance(pomodoro.get(key), int) or isinstance(pomodoro.get(key), bool) \
+                    or pomodoro[key] <= 0:
+                    raise ValueError(f"blocks[{index}].pomodoro.{key} must be a positive integer")
+
+    reminders = config.get("reminders", [])
+    if not isinstance(reminders, list):
+        raise ValueError("reminders must be an array")
+    for index, reminder in enumerate(reminders):
+        if not isinstance(reminder, dict):
+            raise ValueError(f"reminders[{index}] must be an object")
+        for key in ("time", "title"):
+            if not isinstance(reminder.get(key), str) or not reminder[key]:
+                raise ValueError(f"reminders[{index}].{key} must be a non-empty string")
+        minute_of_day(reminder["time"])
+        if "body" in reminder and not isinstance(reminder["body"], str):
+            raise ValueError(f"reminders[{index}].body must be a string")
+        urgency = reminder.get("urgency", "normal")
+        if urgency not in VALID_URGENCIES:
+            raise ValueError(f"reminders[{index}].urgency must be low, normal, or critical")
+
+
+def read_config(required: bool = True) -> dict[str, Any] | None:
+    if not CONFIG_FILE.exists():
+        if required:
+            raise FileNotFoundError(f"private schedule not restored: {CONFIG_FILE}")
+        return None
+    config = load_json(CONFIG_FILE, {})
+    validate_config(config)
+    return config
+
+
+def contains_minute(block: dict[str, Any], minute: int) -> bool:
+    start = minute_of_day(block["start"])
+    end = minute_of_day(block["end"])
+    if end < start:
+        return minute >= start or minute < end
+    return start <= minute < end
+
+
+def active_block(config: dict[str, Any], now: dt.datetime) -> dict[str, Any] | None:
+    minute = now.hour * 60 + now.minute
+    return next((block for block in config["blocks"] if contains_minute(block, minute)), None)
+
+
+def elapsed_minutes(block: dict[str, Any], now: dt.datetime) -> float:
+    start = minute_of_day(block["start"])
+    current = now.hour * 60 + now.minute + now.second / 60
+    if current < start:
+        current += 1440
+    return current - start
+
+
+def remaining_minutes(block: dict[str, Any], now: dt.datetime) -> float:
+    start = minute_of_day(block["start"])
+    end = minute_of_day(block["end"])
+    if end < start:
+        end += 1440
+    current = now.hour * 60 + now.minute + now.second / 60
+    if current < start:
+        current += 1440
+    return max(0.0, end - current)
+
+
+def pomodoro_state(block: dict[str, Any], now: dt.datetime) -> dict[str, Any] | None:
+    config = block.get("pomodoro")
+    if not config:
+        return None
+    work = config["work"]
+    rest = config["break"]
+    elapsed = elapsed_minutes(block, now)
+    cycle_length = work + rest
+    cycle = int(elapsed // cycle_length) + 1
+    position = elapsed % cycle_length
+    if position < work:
+        return {"phase": "work", "cycle": cycle, "remaining": work - position, "total": work}
+    return {"phase": "break", "cycle": cycle, "remaining": cycle_length - position, "total": rest}
+
+
+def load_state() -> dict[str, Any]:
+    state = load_json(STATE_FILE, {})
+    return state if isinstance(state, dict) else {}
+
+
+def save_state(state: dict[str, Any]) -> None:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    temporary = STATE_FILE.with_suffix(".tmp")
+    temporary.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+    temporary.replace(STATE_FILE)
+
+
+def notify(title: str, body: str, urgency: str = "normal") -> bool:
+    command = ["notify-send", "-a", "tt", "-u", urgency, title, body]
+    try:
+        result = subprocess.run(
+            command,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except FileNotFoundError:
+        log(f"notification unavailable: {title}: {body}")
+        return False
+    delivered = result.returncode == 0
+    log(f"notification {'delivered' if delivered else 'failed'}: {title}: {body}")
+    return delivered
+
+
+def signal_waybar() -> None:
+    try:
+        subprocess.run(
+            ["pkill", f"-RTMIN+{WAYBAR_SIGNAL}", "waybar"],
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except FileNotFoundError:
+        pass
+
+
+def tick(config: dict[str, Any]) -> None:
+    now = dt.datetime.now()
+    today = now.strftime("%Y-%m-%d")
+    block = active_block(config, now)
+    state = load_state()
+    changed = False
+
+    block_key = f"{today}:{block['start']}:{block['name']}" if block else None
+    if block_key and state.get("block_key") != block_key:
+        delivered = notify(
+            f"{block.get('icon', '•')} {block['name']}",
+            f"{block['start']}–{block['end']}",
+        )
+        if delivered:
+            state["block_key"] = block_key
+            state.pop("pomodoro_key", None)
+            changed = True
+            signal_waybar()
+
+    if block:
+        pomodoro = pomodoro_state(block, now)
+        if pomodoro:
+            pomodoro_key = f"{block_key}:{pomodoro['cycle']}:{pomodoro['phase']}"
+            if state.get("pomodoro_key") != pomodoro_key:
+                if pomodoro["phase"] == "work":
+                    delivered = notify(
+                        "专注开始",
+                        f"第 {pomodoro['cycle']} 轮 · {pomodoro['total']} 分钟",
+                    )
+                else:
+                    delivered = notify(
+                        "休息开始",
+                        f"第 {pomodoro['cycle']} 轮 · {pomodoro['total']} 分钟",
+                        "critical",
+                    )
+                if delivered:
+                    state["pomodoro_key"] = pomodoro_key
+                    changed = True
+                    signal_waybar()
+
+    delivered_reminders = {
+        key for key in state.get("delivered_reminders", [])
+        if isinstance(key, str) and key.startswith(f"{today}:")
+    }
+    minute = now.strftime("%H:%M")
+    for reminder in config.get("reminders", []):
+        key = f"{today}:{reminder['time']}:{reminder['title']}"
+        if reminder["time"] == minute and key not in delivered_reminders:
+            if notify(
+                reminder["title"],
+                reminder.get("body", ""),
+                reminder.get("urgency", "normal"),
+            ):
+                delivered_reminders.add(key)
+                changed = True
+
+    serialized_reminders = sorted(delivered_reminders)
+    if state.get("delivered_reminders") != serialized_reminders:
+        state["delivered_reminders"] = serialized_reminders
+        changed = True
+    if changed:
+        save_state(state)
+
+
+def bar_payload() -> dict[str, str]:
+    config = read_config(required=False)
+    if config is None:
+        return {"text": "", "tooltip": "Private schedule not restored", "class": "tt-unconfigured"}
+
+    now = dt.datetime.now()
+    block = active_block(config, now)
+    if block is None:
+        return {"text": "", "tooltip": "No active schedule block", "class": "tt-idle"}
+
+    remaining = int(remaining_minutes(block, now))
+    icon = block.get("icon", "•")
+    tooltip = f"{icon} {block['name']}\n{block['start']}–{block['end']}\n剩余 {remaining}m"
+    pomodoro = pomodoro_state(block, now)
+    if not pomodoro:
+        return {"text": f"{icon} {remaining}m", "tooltip": tooltip, "class": "tt-normal"}
+
+    phase_icon = "🧠" if pomodoro["phase"] == "work" else "☕"
+    phase_name = "专注" if pomodoro["phase"] == "work" else "休息"
+    pomodoro_remaining = int(pomodoro["remaining"])
+    tooltip += f"\n\n{phase_name} · 第 {pomodoro['cycle']} 轮 · 剩余 {pomodoro_remaining}m"
+    return {
+        "text": f"{phase_icon} {pomodoro_remaining}m #{pomodoro['cycle']}",
+        "tooltip": tooltip,
+        "class": f"tt-{pomodoro['phase']}",
+    }
+
+
+def print_status() -> None:
+    config = read_config()
+    now = dt.datetime.now()
+    block = active_block(config, now)
+    if block is None:
+        print("No active schedule block")
+        return
+    payload = bar_payload()
+    print(f"{now:%H:%M:%S}  {block.get('icon', '•')} {block['name']}")
+    print(f"{block['start']}–{block['end']}  remaining {int(remaining_minutes(block, now))}m")
+    if payload["text"]:
+        print(payload["text"])
+
+
+def run_daemon() -> None:
+    config = read_config()
+    observed_mtime = CONFIG_FILE.stat().st_mtime_ns
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    with LOCK_FILE.open("w", encoding="utf-8") as lock:
+        try:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RuntimeError("tt daemon is already running") from error
+
+        stop = False
+
+        def request_stop(*_: object) -> None:
+            nonlocal stop
+            stop = True
+
+        signal.signal(signal.SIGTERM, request_stop)
+        signal.signal(signal.SIGINT, request_stop)
+        log(f"daemon started pid={os.getpid()}")
+        while not stop:
+            current_mtime = CONFIG_FILE.stat().st_mtime_ns
+            if current_mtime != observed_mtime:
+                observed_mtime = current_mtime
+                try:
+                    updated = read_config()
+                except (ValueError, json.JSONDecodeError) as error:
+                    log(f"schedule reload rejected: {error}")
+                else:
+                    config = updated
+                    log("schedule reloaded")
+            tick(config)
+            time.sleep(CHECK_SECONDS)
+        log("daemon stopped")
+
+
+def show_log(limit: int) -> None:
+    if not LOG_FILE.exists():
+        return
+    for line in LOG_FILE.read_text(encoding="utf-8").splitlines()[-limit:]:
+        print(line)
+
+
+def main() -> int:
+    command = sys.argv[1] if len(sys.argv) > 1 else "status"
+    try:
+        if command in {"status", "s"}:
+            print_status()
+        elif command in {"watch", "w"}:
+            while True:
+                print("\033[2J\033[H", end="")
+                print_status()
+                time.sleep(1)
+        elif command == "bar":
+            print(json.dumps(bar_payload(), ensure_ascii=False))
+        elif command == "daemon":
+            run_daemon()
+        elif command == "validate":
+            read_config()
+            print(f"valid: {CONFIG_FILE}")
+        elif command == "log":
+            show_log(int(sys.argv[2]) if len(sys.argv) > 2 else 40)
+        else:
+            print("usage: tt [status|watch|bar|daemon|validate|log]", file=sys.stderr)
+            return 2
+    except KeyboardInterrupt:
+        return 0
+    except (FileNotFoundError, ValueError, RuntimeError, json.JSONDecodeError) as error:
+        print(f"tt: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,92 @@
+* {
+    bg:          #eff1f5;   /* 中性底 */
+    bg-input:    #e6e9ef;   /* 中性底稍深 */
+    border-col:  #bcc0cc;   /* 几乎隐形的边框 */
+    fg:          #4c4f69;   /* 深灰文字 */
+    fg-dim:      #9ca0b0;   /* 暗文字 */
+    accent:      #9D8ECE;   /* 紫藤 — prompt 色 */
+    selected-bg: #DDD5FA;   /* 云烟紫 — 选中行底色 */
+    urgent:      #d20f39;
+}
+
+window {
+    background-color: @bg;
+    border:           1px;
+    border-color:     @border-col;
+    border-radius:    12px;
+    padding:          12px;
+    width:            480px;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing:          8px;
+    children:         [inputbar, listview];
+}
+
+inputbar {
+    background-color: @bg-input;
+    border-radius:    8px;
+    padding:          8px 12px;
+    spacing:          8px;
+    children:         [prompt, entry];
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       @accent;
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @fg;
+    placeholder:      "Search...";
+    placeholder-color: @fg-dim;
+}
+
+listview {
+    background-color: transparent;
+    lines:            8;
+    columns:          1;
+    scrollbar:        false;
+    spacing:          2px;
+}
+
+element {
+    background-color: transparent;
+    border-radius:    8px;
+    padding:          8px 12px;
+    spacing:          10px;
+    children:         [element-icon, element-text];
+}
+
+element normal.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element alternate.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element selected.normal {
+    background-color: @selected-bg;
+    text-color:       @fg;
+}
+
+element normal.urgent,
+element alternate.urgent {
+    text-color: @urgent;
+}
+
+element-icon {
+    background-color: transparent;
+    size:             22px;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    vertical-align:   0.5;
+}

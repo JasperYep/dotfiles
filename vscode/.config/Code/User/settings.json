@@ -1,0 +1,20 @@
+{
+    "workbench.colorTheme": "Light 2026",
+    "editor.fontFamily": "JetBrainsMono Nerd Font",
+    "editor.fontSize": 16,
+    "chat.fontSize": 16,
+    "claudeCode.preferredLocation": "panel",
+    "claudeCode.useTerminal": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "window.autoDetectColorScheme": true,
+    "workbench.editorAssociations": {
+        "*.pdf": "pdf.preview"
+    },
+    "markdown.copyFiles.destination": {
+        "**/*": "assets/"
+    },
+    "markdown-preview-enhanced.previewTheme": "vscode.css",
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "python.terminal.activateEnvironment": false,
+    "python-envs.terminal.autoActivationType": "shellStartup"
+}

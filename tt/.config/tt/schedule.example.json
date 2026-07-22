@@ -1,0 +1,29 @@
+{
+  "blocks": [
+    {
+      "start": "08:30",
+      "end": "12:00",
+      "name": "Focus block",
+      "icon": "🧠",
+      "pomodoro": {
+        "work": 25,
+        "break": 5
+      }
+    },
+    {
+      "start": "12:00",
+      "end": "13:30",
+      "name": "Break",
+      "icon": "☕",
+      "pomodoro": null
+    }
+  ],
+  "reminders": [
+    {
+      "time": "22:00",
+      "title": "Wind down",
+      "body": "Finish the day and prepare to rest",
+      "urgency": "normal"
+    }
+  ]
+}

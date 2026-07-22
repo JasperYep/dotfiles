@@ -1,0 +1,16 @@
+BasedOnStyle: LLVM    # 以LLVM风格为基础，可改为 Google / Chromium / Mozilla / WebKit
+IndentWidth: 4        # 缩进空格数
+TabWidth: 4           # Tab 宽度
+UseTab: Never         # 使用空格而不是 Tab
+
+ColumnLimit: 0      # 每行最大长度
+IndentCaseLabels: true
+# PointerAlignment: Right
+#
+
+
+# # 关键：对齐连续的赋值操作符（包括初始化列表中的 '='）
+# AlignConsecutiveAssignments: true
+#
+# # 对齐连续的声明（虽然在这里不是主要作用，但保持一致性是好的）
+# AlignConsecutiveDeclarations: true

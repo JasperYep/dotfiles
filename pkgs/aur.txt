@@ -1,0 +1,15 @@
+android-studio
+baidunetdisk-bin
+bibata-cursor-theme-bin
+clash-verge-rev-bin
+linuxqq
+localsend
+marktext-bin
+onlyoffice-bin
+pandoc-bin
+paru
+qqmusic-bin
+visual-studio-code-bin
+wechat-bin
+wemeet-bin
+zotero

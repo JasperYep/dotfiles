@@ -1,0 +1,92 @@
+* {
+    bg:          #24273a;   /* Macchiato base */
+    bg-input:    #1e2030;   /* Macchiato mantle */
+    border-col:  #494d64;   /* surface1，极淡边框 */
+    fg:          #cad3f5;   /* text */
+    fg-dim:      #6e738d;   /* overlay0 */
+    accent:      #9D8ECE;   /* 紫藤 — prompt 色 */
+    selected-bg: #3d3654;   /* 软紫选中底 */
+    urgent:      #ed8796;
+}
+
+window {
+    background-color: @bg;
+    border:           1px;
+    border-color:     @border-col;
+    border-radius:    12px;
+    padding:          12px;
+    width:            480px;
+}
+
+mainbox {
+    background-color: transparent;
+    spacing:          8px;
+    children:         [inputbar, listview];
+}
+
+inputbar {
+    background-color: @bg-input;
+    border-radius:    8px;
+    padding:          8px 12px;
+    spacing:          8px;
+    children:         [prompt, entry];
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       @accent;
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @fg;
+    placeholder:      "Search...";
+    placeholder-color: @fg-dim;
+}
+
+listview {
+    background-color: transparent;
+    lines:            8;
+    columns:          1;
+    scrollbar:        false;
+    spacing:          2px;
+}
+
+element {
+    background-color: transparent;
+    border-radius:    8px;
+    padding:          8px 12px;
+    spacing:          10px;
+    children:         [element-icon, element-text];
+}
+
+element normal.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element alternate.normal {
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+element selected.normal {
+    background-color: @selected-bg;
+    text-color:       @fg;
+}
+
+element normal.urgent,
+element alternate.urgent {
+    text-color: @urgent;
+}
+
+element-icon {
+    background-color: transparent;
+    size:             22px;
+}
+
+element-text {
+    background-color: transparent;
+    text-color:       inherit;
+    vertical-align:   0.5;
+}

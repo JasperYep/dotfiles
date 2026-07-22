@@ -1,0 +1,36 @@
+# Editor and generated files
+*.swp
+*.swo
+*~
+*.log
+.nvimlog
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Local environments and build output
+.direnv/
+.env
+.env.*
+!.env.example
+result
+build/
+dist/
+
+# Credentials and private material
+*.key
+*.pem
+*.p12
+*.pfx
+subscription.env
+generated/
+
+# Host/private restore state
+hyprland/.config/hypr/host.conf
+**/schedule.json
+**/installation.yaml
+**/user.yaml
+**/*.userdb/
+**/sync/

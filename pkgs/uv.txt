@@ -1,0 +1,7 @@
+docx2txt==0.9
+markdown-print==0.1.0
+paper5md==0.1.0
+pdf2zh==1.9.11
+pyftpdlib==2.2.0
+pylatexenc==2.10
+trafilatura==2.1.0

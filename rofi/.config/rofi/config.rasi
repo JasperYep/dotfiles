@@ -1,0 +1,9 @@
+configuration {
+    font:                "JetBrainsMono Nerd Font 12";
+    show-icons:          true;
+    icon-theme:          "Papirus";
+    drun-display-format: "{name}";
+    modes:               "drun,run,window";
+}
+
+@theme "palette"

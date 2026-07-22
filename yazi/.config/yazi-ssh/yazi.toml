@@ -1,0 +1,31 @@
+# Used when yazi is launched over SSH (see zsh y()).
+# Goal: snappy TUI — no image protocol / heavy external previewers over the wire.
+
+[opener]
+edit = [
+	{ run = 'nvim "$@"', block = true, desc = "Edit with Neovim" }
+]
+open = [
+	{ run = 'nvim "$@"', block = true, desc = "Open in Neovim" },
+]
+
+[preview]
+# Keep tiny values; image/* is forced to noop below anyway.
+image_filter = "nearest"
+image_quality = 50
+max_width = 200
+max_height = 200
+
+[plugin]
+# Disable expensive binary previews over SSH (images especially stall the terminal).
+prepend_previewers = [
+	{ mime = "image/*", run = "noop" },
+	{ mime = "video/*", run = "noop" },
+	{ mime = "audio/*", run = "noop" },
+	{ mime = "application/pdf", run = "noop" },
+	{ mime = "application/postscript", run = "noop" },
+	{ mime = "application/epub+zip", run = "noop" },
+	{ mime = "font/*", run = "noop" },
+	{ mime = "application/font-*", run = "noop" },
+	{ mime = "application/vnd.ms-opentype", run = "noop" },
+]

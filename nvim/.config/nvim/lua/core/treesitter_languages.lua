@@ -1,0 +1,15 @@
+return {
+    'bash',
+    'c',
+    'cpp',
+    'json',
+    'latex',
+    'lua',
+    'markdown',
+    'markdown_inline',
+    'python',
+    'query',
+    'vim',
+    'vimdoc',
+    'yaml',
+}

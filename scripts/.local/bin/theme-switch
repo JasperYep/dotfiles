@@ -1,0 +1,248 @@
+#!/usr/bin/env bash
+# Switch the desktop between the tracked light and dark theme trees.
+set -Eeuo pipefail
+
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+DOTFILES="$(cd "$(dirname "$SCRIPT_PATH")/../../.." && pwd)"
+THEMES="$DOTFILES/themes"
+STATE_DIR="$HOME/.config/theme"
+CURRENT="$STATE_DIR/current"
+
+log() { printf 'theme-switch: %s\n' "$*"; }
+warn() { printf 'theme-switch: warning: %s\n' "$*" >&2; }
+die() { printf 'theme-switch: %s\n' "$*" >&2; exit 1; }
+
+ASSET_LINKS=(
+  "waybar/colors.css:$HOME/.config/waybar/colors.css"
+  "waybar/style.css:$HOME/.config/waybar/style.css"
+  "rofi/palette.rasi:$HOME/.config/rofi/palette.rasi"
+  "mako/config:$HOME/.config/mako/config"
+  "starship/starship.toml:$HOME/.config/starship.toml"
+  "yazi/theme.toml:$HOME/.config/yazi/theme.toml"
+  "yazi/theme.toml:$HOME/.config/yazi-ssh/theme.toml"
+  "hypr/theme.conf:$HOME/.config/hypr/theme.conf"
+  "hypr/hyprlock.conf:$HOME/.config/hypr/hyprlock.conf"
+  "hypr/hyprlock-away.conf:$HOME/.config/hypr/hyprlock-away.conf"
+  "gtk/gtk-3.0/settings.ini:$HOME/.config/gtk-3.0/settings.ini"
+  "gtk/gtk-4.0/settings.ini:$HOME/.config/gtk-4.0/settings.ini"
+  "fcitx5/classicui.conf:$HOME/.config/fcitx5/conf/classicui.conf"
+)
+
+managed_current_target() {
+  local target
+  [[ -L "$CURRENT" ]] || return 1
+  target="$(readlink -f "$CURRENT")"
+  case "$target" in
+    "$THEMES/light"|"$THEMES/dark") printf '%s\n' "$target" ;;
+    *) return 1 ;;
+  esac
+}
+
+current_theme() {
+  local target
+  if [[ ! -e "$CURRENT" && ! -L "$CURRENT" ]]; then
+    printf 'light\n'
+    return
+  fi
+  target="$(managed_current_target)" \
+    || die "refusing unmanaged theme state: $CURRENT"
+  basename "$target"
+}
+
+resolve_theme() {
+  case "${1:-apply}" in
+    light|dark) printf '%s\n' "$1" ;;
+    apply|"") current_theme ;;
+    toggle)
+      if [[ "$(current_theme)" == light ]]; then
+        printf 'dark\n'
+      else
+        printf 'light\n'
+      fi
+      ;;
+    status) current_theme ;;
+    *) die "usage: theme-switch [light|dark|toggle|apply|status]" ;;
+  esac
+}
+
+validate_theme() {
+  local theme="$1" entry rel
+  local root="$THEMES/$theme"
+  [[ -d "$root" ]] || die "missing theme: $root"
+  [[ -f "$root/gsettings.env" ]] || die "missing theme asset: $root/gsettings.env"
+  [[ -f "$root/ghostty/theme.ghostty" ]] || die "missing theme asset: $root/ghostty/theme.ghostty"
+  [[ -f "$root/tmux/theme.conf" ]] || die "missing theme asset: $root/tmux/theme.conf"
+  [[ -f "$root/nvim/colorscheme.lua" ]] || die "missing theme asset: $root/nvim/colorscheme.lua"
+
+  for entry in "${ASSET_LINKS[@]}"; do
+    rel="${entry%%:*}"
+    [[ -f "$root/$rel" ]] || die "missing theme asset: $root/$rel"
+  done
+}
+
+gtk_root_for_theme() {
+  local theme="$1" gtk_theme
+  # shellcheck disable=SC1090
+  source "$THEMES/$theme/gsettings.env"
+  gtk_theme="${GTK_THEME_NAME:?missing GTK_THEME_NAME}"
+  printf '/usr/share/themes/%s/gtk-4.0\n' "$gtk_theme"
+}
+
+validate_gtk_theme() {
+  local gtk_root name
+  gtk_root="$(gtk_root_for_theme "$1")"
+  for name in assets gtk.css gtk-dark.css; do
+    [[ -e "$gtk_root/$name" ]] || die "missing GTK asset: $gtk_root/$name"
+  done
+}
+
+preflight_destinations() {
+  local entry rel dest expected target name
+  if [[ -e "$CURRENT" || -L "$CURRENT" ]]; then
+    managed_current_target >/dev/null \
+      || die "refusing unmanaged theme state: $CURRENT"
+  fi
+
+  for entry in "${ASSET_LINKS[@]}"; do
+    rel="${entry%%:*}"
+    dest="${entry#*:}"
+    expected="$CURRENT/$rel"
+    if [[ -e "$dest" && ! -L "$dest" ]]; then
+      die "refusing to replace unmanaged file: $dest"
+    fi
+    if [[ -L "$dest" && "$(readlink "$dest")" != "$expected" ]]; then
+      die "refusing to replace unmanaged symlink: $dest"
+    fi
+  done
+
+  for name in assets gtk.css gtk-dark.css; do
+    dest="$HOME/.config/gtk-4.0/$name"
+    if [[ -e "$dest" && ! -L "$dest" ]]; then
+      die "refusing to replace unmanaged GTK file: $dest"
+    fi
+    if [[ -L "$dest" ]]; then
+      target="$(readlink -f "$dest")"
+      case "$target" in
+        /usr/share/themes/adw-gtk3/gtk-4.0/"$name"|/usr/share/themes/adw-gtk3-dark/gtk-4.0/"$name") ;;
+        *) die "refusing to replace unmanaged GTK symlink: $dest" ;;
+      esac
+    fi
+  done
+}
+
+ensure_asset_links() {
+  local entry rel dest expected
+  for entry in "${ASSET_LINKS[@]}"; do
+    rel="${entry%%:*}"
+    dest="${entry#*:}"
+    expected="$CURRENT/$rel"
+    mkdir -p "$(dirname "$dest")"
+    [[ -L "$dest" ]] || ln -s "$expected" "$dest"
+  done
+}
+
+apply_gtk_assets() {
+  local gtk_root dest name
+  gtk_root="$(gtk_root_for_theme "$1")"
+  mkdir -p "$HOME/.config/gtk-4.0"
+  for name in assets gtk.css gtk-dark.css; do
+    dest="$HOME/.config/gtk-4.0/$name"
+    ln -sfn "$gtk_root/$name" "$dest"
+  done
+}
+
+set_current_theme() {
+  local theme="$1" temporary
+  mkdir -p "$STATE_DIR"
+  temporary="$STATE_DIR/.current.$$"
+  rm -f "$temporary"
+  ln -s "$THEMES/$theme" "$temporary"
+  mv -Tf "$temporary" "$CURRENT"
+}
+
+apply_gsettings() {
+  local theme_root
+  theme_root="$(readlink -f "$CURRENT")"
+  # shellcheck disable=SC1090
+  source "$theme_root/gsettings.env"
+  gsettings set org.gnome.desktop.interface color-scheme "$COLOR_SCHEME" \
+    || warn "could not set color scheme"
+  gsettings set org.gnome.desktop.interface gtk-theme "$GTK_THEME_NAME" \
+    || warn "could not set GTK theme"
+  gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" \
+    || warn "could not set icon theme"
+  gsettings set org.gnome.desktop.interface cursor-theme "$CURSOR_THEME" \
+    || warn "could not set cursor theme"
+
+  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v hyprctl >/dev/null; then
+    hyprctl setcursor "$CURSOR_THEME" 24 >/dev/null \
+      || warn "could not reload Hyprland cursor"
+  fi
+}
+
+reload_running_apps() {
+  if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v hyprctl >/dev/null; then
+    hyprctl reload >/dev/null || warn "could not reload Hyprland"
+  fi
+
+  if pgrep -x waybar >/dev/null; then
+    pkill -USR2 -x waybar || warn "could not reload Waybar"
+  fi
+  if [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]] \
+    && pgrep -x mako >/dev/null \
+    && command -v makoctl >/dev/null
+  then
+    makoctl reload || warn "could not reload Mako"
+  fi
+  if [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]] \
+    && pgrep -x fcitx5 >/dev/null \
+    && command -v fcitx5-remote >/dev/null
+  then
+    fcitx5-remote -r >/dev/null || warn "could not reload Fcitx5"
+  fi
+
+  if command -v tmux >/dev/null && tmux list-sessions >/dev/null 2>&1; then
+    while IFS= read -r session; do
+      tmux source-file -t "$session" "$HOME/.config/tmux/tmux.conf" \
+        || warn "could not reload tmux session: $session"
+    done < <(tmux list-sessions -F '#S')
+  fi
+
+  if [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]] \
+    && pgrep -x ghostty >/dev/null \
+    && command -v busctl >/dev/null
+  then
+    busctl --user call com.mitchellh.ghostty /com/mitchellh/ghostty \
+      org.gtk.Actions Activate sava{sv} reload-config 0 0 >/dev/null \
+      || warn "could not reload Ghostty"
+  fi
+}
+
+main() {
+  local command="${1:-apply}" theme
+  if [[ "$command" == status ]]; then
+    current_theme
+    return
+  fi
+
+  theme="$(resolve_theme "$command")"
+  validate_theme "$theme"
+  validate_gtk_theme "$theme"
+  preflight_destinations
+  ensure_asset_links
+  apply_gtk_assets "$theme"
+  set_current_theme "$theme"
+
+  if [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]]; then
+    apply_gsettings
+  fi
+  reload_running_apps
+
+  if command -v notify-send >/dev/null && [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]]; then
+    notify-send "Theme → $theme" "Desktop theme applied" -t 2500 \
+      || warn "could not send theme notification"
+  fi
+  log "active theme: $theme"
+}
+
+main "$@"

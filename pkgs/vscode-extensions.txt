@@ -1,0 +1,14 @@
+anthropic.claude-code@2.1.216
+buster.ndjson-colorizer@1.0.0
+james-yu.latex-workshop@10.16.1
+ms-python.debugpy@2026.6.0
+ms-python.python@2026.4.0
+ms-python.vscode-pylance@2026.2.1
+ms-python.vscode-python-envs@1.36.0
+ms-vscode-remote.remote-ssh-edit@0.87.0
+ms-vscode-remote.remote-ssh@0.124.0
+ms-vscode.remote-explorer@0.5.0
+openai.chatgpt@26.715.31925
+shd101wyy.markdown-preview-enhanced@0.8.30
+sst-dev.opencode@0.0.13
+tomoki1207.pdf@1.2.2

@@ -1,0 +1,12 @@
+[Unit]
+Description=tt schedule and Pomodoro notifier
+ConditionPathExists=%h/.config/tt/schedule.json
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/tt daemon
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

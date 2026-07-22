@@ -1,0 +1,181 @@
+@import "colors.css";
+
+/* --- 全局重置 --- */
+* {
+    /* 稍微减小字体，适应更窄的栏 */
+    font-family: "JetBrainsMono Nerd Font", "Inter", sans-serif;
+    font-size: 12px; 
+    font-weight: 700;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* --- Waybar 主窗口 --- */
+window#waybar {
+    background: transparent;
+    color: @text;
+    transition: background-color .5s;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/* --- 工具提示 --- */
+tooltip {
+    background: @base;
+    border: 1px solid @surface1;
+    border-radius: 10px; /* 圆角稍微改小一点适配窄栏 */
+}
+tooltip label {
+    color: @text;
+}
+
+/* =========================================
+   模块样式：紧凑冰川风
+   ========================================= */
+
+/* --- 1. Arch 信仰标 (更紧凑) --- */
+#custom-arch {
+    color: @base;
+    background: linear-gradient(135deg, #9D8ECE, #B3A3E0);
+    font-size: 16px;
+    margin: 1px 6px 1px 0;
+    padding: 1px 14px 1px 10px;
+    border-radius: 10px;
+    opacity: 0.9;
+    box-shadow: 0 2px 4px rgba(157, 142, 206, 0.25);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#custom-arch:hover {
+    padding: 1px 18px 1px 14px;
+    opacity: 1;
+}
+
+/* 2. 工作区 (变扁) */
+#workspaces {
+    background-color: @glass-bg;
+    /* 压缩垂直间距 */
+    margin: 1px 0;
+    padding: 1px 2px;
+    border-radius: 10px;
+    border: 1px solid @glass-border;
+}
+
+#workspaces button {
+    padding: 0 6px; /* 减少左右留白 */
+    color: @overlay0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+#workspaces button:hover {
+    background: @glass-hover;
+    color: @text;
+}
+
+#workspaces button.active {
+    color: #9D8ECE;
+    background: rgba(255, 255, 255, 0.8);
+    min-width: 25px;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.05);
+}
+
+#workspaces button.urgent {
+    color: @red;
+    background: @glass-hover;
+}
+
+#workspaces button.empty:not(.active):not(.visible) {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+}
+
+#workspaces button.empty:not(.active):not(.visible) .workspace-label {
+    font-size: 0;
+}
+
+/* 3. 音量 */
+#pulseaudio {
+    background-color: @glass-bg;
+    border: 1px solid @glass-border;
+    color: @pink;
+    border-radius: 10px;
+    margin: 1px 6px;
+    padding: 0 12px;
+    transition: all 0.3s ease;
+}
+
+#pulseaudio:hover {
+    background-color: @glass-hover;
+}
+
+/* 4. 时钟 */
+#custom-clock {
+    background-color: @blue;
+    color: @base;
+    /* 压缩垂直间距 */
+    margin: 1px 0;
+    padding: 0 12px;
+    border-radius: 10px;
+    font-weight: 800;
+    box-shadow: 0 2px 4px rgba(30, 102, 245, 0.2);
+}
+
+#custom-clock.ime-en {
+    background-color: @blue;
+}
+
+#custom-clock.ime-zh {
+    background-color: #d20f39;
+    box-shadow: 0 2px 4px rgba(210, 15, 57, 0.25);
+}
+
+/* 6. tt 时间管理 */
+#custom-tt {
+    background-color: @glass-bg;
+    color: @text;
+    border: 1px solid @glass-border;
+    border-radius: 10px;
+    margin: 1px 6px;
+    padding: 0 12px;
+    transition: all 0.3s ease;
+}
+
+#custom-tt:hover {
+    background-color: @glass-hover;
+}
+
+/* 深度工作·专注中 — 绿色 */
+#custom-tt.tt-work {
+    color: @green;
+    border-color: rgba(64, 160, 43, 0.35);
+}
+
+/* 深度工作·休息中 — 橙色 */
+#custom-tt.tt-break {
+    color: @peach;
+    border-color: rgba(254, 100, 11, 0.35);
+    background-color: rgba(254, 100, 11, 0.08);
+}
+
+/* 普通时段 — 默认文字色 */
+#custom-tt.tt-normal {
+    color: @subtext1;
+}
+
+/* 7. 托盘 */
+#tray {
+    background-color: @glass-bg;
+    /* 压缩垂直间距 */
+    margin: 1px 10px 1px 0;
+    padding: 0 8px;
+    border-radius: 10px;
+    border: 1px solid @glass-border;
+}

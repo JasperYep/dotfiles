@@ -1,0 +1,24 @@
+# Portable Ghostty behavior. Theme values are selected by theme-switch.
+font-family = Maple Mono NF CN
+font-family = Symbols Nerd Font
+font-size = 13
+adjust-cell-height = 15%
+font-feature = calt
+
+window-padding-x = 10
+window-padding-y = 10
+window-decoration = none
+confirm-close-surface = false
+window-width = 100
+window-height = 30
+maximize = true
+window-save-state = never
+
+scrollback-limit = 2000000
+mouse-scroll-multiplier = precision:1,discrete:1
+background-opacity = 0.98
+background-blur = true
+app-notifications = no-clipboard-copy
+shell-integration-features = no-cursor
+
+config-file = ~/.config/theme/current/ghostty/theme.ghostty
