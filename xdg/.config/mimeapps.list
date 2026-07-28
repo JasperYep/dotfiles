@@ -1,6 +1,7 @@
 [Default Applications]
 x-scheme-handler/terminal=com.mitchellh.ghostty.desktop
 text/html=firefox.desktop
+text/x-bibtex=nvim.desktop
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
 x-scheme-handler/about=firefox.desktop

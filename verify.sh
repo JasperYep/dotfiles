@@ -43,6 +43,9 @@ validate_scripts() {
   bash -n "$DOTFILES/bootstrap.sh" "$DOTFILES/verify.sh"
   bash -n "$DOTFILES/scripts/.local/bin/theme-switch"
   bash -n "$DOTFILES/scripts/.local/bin/daily-wallpaper.sh"
+  bash -n "$DOTFILES/scripts/.local/bin/rofi-calc"
+  bash -n "$DOTFILES/scripts/.local/bin/rofi-files"
+  zsh -n "$DOTFILES/zsh/.zshrc"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/away-lock.sh"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/layout-dispatch.sh"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/quicknote.sh"
@@ -53,7 +56,28 @@ validate_scripts() {
     "$DOTFILES/tt/.local/bin/tt" \
     "$DOTFILES/nvim/.config/nvim/bin/render_markdown_latex.py"
   rm -rf "$cache"
-  pass "script syntax"
+
+  python - "$DOTFILES/tt/.local/bin/tt" <<'PY'
+import datetime as dt
+import runpy
+import sys
+
+module = runpy.run_path(sys.argv[1])
+assert module["display_width"]("A中") == 3
+assert module["truncate_width"]("A中文", 3) == "A中"
+block = {"start": "22:30", "end": "06:30"}
+now = dt.datetime(2026, 1, 2, 1, 0)
+assert module["block_duration_minutes"](block) == 480
+assert module["remaining_minutes"](block, now) == 330
+assert module["block_progress"](block, now) == 0.3125
+PY
+
+  local script
+  for script in rofi-calc rofi-files; do
+    [[ -x "$DOTFILES/scripts/.local/bin/$script" ]] \
+      || fail "script is not executable: scripts/.local/bin/$script"
+  done
+  pass "script syntax and helpers"
 }
 
 validate_data_files() {
@@ -154,6 +178,21 @@ verify_flatpak_packages() {
     flatpak info --system "$app" >/dev/null || fail "missing Flatpak application: $app"
   done <"$DOTFILES/pkgs/flatpak.txt"
   pass "Flatpak applications"
+}
+
+verify_pi() {
+  local launcher target version
+  launcher="$HOME/.local/bin/pi"
+  target="$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/cli.js"
+  [[ -x "$launcher" ]] || fail "Pi launcher is missing: $launcher"
+  [[ "$(readlink -f "$launcher")" == "$target" ]] \
+    || fail "Pi is not installed by the official user-local installer"
+  [[ "$(command -v pi)" == "$launcher" ]] \
+    || fail "PATH does not prefer the official Pi launcher"
+  version="$($launcher --version)"
+  [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][[:alnum:].-]+)?$ ]] \
+    || fail "invalid Pi version: $version"
+  pass "official Pi installation ($version)"
 }
 
 verify_npm_tools() {
@@ -291,6 +330,8 @@ verify_mime_defaults() {
     || fail "PDF default is not Zathura"
   [[ "$(xdg-mime query default text/markdown)" == marktext.desktop ]] \
     || fail "Markdown default is not MarkText"
+  [[ "$(xdg-mime query default text/x-bibtex)" == nvim.desktop ]] \
+    || fail "BibTeX default is not Neovim"
   [[ "$(xdg-mime query default x-scheme-handler/clash)" == clash-verge-handler.desktop ]] \
     || fail "clash URL handler is not restored"
   [[ "$(xdg-mime query default x-scheme-handler/clash-verge)" == clash-verge-handler.desktop ]] \
@@ -302,6 +343,7 @@ verify_installed() {
   [[ -z "$(git -C "$DOTFILES" status --porcelain)" ]] || fail "dotfiles worktree is dirty"
   verify_pacman_packages
   verify_flatpak_packages
+  verify_pi
   verify_npm_tools
   verify_uv_tools
   verify_vscode_extensions

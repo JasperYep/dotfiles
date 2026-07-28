@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Daily schedule and Pomodoro status for Waybar."""
+"""Schedule, Pomodoro notifications, Waybar status, and terminal UI."""
 
 from __future__ import annotations
 
+import curses
 import datetime as dt
 import fcntl
 import json
@@ -12,7 +13,8 @@ import signal
 import subprocess
 import sys
 import time
-from typing import Any
+import unicodedata
+from typing import Any, Literal, overload
 
 CONFIG_FILE = Path.home() / ".config" / "tt" / "schedule.json"
 DATA_DIR = Path.home() / ".local" / "share" / "tt"
@@ -22,6 +24,11 @@ LOCK_FILE = DATA_DIR / "tt.lock"
 CHECK_SECONDS = 10
 WAYBAR_SIGNAL = 8
 VALID_URGENCIES = {"low", "normal", "critical"}
+TUI_WEEKDAYS = ("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
+TUI_MONTHS = (
+    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+)
 
 
 def log(message: str) -> None:
@@ -87,6 +94,14 @@ def validate_config(config: Any) -> None:
         urgency = reminder.get("urgency", "normal")
         if urgency not in VALID_URGENCIES:
             raise ValueError(f"reminders[{index}].urgency must be low, normal, or critical")
+
+
+@overload
+def read_config(required: Literal[True] = True) -> dict[str, Any]: ...
+
+
+@overload
+def read_config(required: Literal[False]) -> dict[str, Any] | None: ...
 
 
 def read_config(required: bool = True) -> dict[str, Any] | None:
@@ -195,7 +210,7 @@ def tick(config: dict[str, Any]) -> None:
     changed = False
 
     block_key = f"{today}:{block['start']}:{block['name']}" if block else None
-    if block_key and state.get("block_key") != block_key:
+    if block is not None and block_key and state.get("block_key") != block_key:
         delivered = notify(
             f"{block.get('icon', '•')} {block['name']}",
             f"{block['start']}–{block['end']}",
@@ -293,6 +308,347 @@ def print_status() -> None:
         print(payload["text"])
 
 
+def display_width(text: str) -> int:
+    return sum(
+        0 if unicodedata.combining(character)
+        else 2 if unicodedata.east_asian_width(character) in {"W", "F"}
+        else 1
+        for character in text
+    )
+
+
+def truncate_width(text: str, width: int) -> str:
+    if width <= 0:
+        return ""
+    result: list[str] = []
+    used = 0
+    for character in text:
+        character_width = (
+            0 if unicodedata.combining(character)
+            else 2 if unicodedata.east_asian_width(character) in {"W", "F"}
+            else 1
+        )
+        if used + character_width > width:
+            break
+        result.append(character)
+        used += character_width
+    return "".join(result)
+
+
+def tui_put(
+    window: Any,
+    y: int,
+    x: int,
+    text: str,
+    attribute: int = 0,
+    max_width: int | None = None,
+) -> None:
+    height, width = window.getmaxyx()
+    if y < 0 or y >= height or x < 0 or x >= width:
+        return
+    available = width - x
+    if max_width is not None:
+        available = min(available, max_width)
+    rendered = truncate_width(text, available)
+    if not rendered:
+        return
+    try:
+        window.addstr(y, x, rendered, attribute)
+    except curses.error:
+        pass
+
+
+def tui_right(window: Any, y: int, right: int, text: str, attribute: int = 0) -> None:
+    tui_put(window, y, max(0, right - display_width(text)), text, attribute)
+
+
+def tui_center(window: Any, y: int, text: str, attribute: int = 0) -> None:
+    _, width = window.getmaxyx()
+    tui_put(window, y, max(0, (width - display_width(text)) // 2), text, attribute)
+
+
+def tui_styles() -> dict[str, int]:
+    styles = {
+        "primary": curses.A_NORMAL,
+        "heading": curses.A_BOLD,
+        "muted": curses.A_DIM,
+        "accent": curses.A_BOLD,
+        "past": curses.A_DIM,
+    }
+    if not curses.has_colors():
+        return styles
+
+    curses.start_color()
+    background = -1
+    try:
+        curses.use_default_colors()
+    except curses.error:
+        background = curses.COLOR_BLACK
+
+    if curses.COLORS >= 256:
+        primary, muted, accent = 255, 245, 110
+    else:
+        primary, muted, accent = curses.COLOR_WHITE, curses.COLOR_WHITE, curses.COLOR_CYAN
+    try:
+        curses.init_pair(1, primary, background)
+        curses.init_pair(2, muted, background)
+        curses.init_pair(3, accent, background)
+    except curses.error:
+        return styles
+
+    styles["primary"] = curses.color_pair(1)
+    styles["heading"] = curses.color_pair(1) | curses.A_BOLD
+    styles["muted"] = curses.color_pair(2)
+    styles["accent"] = curses.color_pair(3) | curses.A_BOLD
+    styles["past"] = curses.color_pair(2) | curses.A_DIM
+    return styles
+
+
+def block_duration_minutes(block: dict[str, Any]) -> int:
+    start = minute_of_day(block["start"])
+    end = minute_of_day(block["end"])
+    if end < start:
+        end += 1440
+    return end - start
+
+
+def block_progress(block: dict[str, Any], now: dt.datetime) -> float:
+    duration = block_duration_minutes(block)
+    if duration <= 0:
+        return 0.0
+    return min(1.0, max(0.0, elapsed_minutes(block, now) / duration))
+
+
+def format_countdown(minutes: float) -> str:
+    seconds = max(0, int(minutes * 60 + 0.999))
+    hours, remainder = divmod(seconds, 3600)
+    minute, second = divmod(remainder, 60)
+    if hours:
+        return f"{hours:02d}:{minute:02d}:{second:02d}"
+    return f"{minute:02d}:{second:02d}"
+
+
+def schedule_block_index(config: dict[str, Any], block: dict[str, Any] | None) -> int | None:
+    if block is None:
+        return None
+    for index, candidate in enumerate(config["blocks"]):
+        if candidate is block:
+            return index
+    return None
+
+
+def next_schedule_block(
+    config: dict[str, Any],
+    block: dict[str, Any] | None,
+    now: dt.datetime,
+) -> dict[str, Any] | None:
+    blocks: list[dict[str, Any]] = config["blocks"]
+    if not blocks:
+        return None
+    index = schedule_block_index(config, block)
+    if index is not None:
+        return blocks[(index + 1) % len(blocks)]
+
+    minute = now.hour * 60 + now.minute
+    return min(blocks, key=lambda item: (minute_of_day(item["start"]) - minute) % 1440)
+
+
+def draw_schedule_rows(
+    window: Any,
+    config: dict[str, Any],
+    current: dict[str, Any] | None,
+    top: int,
+    left: int,
+    right: int,
+    row_limit: int,
+    styles: dict[str, int],
+) -> None:
+    blocks = config["blocks"]
+    if row_limit <= 0 or not blocks:
+        return
+
+    current_index = schedule_block_index(config, current)
+    visible = min(row_limit, len(blocks))
+    if current_index is None:
+        first = 0
+    else:
+        first = max(0, min(current_index - visible // 2, len(blocks) - visible))
+
+    name_x = left + 11
+    end_x = right - 5
+    name_width = max(1, end_x - name_x - 2)
+    for row, index in enumerate(range(first, first + visible)):
+        block = blocks[index]
+        y = top + row
+        is_current = index == current_index
+        if is_current:
+            style = styles["accent"]
+            marker = "●"
+        elif current_index is not None and index < current_index:
+            style = styles["past"]
+            marker = " "
+        else:
+            style = styles["muted"]
+            marker = " "
+
+        tui_put(window, y, left, marker, styles["accent"] if is_current else style)
+        tui_put(window, y, left + 3, block["start"], style)
+        tui_put(window, y, name_x, block["name"].upper(), style, name_width)
+        tui_right(window, y, right, block["end"], style)
+
+
+def draw_tui(
+    window: Any,
+    config: dict[str, Any],
+    now: dt.datetime,
+    styles: dict[str, int],
+    config_error: str | None = None,
+) -> None:
+    window.erase()
+    height, width = window.getmaxyx()
+    if width < 46 or height < 13:
+        tui_center(window, max(1, height // 2 - 1), "tt", styles["heading"])
+        tui_center(window, max(2, height // 2 + 1), "terminal too small", styles["muted"])
+        window.refresh()
+        return
+
+    content_width = min(84, width - 6)
+    left = (width - content_width) // 2
+    right = left + content_width
+    footer_y = height - 2
+
+    stamp = (
+        f"{TUI_WEEKDAYS[now.weekday()]} · {now.day:02d} {TUI_MONTHS[now.month - 1]}"
+        f"  {now:%H:%M:%S}"
+    )
+    tui_put(window, 1, left, "tt", styles["heading"])
+    tui_right(window, 1, right, stamp, styles["muted"])
+    tui_put(window, 2, left, "─" * content_width, styles["past"])
+
+    current = active_block(config, now)
+    next_block = next_schedule_block(config, current, now)
+    tui_put(window, 4, left, "CURRENT", styles["muted"])
+
+    if current is None:
+        tui_put(window, 5, left, "NO ACTIVE BLOCK", styles["heading"])
+        detail_y = 8
+    else:
+        tui_put(window, 5, left, current["name"].upper(), styles["heading"], content_width)
+        tui_put(window, 6, left, f"{current['start']}  —  {current['end']}", styles["muted"])
+        tui_right(
+            window,
+            6,
+            right,
+            f"{format_countdown(remaining_minutes(current, now))}  LEFT",
+            styles["primary"],
+        )
+
+        progress = block_progress(current, now)
+        percentage = int(progress * 100)
+        percentage_text = f"{percentage:>3}%"
+        bar_width = max(8, content_width - display_width(percentage_text) - 2)
+        filled = min(bar_width, max(0, int(round(progress * bar_width))))
+        tui_put(window, 8, left, "━" * filled, styles["accent"])
+        tui_put(window, 8, left + filled, "─" * (bar_width - filled), styles["past"])
+        tui_right(window, 8, right, percentage_text, styles["muted"])
+
+        detail_y = 10
+        pomodoro = pomodoro_state(current, now)
+        if pomodoro:
+            phase = "FOCUS" if pomodoro["phase"] == "work" else "BREAK"
+            tui_put(
+                window,
+                detail_y,
+                left,
+                f"{phase}  ·  ROUND {pomodoro['cycle']:02d}",
+                styles["accent"] if pomodoro["phase"] == "work" else styles["primary"],
+            )
+            tui_right(
+                window,
+                detail_y,
+                right,
+                format_countdown(pomodoro["remaining"]),
+                styles["primary"],
+            )
+            detail_y += 1
+
+    if next_block is not None:
+        tui_put(window, detail_y, left, "NEXT", styles["muted"])
+        tui_put(
+            window,
+            detail_y,
+            left + 7,
+            next_block["name"].upper(),
+            styles["primary"],
+            max(1, content_width - 16),
+        )
+        tui_right(window, detail_y, right, next_block["start"], styles["muted"])
+
+    schedule_title_y = detail_y + 2
+    rows_top = schedule_title_y + 1
+    row_limit = max(0, footer_y - rows_top)
+    if row_limit:
+        tui_put(window, schedule_title_y, left, "TODAY", styles["muted"])
+        draw_schedule_rows(
+            window,
+            config,
+            current,
+            rows_top,
+            left,
+            right,
+            row_limit,
+            styles,
+        )
+
+    if config_error:
+        tui_put(window, footer_y, left, f"CONFIG  {config_error}", styles["accent"], content_width - 12)
+    tui_right(window, footer_y, right, "Q  CLOSE", styles["past"])
+    window.refresh()
+
+
+def run_tui() -> None:
+    if not sys.stdin.isatty() or not sys.stdout.isatty():
+        raise RuntimeError("TUI requires an interactive terminal")
+
+    def session(window: Any) -> None:
+        try:
+            curses.curs_set(0)
+        except curses.error:
+            pass
+        try:
+            curses.set_escdelay(25)
+        except AttributeError:
+            pass
+        window.keypad(True)
+        window.timeout(200)
+        styles = tui_styles()
+        config = read_config()
+        observed_mtime = CONFIG_FILE.stat().st_mtime_ns
+        config_error: str | None = None
+
+        while True:
+            try:
+                current_mtime = CONFIG_FILE.stat().st_mtime_ns
+                if current_mtime != observed_mtime:
+                    observed_mtime = current_mtime
+                    try:
+                        updated = read_config()
+                    except (ValueError, json.JSONDecodeError) as error:
+                        config_error = str(error)
+                    else:
+                        config = updated
+                        config_error = None
+            except FileNotFoundError:
+                config_error = "schedule.json not found"
+
+            draw_tui(window, config, dt.datetime.now(), styles, config_error)
+            key = window.getch()
+            if key in {ord("q"), ord("Q"), 27}:
+                return
+
+    curses.wrapper(session)
+
+
 def run_daemon() -> None:
     config = read_config()
     observed_mtime = CONFIG_FILE.stat().st_mtime_ns
@@ -340,11 +696,8 @@ def main() -> int:
     try:
         if command in {"status", "s"}:
             print_status()
-        elif command in {"watch", "w"}:
-            while True:
-                print("\033[2J\033[H", end="")
-                print_status()
-                time.sleep(1)
+        elif command in {"tui", "watch", "w"}:
+            run_tui()
         elif command == "bar":
             print(json.dumps(bar_payload(), ensure_ascii=False))
         elif command == "daemon":
@@ -355,7 +708,7 @@ def main() -> int:
         elif command == "log":
             show_log(int(sys.argv[2]) if len(sys.argv) > 2 else 40)
         else:
-            print("usage: tt [status|watch|bar|daemon|validate|log]", file=sys.stderr)
+            print("usage: tt [status|tui|watch|bar|daemon|validate|log]", file=sys.stderr)
             return 2
     except KeyboardInterrupt:
         return 0

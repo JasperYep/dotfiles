@@ -22,6 +22,35 @@ if [[ -o interactive && "${TERM:-}" != dumb ]]; then
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
   source /usr/share/fzf/key-bindings.zsh
+
+  # Ctrl+T: 选择文件或目录，回车后 cd 到选中的目录或文件所在目录
+  fzf-cd-target-widget() {
+    setopt localoptions pipefail no_aliases 2> /dev/null
+    local item="$(
+      FZF_DEFAULT_COMMAND=${FZF_CTRL_T_COMMAND:-$FZF_DEFAULT_COMMAND} \
+      FZF_DEFAULT_OPTS=$(__fzf_defaults "--reverse --walker=file,dir,follow,hidden --scheme=path" "${FZF_CTRL_T_OPTS-} +m") \
+      FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) < /dev/tty)"
+    if [[ -z "$item" ]]; then
+      zle redisplay
+      return 0
+    fi
+
+    local target="$item"
+    if [[ -f "$target" || ( ! -d "$target" && -e "$target" ) ]]; then
+      target="${target:h}"
+    fi
+
+    if [[ -d "$target" ]]; then
+      builtin cd -- "$target"
+    fi
+    local ret=$?
+    zle reset-prompt
+    return $ret
+  }
+  zle -N fzf-cd-target-widget
+  bindkey -M emacs '^T' fzf-cd-target-widget
+  bindkey -M vicmd '^T' fzf-cd-target-widget
+  bindkey -M viins '^T' fzf-cd-target-widget
   eval "$(starship init zsh)"
 
   theme_file="${XDG_CONFIG_HOME:-$HOME/.config}/theme/current/zsh/theme.zsh"
@@ -86,3 +115,8 @@ alias grep='grep --color=auto'
 if [[ "${TERM:-}" == xterm-ghostty ]] && ! infocmp xterm-ghostty >/dev/null 2>&1; then
   export TERM=xterm-256color
 fi
+
+# Optional host-only aliases, device addresses, and local tool setup.
+local_zsh_config="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh"
+[[ -r "$local_zsh_config" ]] && source "$local_zsh_config"
+unset local_zsh_config

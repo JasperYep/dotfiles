@@ -3,7 +3,7 @@
 ## 自动恢复
 
 - Arch官方仓、AUR和Flatpak中的用户体验软件
-- npm全局工具、uv tools和VS Code extensions
+- Pi官方user-local安装、npm全局工具、uv tools和VS Code extensions
 - Hyprland、Waybar、Rofi、Ghostty、Mako和Hyprpaper
 - Zsh、Starship、tmux、Yazi、Ripgrep和Neovim
 - Fcitx5公开配置与Rime输入法入口

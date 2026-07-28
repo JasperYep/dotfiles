@@ -27,6 +27,16 @@ fcitx5-remote -r
 
 公共bootstrap只恢复Fcitx5 profile、hotkeys和非私人的UI配置。
 
+## Zsh主机配置
+
+公共`.zshrc`会在存在时加载：
+
+```text
+~/.config/zsh/local.zsh
+```
+
+蓝牙设备地址、主机专用alias、私人PATH和只在单机安装的工具初始化应放在该文件中，不要写入公共仓库。
+
 ## tt
 
 真实日程文件位于：

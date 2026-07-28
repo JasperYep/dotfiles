@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# Search the home directory with fd, then let rofi do the fuzzy matching.
+# Cache/build directories are omitted to keep the list responsive.
+selection="$({
+    fd --hidden \
+        --type f \
+        --type d \
+        --exclude .git \
+        --exclude .cache \
+        --exclude node_modules \
+        --exclude .npm \
+        --exclude Trash \
+        . "$HOME"
+} | rofi -dmenu \
+    -i \
+    -sorting-method fzf \
+    -no-custom \
+    -p 'Open' \
+    -mesg 'Search files and directories')" || exit 0
+
+[ -n "$selection" ] || exit 0
+
+# xdg-open handles both regular files and directories.
+nohup xdg-open "$selection" >/dev/null 2>&1 &

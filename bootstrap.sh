@@ -3,6 +3,7 @@
 set -Eeuo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
 MODULES=(
   hyprland waybar rofi ghostty nvim yazi tmux zsh
   fcitx5 ripgrep vscode xdg scripts tt
@@ -92,6 +93,39 @@ ensure_paru() {
   rm -rf "$build_dir"
 }
 
+install_pi() {
+  local installer launcher target
+  launcher="$HOME/.local/bin/pi"
+  target="$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/cli.js"
+
+  if [[ -e "$HOME/.npm-global/bin/pi" || -L "$HOME/.npm-global/bin/pi" ]]; then
+    blue "Remove the legacy npm-global Pi installation"
+    npm uninstall --global --prefix "$HOME/.npm-global" \
+      @earendil-works/pi-coding-agent
+  fi
+
+  if [[ -x "$launcher" && "$(readlink -f "$launcher")" == "$target" ]]; then
+    return
+  fi
+  if [[ -e "$launcher" || -L "$launcher" ]]; then
+    die "refusing unmanaged Pi launcher: $launcher"
+  fi
+
+  blue "Install Pi with the official installer"
+  installer="$(mktemp)"
+  curl --fail --location --retry 3 --retry-all-errors \
+    --connect-timeout 10 --max-time 300 \
+    https://pi.dev/install.sh -o "$installer"
+  if ! NPM_CONFIG_PREFIX="$HOME/.local" setsid -f -w sh "$installer"; then
+    rm -f "$installer"
+    die "official Pi installer failed"
+  fi
+  rm -f "$installer"
+
+  [[ -x "$launcher" && "$(readlink -f "$launcher")" == "$target" ]] \
+    || die "official Pi installation did not create $launcher"
+}
+
 install_maple_mono() {
   local archive checksum destination temporary
   if fc-match -f '%{family}\n' 'Maple Mono NF CN' | grep -Fq 'Maple Mono NF CN'; then
@@ -129,6 +163,8 @@ install_packages() {
   sudo flatpak remote-add --system --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   read_manifest "$DOTFILES/pkgs/flatpak.txt"
   sudo flatpak install --system -y flathub "${MANIFEST_ITEMS[@]}"
+
+  install_pi
 
   blue "Install global npm tools"
   npm config set prefix "$HOME/.npm-global" --location=user

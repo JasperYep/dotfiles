@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -eu
+
+expression="$(printf '' | rofi -dmenu \
+    -i \
+    -p 'Calc' \
+    -mesg 'Examples: 2+2, sqrt(2), 10 km to mi')" || exit 0
+
+# Do not do anything when the prompt is cancelled or left empty.
+[ -n "${expression//[[:space:]]/}" ] || exit 0
+
+if ! result="$(qalc -t "$expression" 2>/dev/null)" || [ -z "$result" ]; then
+    notify-send -a Rofi -u normal 'Calculator' "Cannot calculate: $expression"
+    exit 1
+fi
+
+# Put the result in the Wayland clipboard and show it in a desktop notification.
+printf '%s' "$result" | wl-copy
+notify-send -a Rofi -u low 'Calculator' "$expression = $result"
