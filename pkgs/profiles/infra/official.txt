@@ -1,0 +1,4 @@
+libvirt
+nmap
+qemu-desktop
+virt-manager

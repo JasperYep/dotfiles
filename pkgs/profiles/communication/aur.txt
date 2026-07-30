@@ -1,0 +1,6 @@
+baidunetdisk-bin
+linuxqq
+localsend
+qqmusic-bin
+wechat-bin
+wemeet-bin

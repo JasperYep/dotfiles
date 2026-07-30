@@ -1,0 +1,8 @@
+bun
+chromium
+clang
+docker
+docker-compose
+go
+pnpm
+ruby

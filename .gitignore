@@ -29,6 +29,7 @@ generated/
 
 # Host/private restore state
 hyprland/.config/hypr/host.conf
+hyprland/.config/hypr/host.lua
 **/schedule.json
 **/installation.yaml
 **/user.yaml

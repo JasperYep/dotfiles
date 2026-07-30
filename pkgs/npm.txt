@@ -1,3 +1,0 @@
-@google/gemini-cli@0.46.0
-@openai/codex@0.145.0
-clawhub@0.5.0

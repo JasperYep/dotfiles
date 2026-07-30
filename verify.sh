@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MODE="${1:-installed}"
+MODE="installed"
 MODULES=(
   hyprland waybar rofi ghostty nvim yazi tmux zsh
   fcitx5 ripgrep vscode xdg scripts tt
@@ -12,7 +12,7 @@ STOW_IGNORE_ARGS=(
   --ignore='(^|/)\.claude($|/)'
   --ignore='(^|/)__pycache__($|/)'
   --ignore='\.py[cod]$'
-  --ignore='(^|/)host\.conf$'
+  --ignore='(^|/)host\.(conf|lua)$'
   --ignore='(^|/)schedule\.json$'
   --ignore='(^|/)(subscription\.env|installation\.yaml|user\.yaml)$'
   --ignore='(^|/)(sync|generated|.*\.userdb)($|/)'
@@ -20,22 +20,186 @@ STOW_IGNORE_ARGS=(
   --ignore='\.(key|pem|p12|pfx|log)$'
   --ignore='(^|/)lazy-lock\.json$'
 )
-MANIFESTS=(official aur flatpak npm uv vscode-extensions)
+MANIFEST_NAMES=(official aur flatpak npm)
+KNOWN_PROFILES=(academic documents dev ai media communication infra remote)
+
+SELECTED_PROFILES=()
+FULL_MODE=0
 
 pass() { printf '\e[32mPASS\e[0m %s\n' "$*"; }
 fail() { printf '\e[31mFAIL\e[0m %s\n' "$*" >&2; exit 1; }
 
-validate_manifests() {
-  local name path overlap
-  for name in "${MANIFESTS[@]}"; do
-    path="$DOTFILES/pkgs/$name.txt"
-    [[ -s "$path" ]] || fail "missing manifest: $path"
-    LC_ALL=C sort -cu "$path" || fail "manifest is not sorted and unique: $path"
-    ! grep -q '^$' "$path" || fail "blank line in manifest: $path"
+is_valid_profile() {
+  local candidate="$1" item
+  for item in "${KNOWN_PROFILES[@]}"; do
+    [[ "$candidate" == "$item" ]] && return 0
+  done
+  return 1
+}
+
+parse_profile_csv() {
+  local csv="$1" profile
+  IFS=',' read -r -a raw_profiles <<<"$csv"
+  for profile in "${raw_profiles[@]}"; do
+    profile="$(echo "$profile" | xargs)"
+    [[ -n "$profile" ]] || continue
+    if ! is_valid_profile "$profile"; then
+      fail "unknown profile: $profile (valid: ${KNOWN_PROFILES[*]})"
+    fi
+    SELECTED_PROFILES+=("$profile")
+  done
+}
+
+parse_args() {
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --repo-only|installed|--session)
+        MODE="$1"
+        shift
+        ;;
+      --with)
+        [[ $# -gt 1 ]] || fail "--with requires a profile CSV list"
+        parse_profile_csv "$2"
+        shift 2
+        ;;
+      --with=*)
+        parse_profile_csv "${1#*=}"
+        shift
+        ;;
+      --full)
+        FULL_MODE=1
+        shift
+        ;;
+      -h|--help)
+        printf '%s\n' \
+          "usage: verify.sh [--repo-only|installed|--session] [--with PROFILE_CSV] [--full]"
+        exit 0
+        ;;
+      *)
+        fail "unknown argument: $1"
+        ;;
+    esac
   done
 
-  overlap="$(LC_ALL=C comm -12 "$DOTFILES/pkgs/official.txt" "$DOTFILES/pkgs/aur.txt")"
-  [[ -z "$overlap" ]] || fail "official/AUR overlap: $overlap"
+  if [[ $FULL_MODE -eq 1 ]]; then
+    SELECTED_PROFILES=("${KNOWN_PROFILES[@]}")
+  fi
+
+  if ((${#SELECTED_PROFILES[@]} > 0)); then
+    mapfile -t SELECTED_PROFILES < <(printf '%s\n' "${SELECTED_PROFILES[@]}" | LC_ALL=C sort -u)
+  fi
+}
+
+collect_manifest_items() {
+  local manifest_name="$1"
+  local item path
+  local -a items=()
+
+  path="$DOTFILES/pkgs/core/$manifest_name.txt"
+  if [[ -f "$path" ]]; then
+    while IFS= read -r item || [[ -n "$item" ]]; do
+      [[ -n "$item" ]] && items+=("$item")
+    done <"$path"
+  fi
+
+  local profile
+  for profile in "${SELECTED_PROFILES[@]}"; do
+    path="$DOTFILES/pkgs/profiles/$profile/$manifest_name.txt"
+    if [[ -f "$path" ]]; then
+      while IFS= read -r item || [[ -n "$item" ]]; do
+        [[ -n "$item" ]] && items+=("$item")
+      done <"$path"
+    fi
+  done
+
+  if ((${#items[@]} > 0)); then
+    printf '%s\n' "${items[@]}" | LC_ALL=C sort -u
+  fi
+}
+
+validate_manifest_file() {
+  local path="$1"
+  [[ -f "$path" ]] || fail "manifest file missing: $path"
+  [[ -s "$path" ]] || return 0
+  LC_ALL=C sort -cu "$path" || fail "manifest is not sorted and unique: $path"
+  ! grep -nE '^[[:space:]]*$|^[[:space:]]|[[:space:]]$' "$path" >/dev/null \
+    || fail "blank or padded line in manifest: $path"
+}
+
+manifest_paths_for_kind() {
+  local name="$1" profile path
+  printf '%s\n' "$DOTFILES/pkgs/core/$name.txt"
+  for profile in "${KNOWN_PROFILES[@]}"; do
+    path="$DOTFILES/pkgs/profiles/$profile/$name.txt"
+    if [[ -f "$path" ]]; then
+      printf '%s\n' "$path"
+    fi
+  done
+}
+
+validate_manifests() {
+  local name profile path item previous basename relative valid
+  local top_manifest core_manifest
+  local -A seen=() official_items=()
+
+  [[ -d "$DOTFILES/pkgs/profiles" ]] || fail "missing profile directory: pkgs/profiles"
+  for profile in "${KNOWN_PROFILES[@]}"; do
+    [[ -d "$DOTFILES/pkgs/profiles/$profile" ]] \
+      || fail "missing expected profile directory: pkgs/profiles/$profile"
+  done
+  for path in "$DOTFILES"/pkgs/profiles/*; do
+    [[ -d "$path" ]] || continue
+    is_valid_profile "$(basename "$path")" \
+      || fail "unknown profile directory: ${path#"$DOTFILES/"}"
+  done
+
+  while IFS= read -r path; do
+    basename="${path##*/}"
+    relative="${path#"$DOTFILES/pkgs/"}"
+    valid=0
+    for name in "${MANIFEST_NAMES[@]}"; do
+      if [[ "$basename" == "$name.txt" ]]; then
+        valid=1
+        break
+      fi
+    done
+    [[ $valid -eq 1 ]] || fail "unknown manifest type: pkgs/$relative"
+  done < <(find "$DOTFILES/pkgs" -type f -name '*.txt' -print)
+
+  for name in "${MANIFEST_NAMES[@]}"; do
+    core_manifest="$DOTFILES/pkgs/core/$name.txt"
+    top_manifest="$DOTFILES/pkgs/$name.txt"
+    validate_manifest_file "$core_manifest"
+    validate_manifest_file "$top_manifest"
+    cmp -s "$top_manifest" "$core_manifest" \
+      || fail "top-level manifest $top_manifest does not match $core_manifest"
+
+    seen=()
+    while IFS= read -r path; do
+      validate_manifest_file "$path"
+      while IFS= read -r item || [[ -n "$item" ]]; do
+        [[ -n "$item" ]] || continue
+        if [[ -n "${seen[$item]+x}" ]]; then
+          previous="${seen[$item]}"
+          fail "duplicate $name item '$item' in ${previous#"$DOTFILES/"} and ${path#"$DOTFILES/"}"
+        fi
+        seen[$item]="$path"
+        if [[ "$name" == official ]]; then
+          official_items[$item]="$path"
+        fi
+      done <"$path"
+    done < <(manifest_paths_for_kind "$name")
+  done
+
+  while IFS= read -r path; do
+    while IFS= read -r item || [[ -n "$item" ]]; do
+      [[ -n "$item" ]] || continue
+      if [[ -n "${official_items[$item]+x}" ]]; then
+        fail "package '$item' appears in official and AUR manifests"
+      fi
+    done <"$path"
+  done < <(manifest_paths_for_kind aur)
+
   pass "package manifests"
 }
 
@@ -49,6 +213,11 @@ validate_scripts() {
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/away-lock.sh"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/layout-dispatch.sh"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/quicknote.sh"
+  luac -p \
+    "$DOTFILES/hyprland/.config/hypr/hyprland.lua" \
+    "$DOTFILES/hyprland/.config/hypr/host.example.lua" \
+    "$DOTFILES/themes/light/hypr/theme.lua" \
+    "$DOTFILES/themes/dark/hypr/theme.lua"
 
   local cache
   cache="$(mktemp -d)"
@@ -82,9 +251,29 @@ PY
 
 validate_data_files() {
   jq empty "$DOTFILES/vscode/.config/Code/User/settings.json"
+  jq empty "$DOTFILES/hyprland/.config/hypr/.luarc.json"
   jq empty "$DOTFILES/tt/.config/tt/schedule.example.json"
   jq empty "$DOTFILES/waybar/.config/waybar/config.jsonc"
   pass "JSON and JSONC files"
+}
+
+validate_hyprland_lua() {
+  local temporary theme
+  temporary="$(mktemp -d)"
+  mkdir -p "$temporary/hypr"
+  cp "$DOTFILES/hyprland/.config/hypr/hyprland.lua" "$temporary/hypr/hyprland.lua"
+  cp "$DOTFILES/hyprland/.config/hypr/host.example.lua" "$temporary/hypr/host.lua"
+
+  for theme in light dark; do
+    cp "$DOTFILES/themes/$theme/hypr/theme.lua" "$temporary/hypr/theme.lua"
+    if ! XDG_CONFIG_HOME="$temporary" Hyprland --verify-config --config "$temporary/hypr/hyprland.lua" >/dev/null; then
+      rm -rf "$temporary"
+      fail "Hyprland Lua config validation failed for $theme theme"
+    fi
+  done
+
+  rm -rf "$temporary"
+  pass "Hyprland Lua configuration"
 }
 
 validate_stow_sources() {
@@ -94,7 +283,7 @@ validate_stow_sources() {
     while IFS= read -r -d '' path; do
       relative="${path#"$DOTFILES/"}"
       case "$relative" in
-        */.claude/*|*/__pycache__/*|*.pyc|*.pyo|*/host.conf|*/schedule.json|*/subscription.env|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
+        */.claude/*|*/__pycache__/*|*.pyc|*.pyo|*/host.conf|*/host.lua|*/schedule.json|*/subscription.env|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
           unsafe+=("$relative")
           ;;
         */.env|*/.env.*)
@@ -134,7 +323,7 @@ validate_public_boundary() {
     for file in "${candidates[@]}"; do
       [[ -f "$DOTFILES/$file" ]] || continue
       case "$file" in
-        */subscription.env|*/schedule.json|*/host.conf|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*/.claude/*|*.key|*.pem|*.p12|*.pfx|*.log)
+        */subscription.env|*/schedule.json|*/host.conf|*/host.lua|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
           printf '%s\n' "$file"
           ;;
         */.env|*/.env.*)
@@ -151,32 +340,37 @@ validate_repository() {
   validate_manifests
   validate_scripts
   validate_data_files
+  validate_hyprland_lua
   validate_stow_sources
   validate_public_boundary
 }
 
-manifest_items() {
-  mapfile -t ITEMS <"$1"
-}
-
 verify_pacman_packages() {
+  local -a official=() aur=()
+  mapfile -t official < <(collect_manifest_items "official")
+  mapfile -t aur < <(collect_manifest_items "aur")
+
   local missing
-  manifest_items "$DOTFILES/pkgs/official.txt"
-  if ! missing="$(pacman -T "${ITEMS[@]}")"; then
-    fail "missing official packages: $missing"
+  if ((${#official[@]} > 0)); then
+    if ! missing="$(pacman -T "${official[@]}")"; then
+      fail "missing official packages: $missing"
+    fi
   fi
-  manifest_items "$DOTFILES/pkgs/aur.txt"
-  if ! missing="$(pacman -T "${ITEMS[@]}")"; then
-    fail "missing AUR packages: $missing"
+  if ((${#aur[@]} > 0)); then
+    if ! missing="$(pacman -T "${aur[@]}")"; then
+      fail "missing AUR packages: $missing"
+    fi
   fi
   pass "Pacman and AUR packages"
 }
 
 verify_flatpak_packages() {
+  local -a items=()
+  mapfile -t items < <(collect_manifest_items "flatpak")
   local app
-  while IFS= read -r app; do
+  for app in "${items[@]}"; do
     flatpak info --system "$app" >/dev/null || fail "missing Flatpak application: $app"
-  done <"$DOTFILES/pkgs/flatpak.txt"
+  done
   pass "Flatpak applications"
 }
 
@@ -188,7 +382,7 @@ verify_pi() {
   [[ "$(readlink -f "$launcher")" == "$target" ]] \
     || fail "Pi is not installed by the official user-local installer"
   [[ "$(command -v pi)" == "$launcher" ]] \
-    || fail "PATH does not prefer the official Pi launcher"
+    || fail "PATH does not prefer official Pi launcher"
   version="$($launcher --version)"
   [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][[:alnum:].-]+)?$ ]] \
     || fail "invalid Pi version: $version"
@@ -196,10 +390,17 @@ verify_pi() {
 }
 
 verify_npm_tools() {
+  local -a items=()
+  mapfile -t items < <(collect_manifest_items "npm")
+  if ((${#items[@]} == 0)); then
+    pass "npm tools (none selected)"
+    return 0
+  fi
+
   local expected actual missing npm_root
   expected="$(mktemp)"
   actual="$(mktemp)"
-  cp "$DOTFILES/pkgs/npm.txt" "$expected"
+  printf '%s\n' "${items[@]}" >"$expected"
   npm list --global --depth=0 --json \
     | jq -r '.dependencies // {} | to_entries[] | "\(.key)@\(.value.version)"' \
     | LC_ALL=C sort >"$actual"
@@ -228,30 +429,6 @@ NODE
   pass "npm tools"
 }
 
-verify_uv_tools() {
-  local spec package version output
-  output="$(uv tool list)"
-  while IFS= read -r spec; do
-    package="${spec%%==*}"
-    version="${spec#*==}"
-    grep -Fqx "$package v$version" <<<"$output" \
-      || fail "missing uv tool: $spec"
-  done <"$DOTFILES/pkgs/uv.txt"
-  pass "uv tools"
-}
-
-verify_vscode_extensions() {
-  local expected actual missing
-  expected="$(mktemp)"
-  actual="$(mktemp)"
-  cp "$DOTFILES/pkgs/vscode-extensions.txt" "$expected"
-  code --list-extensions --show-versions | LC_ALL=C sort >"$actual"
-  missing="$(LC_ALL=C comm -23 "$expected" "$actual")"
-  rm -f "$expected" "$actual"
-  [[ -z "$missing" ]] || fail "missing VS Code extensions: $missing"
-  pass "VS Code extensions"
-}
-
 verify_stow() {
   local directory output
   if ! output="$(
@@ -261,7 +438,7 @@ verify_stow() {
     fail "Stow simulation failed:\n$output"
   fi
   output="${output//$'WARNING: in simulation mode so not modifying filesystem.'/}"
-  [[ -z "$output" ]] || fail "Stow would modify the home directory:\n$output"
+  [[ -z "$output" ]] || fail "Stow would modify home directory:\n$output"
 
   for directory in \
     "$HOME/.config/fcitx5" \
@@ -281,8 +458,8 @@ verify_configs() {
   IFS=: read -r _ _ _ _ _ _ shell <<<"$passwd_line"
   [[ "$shell" == /usr/bin/zsh ]] || fail "login shell is not /usr/bin/zsh"
 
-  Hyprland --verify-config --config "$HOME/.config/hypr/hyprland.conf" >/dev/null \
-    || fail "Hyprland config validation failed"
+  Hyprland --verify-config --config "$HOME/.config/hypr/hyprland.lua" >/dev/null \
+    || fail "Hyprland Lua config validation failed"
   ghostty +validate-config >/dev/null || fail "Ghostty config validation failed"
   cmp -s "$DOTFILES/nvim/.config/nvim/lazy-lock.json" \
     "$HOME/.config/nvim/lazy-lock.json" \
@@ -292,7 +469,7 @@ verify_configs() {
     +qa >/dev/null || fail "Neovim headless startup failed"
   cmp -s "$DOTFILES/nvim/.config/nvim/lazy-lock.json" \
     "$HOME/.config/nvim/lazy-lock.json" \
-    || fail "Neovim startup modified the installed lockfile"
+    || fail "Neovim startup modified installed lockfile"
   nvim --headless \
     "+lua for _, language in ipairs(require('core.treesitter_languages')) do assert(pcall(vim.treesitter.language.add, language), 'missing parser: ' .. language) end" \
     +qa >/dev/null || fail "Treesitter parser validation failed"
@@ -307,6 +484,8 @@ verify_configs() {
     "$HOME/.config/systemd/user/tt.service" >/dev/null
   fc-match 'Maple Mono NF CN' | grep -Fq 'MapleMono' \
     || fail "Maple Mono NF CN is not available"
+  [[ -d /usr/share/icons/Adwaita/cursors ]] \
+    || fail "Adwaita cursor theme is not installed"
   pass "desktop configuration"
 }
 
@@ -328,14 +507,10 @@ verify_mime_defaults() {
     || fail "HTML default is not Firefox"
   [[ "$(xdg-mime query default application/pdf)" == org.pwmt.zathura-pdf-mupdf.desktop ]] \
     || fail "PDF default is not Zathura"
-  [[ "$(xdg-mime query default text/markdown)" == marktext.desktop ]] \
-    || fail "Markdown default is not MarkText"
+  [[ "$(xdg-mime query default text/markdown)" == nvim.desktop ]] \
+    || fail "Markdown default is not Neovim"
   [[ "$(xdg-mime query default text/x-bibtex)" == nvim.desktop ]] \
     || fail "BibTeX default is not Neovim"
-  [[ "$(xdg-mime query default x-scheme-handler/clash)" == clash-verge-handler.desktop ]] \
-    || fail "clash URL handler is not restored"
-  [[ "$(xdg-mime query default x-scheme-handler/clash-verge)" == clash-verge-handler.desktop ]] \
-    || fail "clash-verge URL handler is not restored"
   pass "MIME defaults"
 }
 
@@ -345,8 +520,6 @@ verify_installed() {
   verify_flatpak_packages
   verify_pi
   verify_npm_tools
-  verify_uv_tools
-  verify_vscode_extensions
   verify_stow
   verify_configs
   verify_services
@@ -374,20 +547,22 @@ verify_session() {
   pass "live Hyprland session"
 }
 
-case "$MODE" in
-  --repo-only)
-    validate_repository
-    ;;
-  installed)
-    validate_repository
-    verify_installed
-    ;;
-  --session)
-    validate_repository
-    verify_installed
-    verify_session
-    ;;
-  *)
-    fail "usage: verify.sh [--repo-only|--session]"
-    ;;
-esac
+main() {
+  parse_args "$@"
+  case "$MODE" in
+    --repo-only)
+      validate_repository
+      ;;
+    installed)
+      validate_repository
+      verify_installed
+      ;;
+    --session)
+      validate_repository
+      verify_installed
+      verify_session
+      ;;
+  esac
+}
+
+main "$@"

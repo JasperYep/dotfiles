@@ -8,20 +8,6 @@ edit = [
 open = [
 	{ run = 'xdg-open %s1', desc = "Open" },
 ]
-office = [
-	{ run = 'onlyoffice-desktopeditors %s1', orphan = true, desc = "Open with ONLYOFFICE", for = "linux" },
-]
-
-[open]
-prepend_rules = [
-	{ url = "*.doc", use = "office" },
-	{ url = "*.docx", use = "office" },
-	{ url = "*.rtf", use = "office" },
-	{ url = "*.xls", use = "office" },
-	{ url = "*.xlsx", use = "office" },
-	{ url = "*.ppt", use = "office" },
-	{ url = "*.pptx", use = "office" },
-]
 
 [preview]
 # Local desktop: still useful previews, but avoid giant lanczos work on every hover.

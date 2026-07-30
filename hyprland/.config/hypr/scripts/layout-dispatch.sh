@@ -12,57 +12,57 @@ case "$workspace_json" in
 esac
 
 dispatch() {
-    hyprctl dispatch "$@"
+    hyprctl dispatch "$1"
 }
 
 case "${1:-}" in
     focus-left)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg "focus l"
+            dispatch 'hl.dsp.layout("focus l")'
         else
-            dispatch movefocus l
+            dispatch 'hl.dsp.focus({ direction = "l" })'
         fi
         ;;
     focus-right)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg "focus r"
+            dispatch 'hl.dsp.layout("focus r")'
         else
-            dispatch movefocus r
+            dispatch 'hl.dsp.focus({ direction = "r" })'
         fi
         ;;
     move-left)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg "swapcol l"
+            dispatch 'hl.dsp.layout("swapcol l")'
         else
-            dispatch movewindow l
+            dispatch 'hl.dsp.window.move({ direction = "l" })'
         fi
         ;;
     move-right)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg "swapcol r"
+            dispatch 'hl.dsp.layout("swapcol r")'
         else
-            dispatch movewindow r
+            dispatch 'hl.dsp.window.move({ direction = "r" })'
         fi
         ;;
     shrink-main)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg "colresize -0.05"
+            dispatch 'hl.dsp.layout("colresize -0.05")'
         else
-            dispatch layoutmsg "mfact -0.05"
+            dispatch 'hl.dsp.layout("mfact -0.05")'
         fi
         ;;
     grow-main)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg "colresize +0.05"
+            dispatch 'hl.dsp.layout("colresize +0.05")'
         else
-            dispatch layoutmsg "mfact +0.05"
+            dispatch 'hl.dsp.layout("mfact +0.05")'
         fi
         ;;
     promote-main)
         if [ "$layout" = "scrolling" ]; then
-            dispatch layoutmsg promote
+            dispatch 'hl.dsp.layout("promote")'
         else
-            dispatch layoutmsg swapwithmaster
+            dispatch 'hl.dsp.layout("swapwithmaster")'
         fi
         ;;
     *)

@@ -20,7 +20,7 @@ ASSET_LINKS=(
   "starship/starship.toml:$HOME/.config/starship.toml"
   "yazi/theme.toml:$HOME/.config/yazi/theme.toml"
   "yazi/theme.toml:$HOME/.config/yazi-ssh/theme.toml"
-  "hypr/theme.conf:$HOME/.config/hypr/theme.conf"
+  "hypr/theme.lua:$HOME/.config/hypr/theme.lua"
   "hypr/hyprlock.conf:$HOME/.config/hypr/hyprlock.conf"
   "hypr/hyprlock-away.conf:$HOME/.config/hypr/hyprlock-away.conf"
   "gtk/gtk-3.0/settings.ini:$HOME/.config/gtk-3.0/settings.ini"
@@ -97,10 +97,17 @@ validate_gtk_theme() {
 }
 
 preflight_destinations() {
-  local entry rel dest expected target name
+  local entry rel dest expected target name legacy expected_legacy
   if [[ -e "$CURRENT" || -L "$CURRENT" ]]; then
     managed_current_target >/dev/null \
       || die "refusing unmanaged theme state: $CURRENT"
+  fi
+
+  legacy="$HOME/.config/hypr/theme.conf"
+  expected_legacy="$CURRENT/hypr/theme.conf"
+  if [[ -e "$legacy" || -L "$legacy" ]]; then
+    [[ -L "$legacy" && "$(readlink "$legacy")" == "$expected_legacy" ]] \
+      || die "refusing unmanaged legacy theme link: $legacy"
   fi
 
   for entry in "${ASSET_LINKS[@]}"; do
@@ -131,7 +138,13 @@ preflight_destinations() {
 }
 
 ensure_asset_links() {
-  local entry rel dest expected
+  local entry rel dest expected legacy expected_legacy
+  legacy="$HOME/.config/hypr/theme.conf"
+  expected_legacy="$CURRENT/hypr/theme.conf"
+  if [[ -L "$legacy" && "$(readlink "$legacy")" == "$expected_legacy" ]]; then
+    rm -f "$legacy"
+  fi
+
   for entry in "${ASSET_LINKS[@]}"; do
     rel="${entry%%:*}"
     dest="${entry#*:}"

@@ -1,10 +1,10 @@
 # dotfiles
 
-从已安装、更新并适配好硬件的基础 Arch，一键恢复我的 Hyprland 工作环境。
+Restore my Hyprland workstation environment from a base Arch Linux installation that has already been updated and configured for the machine's hardware.
 
-## 换新电脑
+## Quick Restore (Core Desktop)
 
-以普通用户执行：
+Run as a regular user to restore only the essential desktop, shell, and editor environment:
 
 ```bash
 sudo pacman -S --needed git base-devel && \
@@ -12,13 +12,33 @@ git clone https://github.com/JasperYep/dotfiles ~/dotfiles && \
 ~/dotfiles/bootstrap.sh
 ```
 
-完成后重新登录 TTY1：
+After the bootstrap completes, log out and log back in on TTY1:
 
 ```bash
 start-hyprland
 ~/dotfiles/verify.sh --session
 ```
 
-本仓库只恢复软件、dotfiles 和用户服务，不更新系统，也不修改 kernel、驱动或 bootloader。机器专属配置写入 `~/.config/hypr/host.conf`；私密数据需自行恢复。
+## Optional Work Profiles
 
-详细边界：[scope](docs/scope.md) · [private restore](docs/private-restore.md)
+Heavy tools (TeX Live, VS Code application, Android Studio, office suites, AI CLIs, etc.) are split into optional profiles so fresh machine restores stay fast:
+
+```bash
+# Preview what will be installed
+~/dotfiles/bootstrap.sh --plan
+
+# List supported profiles
+~/dotfiles/bootstrap.sh --list-profiles
+
+# Install core environment plus selected profiles
+~/dotfiles/bootstrap.sh --with academic,dev
+
+# Install core and all profiles
+~/dotfiles/bootstrap.sh --full
+```
+
+Supported profiles: `academic`, `documents`, `dev`, `ai`, `media`, `communication`, `infra`, `remote`.
+
+This repository restores user-facing software, dotfiles, and user services. It does not upgrade the system or modify the kernel, drivers, or bootloader. Store machine-specific configuration in `~/.config/hypr/host.lua` and restore private data separately.
+
+Detailed boundaries: [restore scope](docs/scope.md) · [private data restoration](docs/private-restore.md)

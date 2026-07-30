@@ -1,0 +1,4 @@
+flatpak
+lftp
+remmina
+tig

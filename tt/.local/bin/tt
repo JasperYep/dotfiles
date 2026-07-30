@@ -7,6 +7,7 @@ import curses
 import datetime as dt
 import fcntl
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -21,7 +22,8 @@ DATA_DIR = Path.home() / ".local" / "share" / "tt"
 STATE_FILE = DATA_DIR / "state.json"
 LOG_FILE = DATA_DIR / "tt.log"
 LOCK_FILE = DATA_DIR / "tt.lock"
-CHECK_SECONDS = 10
+# This controls only notifier/config reload cadence; each `tt bar` call computes fresh status.
+DAEMON_CHECK_SECONDS = 10
 WAYBAR_SIGNAL = 8
 VALID_URGENCIES = {"low", "normal", "critical"}
 TUI_WEEKDAYS = ("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
@@ -276,7 +278,7 @@ def bar_payload() -> dict[str, str]:
     if block is None:
         return {"text": "", "tooltip": "No active schedule block", "class": "tt-idle"}
 
-    remaining = int(remaining_minutes(block, now))
+    remaining = max(0, math.ceil(remaining_minutes(block, now)))
     icon = block.get("icon", "•")
     tooltip = f"{icon} {block['name']}\n{block['start']}–{block['end']}\n剩余 {remaining}m"
     pomodoro = pomodoro_state(block, now)
@@ -285,7 +287,7 @@ def bar_payload() -> dict[str, str]:
 
     phase_icon = "🧠" if pomodoro["phase"] == "work" else "☕"
     phase_name = "专注" if pomodoro["phase"] == "work" else "休息"
-    pomodoro_remaining = int(pomodoro["remaining"])
+    pomodoro_remaining = max(0, math.ceil(pomodoro["remaining"]))
     tooltip += f"\n\n{phase_name} · 第 {pomodoro['cycle']} 轮 · 剩余 {pomodoro_remaining}m"
     return {
         "text": f"{phase_icon} {pomodoro_remaining}m #{pomodoro['cycle']}",
@@ -303,7 +305,7 @@ def print_status() -> None:
         return
     payload = bar_payload()
     print(f"{now:%H:%M:%S}  {block.get('icon', '•')} {block['name']}")
-    print(f"{block['start']}–{block['end']}  remaining {int(remaining_minutes(block, now))}m")
+    print(f"{block['start']}–{block['end']}  remaining {max(0, math.ceil(remaining_minutes(block, now)))}m")
     if payload["text"]:
         print(payload["text"])
 
@@ -367,6 +369,16 @@ def tui_center(window: Any, y: int, text: str, attribute: int = 0) -> None:
     tui_put(window, y, max(0, (width - display_width(text)) // 2), text, attribute)
 
 
+def is_light_theme() -> bool:
+    theme_file = Path.home() / ".config" / "theme" / "current" / "name"
+    try:
+        if theme_file.exists():
+            return "light" in theme_file.read_text(encoding="utf-8").strip().lower()
+    except Exception:
+        pass
+    return False
+
+
 def tui_styles() -> dict[str, int]:
     styles = {
         "primary": curses.A_NORMAL,
@@ -385,14 +397,24 @@ def tui_styles() -> dict[str, int]:
     except curses.error:
         background = curses.COLOR_BLACK
 
+    light = is_light_theme()
+
     if curses.COLORS >= 256:
-        primary, muted, accent = 255, 245, 110
+        primary = -1
+        muted = 241 if light else 245
+        accent = 33 if light else 110
+        past = 245 if light else 240
     else:
-        primary, muted, accent = curses.COLOR_WHITE, curses.COLOR_WHITE, curses.COLOR_CYAN
+        primary = -1
+        muted = curses.COLOR_BLACK if light else curses.COLOR_WHITE
+        accent = curses.COLOR_BLUE if light else curses.COLOR_CYAN
+        past = curses.COLOR_BLACK if light else curses.COLOR_WHITE
+
     try:
         curses.init_pair(1, primary, background)
         curses.init_pair(2, muted, background)
         curses.init_pair(3, accent, background)
+        curses.init_pair(4, past, background)
     except curses.error:
         return styles
 
@@ -400,7 +422,7 @@ def tui_styles() -> dict[str, int]:
     styles["heading"] = curses.color_pair(1) | curses.A_BOLD
     styles["muted"] = curses.color_pair(2)
     styles["accent"] = curses.color_pair(3) | curses.A_BOLD
-    styles["past"] = curses.color_pair(2) | curses.A_DIM
+    styles["past"] = curses.color_pair(4)
     return styles
 
 
@@ -627,6 +649,7 @@ def run_tui() -> None:
         config_error: str | None = None
 
         while True:
+            styles = tui_styles()
             try:
                 current_mtime = CONFIG_FILE.stat().st_mtime_ns
                 if current_mtime != observed_mtime:
@@ -679,8 +702,9 @@ def run_daemon() -> None:
                 else:
                     config = updated
                     log("schedule reloaded")
+                    signal_waybar()
             tick(config)
-            time.sleep(CHECK_SECONDS)
+            time.sleep(DAEMON_CHECK_SECONDS)
         log("daemon stopped")
 
 

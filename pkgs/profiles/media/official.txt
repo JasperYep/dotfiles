@@ -1,0 +1,5 @@
+drawio-desktop
+gimp
+handbrake
+kdenlive
+obs-studio

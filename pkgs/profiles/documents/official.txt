@@ -1,0 +1,6 @@
+anki
+calibre
+libreoffice-fresh
+libreoffice-fresh-zh-cn
+obsidian
+pdfarranger
