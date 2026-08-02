@@ -1,0 +1,16 @@
+# Global Rime behavior. Only enable what you actually use.
+patch:
+  menu:
+    page_size: 5
+  schema_list:
+    - schema: double_pinyin_flypy
+  ascii_composer:
+    # Pair with macOS “Use Globe/中英 key to switch to ABC”.
+    good_old_caps_lock: false
+    switch_key:
+      Caps_Lock: commit_code
+      # Shift does not toggle IME; use Caps/中英 key instead.
+      Shift_L: noop
+      Shift_R: noop
+      Control_L: noop
+      Control_R: noop

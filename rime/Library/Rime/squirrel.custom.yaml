@@ -1,0 +1,49 @@
+# Squirrel frontend only. Keep this file lean: style + app defaults.
+patch:
+  show_notifications_when: never
+  style/color_scheme: wisteria_dream
+  style/candidate_list_layout: linear
+  style/inline_preedit: true
+
+  # Terminals default to ASCII; editors stay Chinese-capable.
+  app_options:
+    com.mitchellh.ghostty:
+      ascii_mode: false
+    com.apple.Terminal:
+      ascii_mode: true
+    com.microsoft.VSCode:
+      ascii_mode: false
+    com.todesktop.230313mzl4w4u92:
+      ascii_mode: false
+
+  preset_color_schemes:
+    wisteria_dream:
+      name: "Wisteria / 紫藤"
+      author: "jasper"
+      font_face: "PingFangSC-Regular"
+      font_point: 16
+      label_font_face: "PingFangSC-Light"
+      label_font_point: 12
+      comment_font_face: "PingFangSC-Regular"
+      comment_font_point: 14
+      candidate_list_layout: linear
+      inline_preedit: true
+      candidate_format: "%c %@"
+      border_height: 0
+      border_width: 8
+      corner_radius: 6
+      hilited_corner_radius: 6
+      surrounding_extra_expansion: 2
+      color_space: srgb
+      # warm off-white base
+      back_color: 0xF2F4F7
+      border_color: 0xF2F4F7
+      shadow_size: 6
+      candidate_text_color: 0x665555
+      label_color: 0xB0A0A0
+      comment_text_color: 0xD0C0C0
+      # soft wisteria highlight (BGR of #BFA2DB)
+      hilited_candidate_back_color: 0xDBA2BF
+      hilited_candidate_text_color: 0xFFFFFF
+      hilited_candidate_label_color: 0xFFFFFF
+      hilited_comment_text_color: 0xFFEEEE
