@@ -1,0 +1,87 @@
+{
+  "providers": {
+    "jasper": {
+      "baseUrl": "https://api.jasperllm.me/v1",
+      "api": "openai-responses",
+      "headers": {
+        "User-Agent": "pi-coding-agent"
+      },
+      "compat": {
+        "supportsDeveloperRole": false,
+        "supportsReasoningEffort": true
+      },
+      "models": [
+        { "id": "claude-opus-4-6-thinking", "reasoning": true, "contextWindow": 1000000 },
+        { "id": "claude-opus-4-6", "reasoning": true, "contextWindow": 1000000 },
+        { "id": "claude-sonnet-4-6", "reasoning": true, "contextWindow": 1000000 },
+        {
+          "id": "gpt-5.5",
+          "reasoning": true,
+          "contextWindow": 1050000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "xhigh": "xhigh",
+            "minimal": null
+          }
+        },
+        {
+          "id": "gpt-5.6-sol",
+          "reasoning": true,
+          "contextWindow": 1050000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "xhigh": "xhigh",
+            "max": "max"
+          }
+        },
+        {
+          "id": "gpt-5.6-luna",
+          "reasoning": true,
+          "contextWindow": 1050000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "xhigh": "xhigh",
+            "max": "max"
+          }
+        },
+        {
+          "id": "gpt-5.6-terra",
+          "reasoning": true,
+          "contextWindow": 1050000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "xhigh": "xhigh",
+            "max": "max"
+          }
+        },
+        {
+          "id": "gpt-5.4",
+          "reasoning": true,
+          "contextWindow": 1050000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "xhigh": "xhigh"
+          }
+        },
+        {
+          "id": "gpt-5.4-mini",
+          "reasoning": true,
+          "contextWindow": 400000,
+          "thinkingLevelMap": {
+            "off": "none",
+            "xhigh": "xhigh"
+          }
+        },
+        { "id": "grok-4.5", "reasoning": true, "contextWindow": 500000 },
+        { "id": "kimi-k3", "reasoning": true, "contextWindow": 500000 },
+        { "id": "grok-4.3", "reasoning": true, "contextWindow": 1000000 },
+        { "id": "gemini-3.6-flash-high", "reasoning": false, "contextWindow": 1048576 },
+        { "id": "gemini-3.1-pro-low", "reasoning": true, "contextWindow": 1048576 },
+        { "id": "gemini-pro-agent", "reasoning": true, "contextWindow": 1048576 },
+        { "id": "deepseek-v4-flash", "reasoning": true, "contextWindow": 1048576, "api": "openai-completions", "compat": { "thinkingFormat": "deepseek", "supportsReasoningEffort": true } },
+        { "id": "deepseek-ocr", "reasoning": false, "contextWindow": 65536, "api": "openai-responses", "compat": {} },
+        { "id": "qwen3.5", "reasoning": true, "contextWindow": 262144 }
+      ]
+    }
+  }
+}

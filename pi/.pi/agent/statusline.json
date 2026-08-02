@@ -1,0 +1,20 @@
+{
+  "enabled": true,
+  "separator": " · ",
+  "minPad": 2,
+  "contextWarnAt": 70,
+  "contextErrorAt": 90,
+  "cwdStyle": "short",
+  "modelStyle": "id",
+  "tokenScope": "session",
+  "showThinkingWhenOff": true,
+  "left": [
+    "model",
+    "thinking",
+    "context"
+  ],
+  "right": [
+    "branch",
+    "cwd"
+  ]
+}

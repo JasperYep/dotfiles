@@ -1,0 +1,23 @@
+{
+  "lastChangelogVersion": "0.83.0",
+  "theme": "wisteria-light/wisteria-dark",
+  "defaultProvider": "jasper",
+  "defaultModel": "gemini-3.6-flash-high",
+  "defaultThinkingLevel": "xhigh",
+  "terminal": {
+    "showTerminalProgress": false
+  },
+  "hideThinkingBlock": true,
+  "treeFilterMode": "user-only",
+  "collapseChangelog": true,
+  "enableSkillCommands": true,
+  "images": {
+    "blockImages": true
+  },
+  "steeringMode": "one-at-a-time",
+  "quietStartup": true,
+  "doubleEscapeAction": "tree",
+  "packages": [
+    "../../drawio-scientific-illustrator"
+  ]
+}

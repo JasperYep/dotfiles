@@ -26,6 +26,8 @@ dist/
 *.pfx
 subscription.env
 generated/
+**/auth.json
+node_modules/
 
 # Host/private restore state
 hyprland/.config/hypr/host.conf

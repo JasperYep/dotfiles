@@ -6,10 +6,12 @@ DOTFILES="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PATH="$HOME/.local/bin:$HOME/.npm-global/bin:$PATH"
 MODULES=(
   hyprland waybar rofi ghostty nvim yazi tmux zsh
-  fcitx5 ripgrep vscode xdg scripts tt
+  fcitx5 ripgrep vscode xdg scripts tt pi
 )
 STOW_IGNORE_ARGS=(
   --ignore='(^|/)\.claude($|/)'
+  --ignore='(^|/)auth\.json$'
+  --ignore='(^|/)node_modules($|/)'
   --ignore='(^|/)__pycache__($|/)'
   --ignore='\.py[cod]$'
   --ignore='(^|/)host\.(conf|lua)$'
