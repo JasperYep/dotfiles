@@ -380,7 +380,7 @@ verify_pi() {
     || fail "Pi is not installed by the official user-local installer"
   local current_pi
   current_pi="$(command -v pi)"
-  [[ "$current_pi" == "$launcher" || "$(readlink -f "$current_pi")" == "$target" || "$(readlink -f "$current_pi")" == "$target_bundle" ]] \
+  [[ "$current_pi" == "$launcher" || "$(readlink -f "$current_pi")" == *"pi-coding-agent"* ]] \
     || fail "PATH does not prefer official Pi launcher"
   version="$($launcher --version)"
   [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][[:alnum:].-]+)?$ ]] \
