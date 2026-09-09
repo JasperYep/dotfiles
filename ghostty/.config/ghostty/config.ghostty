@@ -14,7 +14,7 @@ window-height = 30
 maximize = true
 window-save-state = never
 
-scrollback-limit = 2000000
+scrollback-limit = 100000
 mouse-scroll-multiplier = precision:1,discrete:1
 background-opacity = 0.98
 background-blur = true
