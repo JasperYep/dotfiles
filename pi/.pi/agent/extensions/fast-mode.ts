@@ -17,7 +17,8 @@ function isGptModel(modelId: string | undefined): boolean {
 }
 
 export default function fastModeExtension(pi: ExtensionAPI) {
-  let enabled = false;
+  // Fast mode is enabled by default for GPT models; `/fast off` remains available.
+  let enabled = true;
 
   function updateStatus(ctx: ExtensionContext): void {
     if (!enabled) {
@@ -87,7 +88,9 @@ export default function fastModeExtension(pi: ExtensionAPI) {
   });
 
   pi.on("session_start", (_event, ctx) => {
-    enabled = false;
+    // Default to enabled in every new/resumed session. A persisted `/fast off`
+    // state still takes precedence below.
+    enabled = true;
 
     for (const entry of ctx.sessionManager.getBranch()) {
       if (entry.type !== "custom" || entry.customType !== STATE_ENTRY) continue;

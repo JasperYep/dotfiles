@@ -1,13 +1,14 @@
 {
-  "lastChangelogVersion": "0.83.0",
+  "lastChangelogVersion": "0.85.1",
   "theme": "wisteria-light/wisteria-dark",
   "defaultProvider": "jasper",
-  "defaultModel": "gemini-3.6-flash-high",
-  "defaultThinkingLevel": "xhigh",
+  "defaultModel": "deepseek-v4-pro",
+  "defaultThinkingLevel": "high",
   "terminal": {
     "showTerminalProgress": false
   },
   "hideThinkingBlock": true,
+  "outputPad": 0,
   "treeFilterMode": "user-only",
   "collapseChangelog": true,
   "enableSkillCommands": true,
@@ -18,6 +19,7 @@
   "quietStartup": true,
   "doubleEscapeAction": "tree",
   "packages": [
-    "../../drawio-scientific-illustrator"
+    "git:github.com/DietrichGebert/ponytail",
+    "npm:ax-feishu-bridge"
   ]
 }

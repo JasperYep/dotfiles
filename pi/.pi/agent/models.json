@@ -3,84 +3,179 @@
     "jasper": {
       "baseUrl": "https://api.jasperllm.me/v1",
       "api": "openai-responses",
-      "headers": {
-        "User-Agent": "pi-coding-agent"
-      },
       "compat": {
         "supportsDeveloperRole": false,
         "supportsReasoningEffort": true
       },
       "models": [
-        { "id": "claude-opus-4-6-thinking", "reasoning": true, "contextWindow": 1000000 },
-        { "id": "claude-opus-4-6", "reasoning": true, "contextWindow": 1000000 },
-        { "id": "claude-sonnet-4-6", "reasoning": true, "contextWindow": 1000000 },
         {
-          "id": "gpt-5.5",
+          "id": "claude-sonnet-4-5",
           "reasoning": true,
+          "input": [
+            "text"
+          ],
+          "contextWindow": 1048576,
+          "maxTokens": 384000,
+          "api": "openai-completions",
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "deepseek",
+            "requiresReasoningContentOnAssistantMessages": true
+          },
+          "name": "Deepseek V4 Flash"
+        },
+        {
+          "id": "deepseek-v4-flash-vision-exp",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 1048576,
+          "maxTokens": 384000,
+          "api": "openai-completions",
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "deepseek",
+            "requiresReasoningContentOnAssistantMessages": true
+          },
+          "name": "Deepseek V4 Flash Exp"
+        },
+        {
+          "id": "gpt-5.6-luna",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
           "contextWindow": 1050000,
+          "maxTokens": 128000,
+          "compat": {
+            "supportsStrictMode": true,
+            "supportsOpenAIGrammarTools": true,
+            "supportsAdditionalTools": true,
+            "supportsToolSearch": true,
+            "sessionAffinityFormat": "openai-nosession"
+          },
           "thinkingLevelMap": {
-            "off": "none",
+            "off": null,
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
             "xhigh": "xhigh",
-            "minimal": null
+            "max": "max"
+          }
+        },
+        {
+          "id": "gpt-6-astra",
+          "reasoning": true,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "compat": {
+            "supportsStrictMode": true,
+            "supportsOpenAIGrammarTools": true,
+            "supportsAdditionalTools": true,
+            "supportsToolSearch": true
+          },
+          "thinkingLevelMap": {
+            "off": null,
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
+            "xhigh": "xhigh",
+            "max": "max"
           }
         },
         {
           "id": "gpt-5.6-sol",
           "reasoning": true,
-          "contextWindow": 1050000,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "compat": {
+            "supportsStrictMode": true,
+            "supportsOpenAIGrammarTools": true,
+            "supportsAdditionalTools": true,
+            "supportsToolSearch": true
+          },
           "thinkingLevelMap": {
-            "off": "none",
+            "off": null,
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
             "xhigh": "xhigh",
             "max": "max"
           }
         },
         {
-          "id": "gpt-5.6-luna",
+          "id": "gpt-5.6-sol",
           "reasoning": true,
-          "contextWindow": 1050000,
+          "input": [
+            "text",
+            "image"
+          ],
+          "contextWindow": 272000,
+          "maxTokens": 128000,
+          "compat": {
+            "supportsStrictMode": true,
+            "supportsOpenAIGrammarTools": true,
+            "supportsAdditionalTools": true,
+            "supportsToolSearch": true
+          },
           "thinkingLevelMap": {
-            "off": "none",
+            "off": null,
+            "minimal": null,
+            "low": "low",
+            "medium": "medium",
+            "high": "high",
             "xhigh": "xhigh",
             "max": "max"
           }
         },
         {
-          "id": "gpt-5.6-terra",
+          "id": "glm-5.3-flash",
           "reasoning": true,
-          "contextWindow": 1050000,
+          "api": "openai-completions",
           "thinkingLevelMap": {
-            "off": "none",
-            "xhigh": "xhigh",
             "max": "max"
           }
         },
         {
-          "id": "gpt-5.4",
-          "reasoning": true,
-          "contextWindow": 1050000,
-          "thinkingLevelMap": {
-            "off": "none",
-            "xhigh": "xhigh"
-          }
+          "id": "gemini-3.8-flash-high",
+          "contextWindow": 1048576
         },
         {
-          "id": "gpt-5.4-mini",
-          "reasoning": true,
-          "contextWindow": 400000,
-          "thinkingLevelMap": {
-            "off": "none",
-            "xhigh": "xhigh"
-          }
+          "id": "gemini-3.7-flash-high",
+          "contextWindow": 1048576
         },
-        { "id": "grok-4.5", "reasoning": true, "contextWindow": 500000 },
-        { "id": "kimi-k3", "reasoning": true, "contextWindow": 500000 },
-        { "id": "grok-4.3", "reasoning": true, "contextWindow": 1000000 },
-        { "id": "gemini-3.6-flash-high", "reasoning": false, "contextWindow": 1048576 },
-        { "id": "gemini-3.1-pro-low", "reasoning": true, "contextWindow": 1048576 },
-        { "id": "gemini-pro-agent", "reasoning": true, "contextWindow": 1048576 },
-        { "id": "deepseek-v4-flash", "reasoning": true, "contextWindow": 1048576, "api": "openai-completions", "compat": { "thinkingFormat": "deepseek", "supportsReasoningEffort": true } },
-        { "id": "deepseek-ocr", "reasoning": false, "contextWindow": 65536, "api": "openai-responses", "compat": {} },
-        { "id": "qwen3.5", "reasoning": true, "contextWindow": 262144 }
+        {
+          "id": "deepseek-v4-pro",
+          "name": "Deepseek V4 Pro",
+          "api": "openai-completions",
+          "reasoning": true,
+          "compat": {
+            "thinkingFormat": "deepseek",
+            "requiresReasoningContentOnAssistantMessages": true
+          },
+          "contextWindow": 1048576,
+          "maxTokens": 384000
+        }
       ]
     }
   }

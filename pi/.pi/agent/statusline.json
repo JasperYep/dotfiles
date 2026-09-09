@@ -11,10 +11,11 @@
   "left": [
     "model",
     "thinking",
-    "context"
+    "cacheHit",
+    "cwd"
   ],
   "right": [
     "branch",
-    "cwd"
+    "context"
   ]
 }

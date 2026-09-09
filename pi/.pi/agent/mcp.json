@@ -1,3 +1,8 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "firecrawl": {
+      "command": "firecrawl-mcp",
+      "args": []
+    }
+  }
 }
