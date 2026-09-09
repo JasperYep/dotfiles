@@ -117,24 +117,15 @@ tooltip label {
 }
 
 /* 4. 时钟 */
-#custom-clock {
-    background-color: @blue;
-    color: @base;
+#clock {
+    background-color: #B2A4D4;
+    color: #24273a;
     /* 压缩垂直间距 */
     margin: 1px 0;
-    padding: 0 12px;
+    padding: 1px 14px;
     border-radius: 10px;
     font-weight: 800;
-    box-shadow: 0 2px 4px rgba(138, 173, 244, 0.25);
-}
-
-#custom-clock.ime-en {
-    background-color: @blue;
-}
-
-#custom-clock.ime-zh {
-    background-color: @mauve;
-    box-shadow: 0 2px 4px rgba(198, 160, 246, 0.3);
+    box-shadow: 0 2px 4px rgba(178, 164, 212, 0.35);
 }
 
 /* 6. tt 时间管理 */
