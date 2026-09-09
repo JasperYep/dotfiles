@@ -370,11 +370,13 @@ verify_flatpak_packages() {
 }
 
 verify_pi() {
-  local launcher target version
+  local launcher target target_bundle version resolved
   launcher="$HOME/.local/bin/pi"
   target="$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/cli.js"
+  target_bundle="$HOME/.local/lib/node_modules/@earendil-works/pi-coding-agent/dist/bundle/cli.js"
   [[ -x "$launcher" ]] || fail "Pi launcher is missing: $launcher"
-  [[ "$(readlink -f "$launcher")" == "$target" ]] \
+  resolved="$(readlink -f "$launcher")"
+  [[ "$resolved" == "$target" || "$resolved" == "$target_bundle" ]] \
     || fail "Pi is not installed by the official user-local installer"
   [[ "$(command -v pi)" == "$launcher" ]] \
     || fail "PATH does not prefer official Pi launcher"
