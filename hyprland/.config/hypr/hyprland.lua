@@ -7,16 +7,18 @@ require(configHome .. "/hypr/host.lua")
 -----------------
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd("systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-    hl.exec_cmd("~/.local/bin/theme-switch apply")
-    hl.exec_cmd("waybar")
-    hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-    hl.exec_cmd("fcitx5 -d --replace")
-    hl.exec_cmd("mako")
-    hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("udiskie --appindicator")
-    hl.exec_cmd("wl-paste --type text --watch cliphist store")
-    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+	hl.exec_cmd(
+		"systemctl --user import-environment HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE XDG_SESSION_CLASS"
+	)
+	hl.exec_cmd("~/.local/bin/theme-switch apply")
+	hl.exec_cmd("waybar")
+	hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+	hl.exec_cmd("fcitx5 -d --replace")
+	hl.exec_cmd("mako")
+	hl.exec_cmd("hyprpaper")
+	hl.exec_cmd("udiskie --appindicator")
+	hl.exec_cmd("wl-paste --type text --watch cliphist store")
+	hl.exec_cmd("wl-paste --type image --watch cliphist store")
 end)
 
 -------------------
@@ -36,82 +38,81 @@ hl.env("QT_QPA_PLATFORM", "wayland")
 ---------------------
 
 hl.config({
-    general = {
-        gaps_in = 4,
-        gaps_out = 4,
-        border_size = 2,
-        resize_on_border = false,
-        allow_tearing = false,
-        layout = "master",
-    },
-    decoration = {
-        rounding = 12,
-        rounding_power = 2,
-        active_opacity = 1.0,
-        inactive_opacity = 0.85,
-        dim_inactive = true,
-        shadow = {
-            enabled = false,
-        },
-        blur = {
-            enabled = true,
-            size = 5,
-            passes = 2,
-            new_optimizations = true,
-            xray = true,
-            contrast = 1.0,
-            vibrancy = 0.1696,
-        },
-    },
-    animations = {
-        enabled = true,
-    },
-    master = {
-        mfact = 0.65,
-        new_status = "slave",
-        new_on_top = true,
-    },
-    misc = {
-        force_default_wallpaper = 0,
-        disable_hyprland_logo = true,
-        disable_splash_rendering = true,
-        vrr = 0,
-        focus_on_activate = false,
-    },
-    render = {
-        direct_scanout = false,
-        expand_undersized_textures = true,
-        new_render_scheduling = true,
-    },
-    input = {
-        kb_layout = "us",
-        kb_options = "caps:ctrl_modifier",
-        follow_mouse = 0,
-        sensitivity = 0,
-        touchpad = {
-            natural_scroll = false,
-        },
-    },
+	general = {
+		gaps_in = 4,
+		gaps_out = 4,
+		border_size = 2,
+		resize_on_border = false,
+		allow_tearing = false,
+		layout = "master",
+	},
+	decoration = {
+		rounding = 12,
+		rounding_power = 2,
+		active_opacity = 1.0,
+		inactive_opacity = 0.85,
+		dim_inactive = true,
+		shadow = {
+			enabled = false,
+		},
+		blur = {
+			enabled = true,
+			size = 5,
+			passes = 2,
+			new_optimizations = true,
+			xray = true,
+			contrast = 1.0,
+			vibrancy = 0.1696,
+		},
+	},
+	animations = {
+		enabled = true,
+	},
+	master = {
+		mfact = 0.65,
+		new_status = "slave",
+		new_on_top = true,
+	},
+	misc = {
+		force_default_wallpaper = 0,
+		disable_hyprland_logo = true,
+		disable_splash_rendering = true,
+		vrr = 0,
+		focus_on_activate = false,
+	},
+	render = {
+		direct_scanout = false,
+		expand_undersized_textures = true,
+		new_render_scheduling = true,
+	},
+	input = {
+		kb_layout = "custom",
+		follow_mouse = 0,
+		sensitivity = 0,
+		touchpad = {
+			natural_scroll = false,
+		},
+	},
 })
 
 -- Theme colors, GTK settings, and border overrides are managed by theme-switch.
 require(configHome .. "/hypr/theme.lua")
 
 hl.curve("wind", {
-    type = "bezier",
-    points = { { 0.05, 0.9 }, { 0.1, 1.05 } },
+	type = "bezier",
+	points = { { 0.05, 0.9 }, { 0.1, 1.05 } },
 })
 hl.curve("winIn", {
-    type = "bezier",
-    points = { { 0.1, 1.1 }, { 0.1, 1.1 } },
+	type = "bezier",
+	points = { { 0.1, 1.1 }, { 0.1, 1.1 } },
 })
 hl.curve("winOut", {
-    type = "bezier",
-    points = { { 0.3, -0.3 }, { 0, 1 } },
+	type = "bezier",
+	points = { { 0.3, -0.3 }, { 0, 1 } },
 })
 hl.curve("liner", {
-    type = "bezier",
-    points = { { 1, 1 }, { 1, 1 } },
+	type = "bezier",
+	points = { { 1, 1 }, { 1, 1 } },
 })
 
 hl.animation({ leaf = "windows", enabled = true, speed = 6, bezier = "wind", style = "slide" })
@@ -129,13 +130,13 @@ hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "wind" }
 
 local mainMod = "SUPER"
 local terminal = "ghostty"
-local fileManager = "nautilus"
+local fileManager = "thunar"
 local menu = "rofi -show drun"
 local fileSearch = "~/.local/bin/rofi-files"
 local calculator = "~/.local/bin/rofi-calc"
 
 local function execBind(keys, command, options)
-    hl.bind(keys, hl.dsp.exec_cmd(command), options)
+	hl.bind(keys, hl.dsp.exec_cmd(command), options)
 end
 
 execBind(mainMod .. " + B", "killall -SIGUSR1 waybar")
@@ -175,9 +176,9 @@ hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "u" }))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
 
 for workspace = 1, 10 do
-    local key = workspace % 10
-    hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = workspace }))
-    hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = workspace, follow = true }))
+	local key = workspace % 10
+	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = workspace }))
+	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = workspace, follow = true }))
 end
 
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -204,57 +205,57 @@ execBind("XF86AudioPrev", "playerctl previous", mediaLocked)
 --------------------
 
 hl.window_rule({
-    name = "quicknote",
-    match = { class = "^(quicknote)$" },
-    size = { 800, 500 },
-    float = true,
-    opacity = "0.9",
+	name = "quicknote",
+	match = { class = "^(quicknote)$" },
+	size = { 800, 500 },
+	float = true,
+	opacity = "0.9",
 })
 
 hl.window_rule({
-    match = { class = "org.gnome.Nautilus" },
-    opacity = "0.9",
+	match = { class = "org.gnome.Nautilus" },
+	opacity = "0.9",
 })
 
 hl.window_rule({
-    name = "suppress-maximize-events",
-    match = { class = ".*" },
-    suppress_event = "maximize",
+	name = "suppress-maximize-events",
+	match = { class = ".*" },
+	suppress_event = "maximize",
 })
 
 hl.window_rule({
-    name = "fix-xwayland-drags",
-    match = {
-        class = "^$",
-        title = "^$",
-        xwayland = true,
-        float = true,
-        fullscreen = false,
-        pin = false,
-    },
-    no_focus = true,
+	name = "fix-xwayland-drags",
+	match = {
+		class = "^$",
+		title = "^$",
+		xwayland = true,
+		float = true,
+		fullscreen = false,
+		pin = false,
+	},
+	no_focus = true,
 })
 
 hl.window_rule({
-    name = "Picture-in-picture",
-    match = { title = "^Picture-in-picture$" },
-    float = true,
-    pin = true,
-    border_size = 1,
+	name = "Picture-in-picture",
+	match = { title = "^Picture-in-picture$" },
+	float = true,
+	pin = true,
+	border_size = 1,
 })
 
 hl.window_rule({
-    name = "Wemeet",
-    match = { class = "^(wemeetapp)$" },
-    no_dim = true,
-    no_anim = true,
-    no_blur = true,
-    no_shadow = true,
-    dim_around = false,
-    decorate = false,
-    no_screen_share = false,
-    border_size = 0,
-    opacity = "1.0",
+	name = "Wemeet",
+	match = { class = "^(wemeetapp)$" },
+	no_dim = true,
+	no_anim = true,
+	no_blur = true,
+	no_shadow = true,
+	dim_around = false,
+	decorate = false,
+	no_screen_share = false,
+	border_size = 0,
+	opacity = "1.0",
 })
 
 -------------------
@@ -262,22 +263,22 @@ hl.window_rule({
 -------------------
 
 hl.layer_rule({
-    name = "waybar_rule",
-    match = { namespace = "waybar" },
-    blur = true,
-    ignore_alpha = 0.5,
+	name = "waybar_rule",
+	match = { namespace = "waybar" },
+	blur = true,
+	ignore_alpha = 0.5,
 })
 
 hl.layer_rule({
-    name = "rofi",
-    match = { namespace = "rofi" },
-    ignore_alpha = 0.5,
-    blur = true,
-    animation = "fade",
+	name = "rofi",
+	match = { namespace = "rofi" },
+	ignore_alpha = 0.5,
+	blur = true,
+	animation = "fade",
 })
 
 hl.layer_rule({
-    name = "no_anim_for_selection",
-    match = { namespace = "selection" },
-    no_anim = true,
+	name = "no_anim_for_selection",
+	match = { namespace = "selection" },
+	no_anim = true,
 })

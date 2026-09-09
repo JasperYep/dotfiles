@@ -7,7 +7,7 @@ EnumerateSkipFirst=False
 ModifierOnlyKeyTimeout=250
 
 [Hotkey/TriggerKeys]
-0=Caps_Lock
+0=F13
 
 [Hotkey/ActivateKeys]
 0=Hangul_Hanja
