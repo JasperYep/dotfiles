@@ -35,6 +35,7 @@ if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v hyprctl >/dev/null;
   if monitors="$(hyprctl -j monitors 2>/dev/null | jq -r '.[].name' 2>/dev/null)" \
     && [[ -n "$monitors" ]]
   then
+    hyprctl hyprpaper unload all >/dev/null 2>&1 || true
     while IFS= read -r monitor; do
       hyprctl hyprpaper wallpaper "$monitor, $today, cover" >/dev/null \
         || printf 'daily-wallpaper: could not update %s\n' "$monitor" >&2
