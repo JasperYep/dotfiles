@@ -7,7 +7,7 @@
 - 足够极简
 - 足够稳定
 - 足够适合 `macbook -> ssh -> tmux -> nvim` 的远程开发
-- 能把 `Codex` 真正融进编辑器工作流
+- 能把 `Claude Code` 真正融进编辑器工作流
 
 当前这版的原则是：
 
@@ -21,7 +21,7 @@
 
 - 强搜索：`Telescope`
 - 强结构导航：`LSP + Treesitter + Aerial`
-- 强协作/代理：`Codex`
+- 强协作/代理：`Claude Code`
 
 同时把一些不必要的界面层删掉：
 
@@ -38,7 +38,7 @@
 
 - 用 `Telescope` 处理“我知道我要找什么”
 - 用 `nvim-tree` 处理“我需要先浏览项目结构”
-- 用 `Codex` 处理“我想边写边协作/生成/修改”
+- 用 `Claude Code` 处理“我想边写边协作/生成/修改”
 
 ## 2. 核心习惯
 
@@ -56,7 +56,7 @@
 这套方案对远程开发尤其合适，因为：
 
 - 避免频繁按 `Esc`
-- 避免在 `Codex` 这种 TUI 里把 `Esc` 误发进去
+- 避免在 `Claude Code` 这种 TUI 里把 `Esc` 误发进去
 - 心智模型统一
 
 注意：
@@ -81,8 +81,8 @@
 
 为什么终端里不用 `Ctrl-h/j/k/l`：
 
-- `Codex` 自己占用了部分 `Ctrl` 键
-- 尤其 `Ctrl-j` 在 Codex 里是换行
+- `Claude Code`运行在终端中，避免依赖可能冲突的 `Ctrl` 组合
+- 因此终端里统一用 `Ctrl-g + 方向键母`
 
 所以终端里统一用 `Ctrl-g + 方向键母`。
 
@@ -154,13 +154,17 @@
 - `nvim-tree.lua`
   - 项目树浏览与文件管理
 
-### Git 与协作
+### Git 与 AI 协作
 
 - `gitsigns.nvim`
   - Git hunk 操作
 
-- `rhart92/codex.nvim`
-  - 在右侧栏嵌入 Codex CLI
+- 内置浮动 terminal
+  - `<leader>ft` 打开普通 shell
+  - `<leader>fc` 打开 Claude Code
+
+- `Claude Code`
+  - 通过系统命令运行，不额外引入 Neovim 插件
 
 ### 视觉与细节
 
@@ -252,7 +256,13 @@
   - terminal mode 下退出到 normal
 
 - `<leader>ft`
-  - 打开/关闭内置浮动终端
+  - 打开/关闭普通浮动终端
+
+- `<leader>fc`
+  - 打开/关闭 Claude Code 浮动终端
+
+- `:Claude`
+  - 执行同样的 Claude Code 浮动终端入口
 
 ## 6. Telescope 手册
 
@@ -429,6 +439,9 @@ Git 操作：
 - `<leader>gD`
   - diff against last commit
 
+- `<leader>gW`
+  - 在浮动窗口显示相对`HEAD`的整个工作区diff
+
 Toggle：
 
 - `<leader>tb`
@@ -446,7 +459,7 @@ Toggle：
 
 - 阅读长文件
 - 快速跳函数/类
-- 边看结构边问 Codex
+- 边看结构边问 Claude Code
 
 ## 12. Flash 手册
 
@@ -508,65 +521,50 @@ Treesitter 当前作为语法高亮与结构能力底座使用。
 - vimdoc
 - yaml
 
-## 15. Codex 手册
+## 15. Claude Code手册
 
-这是当前配置里最重要的增量能力之一。
+Claude Code不是Neovim插件，而是通过现有浮动terminal运行的外部CLI。这种方式不增加额外插件，也适合SSH和tmux远程开发。
 
 ### 打开方式
 
-- `<leader>m`
-  - 打开/关闭右侧 Codex 栏
+- `<leader>fc`
+  - 打开/关闭Claude Code浮动终端
 
-Codex 当前配置：
+- `:Claude`
+  - 执行同样的Claude Code入口
 
-- 右侧竖栏
-- 宽度约 40%
-- 启动 Neovim 后有 UI 时自动启动
-- 发送内容后自动聚焦 Codex
+终端会以当前Neovim工作目录启动Claude Code。Claude进程会在关闭浮动窗口后继续运行，再次按`<leader>fc`即可重新查看。
 
-### 发送内容
-
-- `<leader>M`
-  - 发送当前 buffer 给 Codex
-
-- visual mode 下 `<leader>m`
-  - 发送选中内容给 Codex
-
-### 命令
-
-- `:CodexToggle`
-- `:CodexBuffer`
-- `:CodexSelection`
-
-### 在 Codex 里怎么操作
+### 在Claude Code里怎么操作
 
 - `jk`
-  - 退出 terminal mode，回到 normal mode
+  - 退出terminal mode，回到normal mode
 
 - `Ctrl-g h/j/k/l`
   - 在终端模式下切换到其他窗口
 
-- `Ctrl-j`
-  - 在 Codex 输入框中插入新行，不发送
+- `<leader>ft`
+  - 需要运行普通shell命令时打开另一个浮动终端
 
-### Codex 工作流建议
+### Git diff review
 
-最推荐的工作流是：
+- `<leader>gW`
+  - 在大号浮动窗口显示相对`HEAD`的已跟踪改动
 
-1. 左边编辑代码
-2. 右边开 Codex
-3. 选中一段代码后 visual mode 下按 `<leader>m`
-4. 在 Codex 里继续追加说明
-5. 用 `jk` 回到 normal mode
-6. 用 `Ctrl-g h` 切回代码窗口
+- `q`或`<Esc>`
+  - 关闭diff窗口
 
-如果你要让 Codex 帮你看整个文件：
+- `<leader>gd`、`<leader>gD`
+  - 在当前文件中查看index或上一次提交的diff
 
-- 直接按 `<leader>M`
+### Claude Code工作流建议
 
-如果你要让 Codex 聚焦某一段逻辑：
-
-- 选中后按 `<leader>m`
+1. 先用Telescope或文件树定位代码
+2. 按`<leader>fc`打开Claude Code
+3. 让Claude Code修改实验代码或解释问题
+4. 关闭或隐藏终端后按`<leader>gW`检查整个工作区改动
+5. 回到当前文件，用`[h`、`]h`和`<leader>gp`检查具体hunk
+6. 确认无误后再stage或继续调试
 
 ## 16. 当前 UI / 行为设置
 
@@ -608,7 +606,7 @@ Codex 当前配置：
 1. `space space` 找文件
 2. `space e` 看目录结构
 3. `space o` 看代码大纲
-4. `space m` 开 Codex 侧栏
+4. `space fc` 开 Claude Code 浮动终端
 
 ### 写代码时
 
@@ -636,21 +634,21 @@ Codex 当前配置：
 2. `space o` 看当前文件结构
 3. `space sg` 从内容反查文件
 
-### 与 Codex 协作时
+### 与 Claude Code协作时
 
 最推荐的组合是：
 
-- `space m`: 打开 Codex
-- visual + `space m`: 发选中代码
-- `space M`: 发整个 buffer
-- `jk`: 退出 terminal mode
-- `Ctrl-g h`: 从 Codex 切回左边代码窗口
+- `space fc`: 打开 Claude Code
+- `space gW`: 查看相对`HEAD`的整个工作区改动
+- `space gd`或`space gD`: 查看当前文件diff
+- `jk`: 退出terminal mode
+- `Ctrl-g h`: 从终端切回左边代码窗口
 
 ## 18. 这版配置的优点
 
 - 按键逻辑比较统一
 - 对远程开发友好
-- 对 Codex 友好
+- 对 Claude Code 友好
 - 该删的界面层已经删掉
 - 还保留了浏览目录的能力
 
@@ -674,6 +672,6 @@ Codex 当前配置：
 - `telescope`
 - `lsp`
 - `treesitter`
-- `codex`
+- Claude Code终端入口
 
 因为这些已经是你当前工作流的核心基础设施。

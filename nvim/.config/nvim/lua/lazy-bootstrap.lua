@@ -15,6 +15,7 @@ require('lazy').setup {
         { import = 'plugins' }, -- 自动加载 lua/plugins/ 下的所有模块
     },
     defaults = { lazy = true }, -- 默认懒加载
+    rocks = { enabled = false },
     performance = {
         cache = { enabled = true },
         reset_packpath = true,

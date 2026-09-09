@@ -3,6 +3,12 @@ vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
 vim.opt.expandtab = true
 
+-- These optional providers are not used by this configuration.
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- vim.opt.showtabline = 2 -- 2 表示始终显示 Tab Line (Bufferline 会覆盖它)
 vim.opt.cmdheight = 1 -- Keep command feedback visible to reduce surprise.
 -- Set to true if you have a Nerd Font installed and selected in the terminal

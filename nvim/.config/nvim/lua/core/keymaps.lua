@@ -7,7 +7,17 @@ vim.keymap.set("v", "<", "<gv", { silent = true, desc = "Outdent and keep select
 vim.keymap.set("i", "jk", "<Esc>", { silent = true, desc = "Exit insert mode" })
 
 -- 将 <leader>r 映射为重新加载配置
-vim.keymap.set("n", "<leader>r", "<cmd>source $MYVIMRC<CR>", { desc = "Reload Neovim config" })
+local function reload_config()
+    for module in pairs(package.loaded) do
+        if module == "core" or module:match("^core%.") then
+            package.loaded[module] = nil
+        end
+    end
+
+    dofile(vim.fn.stdpath("config") .. "/init.lua")
+end
+
+vim.keymap.set("n", "<leader>r", reload_config, { desc = "Reload Neovim config" })
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -84,43 +94,61 @@ vim.keymap.set("n", "<C-M-Up>", "<C-w>+", { desc = "Increase window height" })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
 -- NOTE: 浮动Terminal
--- 创建一个变量来保存终端缓冲区ID，以便复用
-local term_buf = nil
+-- 使用两个独立的终端缓冲区：一个用于普通shell，一个用于Claude Code。
+local terminal_buffers = {}
 
-local function toggle_floating_terminal()
-    -- 检查是否已经存在一个悬浮终端窗口
-    local win_found = false
+local function terminal_job_is_running(buf)
+    if not buf or not vim.api.nvim_buf_is_valid(buf) then
+        return false
+    end
+
+    local job_id = vim.b[buf].terminal_job_id
+    return job_id ~= nil and vim.fn.jobwait({ job_id }, 0)[1] == -1
+end
+
+local function close_floating_terminal(buf)
+    if not buf or not vim.api.nvim_buf_is_valid(buf) then
+        return false
+    end
+
     for _, win in ipairs(vim.api.nvim_list_wins()) do
         local config = vim.api.nvim_win_get_config(win)
-        -- 检查是否是浮动窗口，并且显示的是我们的终端缓冲区
-        if config.relative == "editor" and vim.api.nvim_win_get_buf(win) == term_buf then
-            win_found = true
-            -- 如果找到了，就关闭它
+        if config.relative == "editor" and vim.api.nvim_win_get_buf(win) == buf then
             vim.api.nvim_win_close(win, true)
-            break
+            return true
         end
     end
 
-    -- 如果找到了窗口并已关闭，或者本来就找不到，函数就结束
-    if win_found then
+    return false
+end
+
+local function toggle_floating_terminal(kind, command)
+    local term_buf = terminal_buffers[kind]
+
+    if close_floating_terminal(term_buf) then
         return
     end
 
-    -- --- 如果没找到窗口，就创建一个 ---
-
-    -- 1. 检查终端缓冲区是否存在，如果不存在就创建它
-    if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
-        term_buf = vim.api.nvim_create_buf(false, true) -- false: 不列出, true: 是scratch buffer
+    -- 进程已经退出时，重新打开快捷键应启动一个新的终端。
+    if term_buf and vim.api.nvim_buf_is_valid(term_buf) and vim.bo[term_buf].buftype == "terminal" then
+        if not terminal_job_is_running(term_buf) then
+            vim.api.nvim_buf_delete(term_buf, { force = true })
+            term_buf = nil
+        end
     end
 
-    -- 2. 获取编辑器尺寸，用于计算居中位置
-    local ui = vim.api.nvim_list_uis()[1]
-    local width = math.floor(ui.width * 0.4)
-    local height = math.floor(ui.height * 0.3) -- 高度稍微小一点
-    local col = math.floor((ui.width - width) / 2)
-    local row = ui.height - height - 6
+    if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
+        term_buf = vim.api.nvim_create_buf(false, true)
+        terminal_buffers[kind] = term_buf
+    end
 
-    -- 3. 创建浮动窗口，并将我们的终端缓冲区显示在里面
+    local ui = vim.api.nvim_list_uis()[1]
+    local is_claude = kind == "claude"
+    local width = math.max(1, math.floor(ui.width * (is_claude and 0.82 or 0.45)))
+    local height = math.max(1, math.floor(ui.height * (is_claude and 0.80 or 0.30)))
+    local col = math.floor((ui.width - width) / 2)
+    local row = math.floor((ui.height - height) / 2)
+
     local win = vim.api.nvim_open_win(term_buf, true, {
         relative = "editor",
         width = width,
@@ -130,18 +158,125 @@ local function toggle_floating_terminal()
         border = "rounded",
         style = "minimal",
     })
-    -- 4. 检查这个缓冲区是否已经是终端了
+
+    vim.wo[win].number = false
+    vim.wo[win].relativenumber = false
+    vim.wo[win].signcolumn = "no"
+    vim.wo[win].wrap = false
+    vim.bo[term_buf].bufhidden = "hide"
+
     if vim.bo[term_buf].buftype ~= "terminal" then
-        -- 如果不是，就在这个缓冲区里启动终端
-        -- vim.cmd.term() 会在当前窗口（也就是我们的浮动窗口）的当前缓冲区里启动终端
-        vim.cmd.term()
-        -- 将新创建的终端进程的缓冲区ID保存下来
-        term_buf = vim.api.nvim_get_current_buf()
+        local job_id = vim.fn.termopen(command or vim.o.shell, { cwd = vim.fn.getcwd() })
+        if job_id <= 0 then
+            vim.api.nvim_win_close(win, true)
+            vim.notify("Unable to start terminal process", vim.log.levels.ERROR)
+            return
+        end
     end
 
-    -- 5. 进入终端插入模式，方便直接输入
     vim.cmd("startinsert")
 end
 
--- 设置快捷键，比如 <leader>ft (floating terminal)
-vim.keymap.set("n", "<leader>ft", toggle_floating_terminal, { desc = "Toggle Floating Terminal" })
+local function toggle_claude_code()
+    if vim.fn.executable("claude") ~= 1 then
+        vim.notify("Claude Code executable not found: claude", vim.log.levels.ERROR)
+        return
+    end
+
+    toggle_floating_terminal("claude", vim.fn.exepath("claude"))
+end
+
+vim.api.nvim_create_user_command("Claude", toggle_claude_code, {
+    desc = "Open Claude Code in a floating terminal",
+    force = true,
+})
+
+-- <leader>ft: 普通shell；<leader>fc: Claude Code。
+vim.keymap.set("n", "<leader>ft", function()
+    toggle_floating_terminal("shell")
+end, { desc = "Toggle Floating Terminal" })
+vim.keymap.set("n", "<leader>fc", toggle_claude_code, { desc = "Open Claude Code" })
+
+local git_diff_buf = nil
+local git_diff_win = nil
+
+local function close_git_diff()
+    if git_diff_win and vim.api.nvim_win_is_valid(git_diff_win) then
+        vim.api.nvim_win_close(git_diff_win, true)
+    end
+
+    if git_diff_buf and vim.api.nvim_buf_is_valid(git_diff_buf) then
+        vim.api.nvim_buf_delete(git_diff_buf, { force = true })
+    end
+
+    git_diff_win = nil
+    git_diff_buf = nil
+end
+
+local function show_git_diff()
+    if git_diff_win and vim.api.nvim_win_is_valid(git_diff_win) then
+        close_git_diff()
+        return
+    end
+
+    close_git_diff()
+
+    vim.system({ "git", "-C", vim.fn.getcwd(), "diff", "--no-ext-diff", "HEAD", "--" }, { text = true }, function(result)
+        vim.schedule(function()
+            if result.code ~= 0 then
+                local message = vim.trim(result.stderr or "Not a Git repository")
+                vim.notify(message, vim.log.levels.ERROR)
+                return
+            end
+
+            if result.stdout == "" then
+                vim.notify("No tracked changes compared with HEAD", vim.log.levels.INFO)
+                return
+            end
+
+            local buf = vim.api.nvim_create_buf(false, true)
+            local lines = vim.split(result.stdout, "\n", { plain = true })
+            if lines[#lines] == "" then
+                table.remove(lines)
+            end
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+            vim.bo[buf].buftype = "nofile"
+            vim.bo[buf].bufhidden = "wipe"
+            vim.bo[buf].filetype = "diff"
+            vim.bo[buf].modifiable = false
+            vim.bo[buf].swapfile = false
+
+            local ui = vim.api.nvim_list_uis()[1]
+            local width = math.max(1, math.floor(ui.width * 0.92))
+            local height = math.max(1, math.floor(ui.height * 0.86))
+            local win = vim.api.nvim_open_win(buf, true, {
+                relative = "editor",
+                width = width,
+                height = height,
+                col = math.floor((ui.width - width) / 2),
+                row = math.floor((ui.height - height) / 2),
+                border = "rounded",
+                style = "minimal",
+            })
+
+            git_diff_buf = buf
+            git_diff_win = win
+            vim.wo[win].number = false
+            vim.wo[win].relativenumber = false
+            vim.wo[win].signcolumn = "no"
+            vim.wo[win].wrap = false
+
+            local close = function()
+                close_git_diff()
+            end
+            vim.keymap.set("n", "q", close, { buffer = buf, desc = "Close Git diff" })
+            vim.keymap.set("n", "<Esc>", close, { buffer = buf, desc = "Close Git diff" })
+        end)
+    end)
+end
+
+vim.api.nvim_create_user_command("GitDiff", show_git_diff, {
+    desc = "Show tracked changes compared with HEAD",
+    force = true,
+})
+vim.keymap.set("n", "<leader>gW", show_git_diff, { desc = "[G]it [W]orktree diff" })

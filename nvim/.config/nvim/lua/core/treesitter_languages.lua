@@ -2,6 +2,7 @@ return {
     'bash',
     'c',
     'cpp',
+    'html',
     'json',
     'latex',
     'lua',
