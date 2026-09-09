@@ -16,7 +16,7 @@
         "hyprland/workspaces"
     ],
     "modules-center": [
-        "custom/clock"
+        "clock"
     ],
     "modules-right": [
         "memory",
@@ -40,13 +40,10 @@
         "on-click": "ghostty --title=tt-watch -e tt watch"
     },
 
-    "custom/clock": {
-        "exec": "$HOME/.config/waybar/scripts/clock-ime.sh",
-        "return-type": "json",
-        "interval": 1,
-        "signal": 9,
-        "tooltip": true,
-        "on-click": "$HOME/.config/waybar/scripts/clock-ime.sh toggle"
+    "clock": {
+        "format": "{:%H:%M}",
+        "tooltip-format": "{:%Y-%m-%d %A}",
+        "interval": 1
     },
 
     "hyprland/workspaces": {

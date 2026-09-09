@@ -8,5 +8,12 @@
   "security.workspace.trust.untrustedFiles": "open",
   "window.autoDetectColorScheme": true,
   "workbench.colorTheme": "Light 2026",
-  "workbench.preferredDarkColorTheme": "Light 2026"
+  "workbench.preferredDarkColorTheme": "Light 2026",
+  "chatgpt.followUpQueueMode": "steer",
+  "chatgpt.composerEnterBehavior": "enter",
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.allowDangerouslySkipPermissions": true,
+  "claudeCode.disableLoginPrompt": true,
+  "claudeCode.environmentVariables": [],
+  "workbench.secondarySideBar.showLabels": false
 }

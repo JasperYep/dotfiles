@@ -142,9 +142,7 @@ return {
                 -- C/C++ (最受欢迎的 LSP)
                 clangd = {},
                 -- Python (最受欢迎的 LSP)
-                pyright = {
-                    cmd = { "sh", "-c", "cat | pyright-langserver --stdio | cat" },
-                },
+                pyright = {},
                 -- Lua (您的配置已经有了)
                 lua_ls = {
                     settings = {

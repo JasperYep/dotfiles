@@ -58,7 +58,7 @@ hl.config({
 		blur = {
 			enabled = true,
 			size = 5,
-			passes = 2,
+			passes = 1,
 			new_optimizations = true,
 			xray = true,
 			contrast = 1.0,
@@ -81,7 +81,7 @@ hl.config({
 		focus_on_activate = false,
 	},
 	render = {
-		direct_scanout = false,
+		direct_scanout = true,
 		expand_undersized_textures = true,
 		new_render_scheduling = true,
 	},

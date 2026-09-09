@@ -3,7 +3,7 @@
   "theme": "wisteria-light/wisteria-dark",
   "defaultProvider": "jasper",
   "defaultModel": "deepseek-v4-pro",
-  "defaultThinkingLevel": "high",
+  "defaultThinkingLevel": "max",
   "terminal": {
     "showTerminalProgress": false
   },

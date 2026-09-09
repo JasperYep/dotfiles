@@ -103,7 +103,7 @@ alias ls='eza --icons --group-directories-first'
 alias ll='eza --icons --group-directories-first -l --git'
 alias la='eza --icons --group-directories-first -la --git'
 alias lt='eza --icons --tree --level=2'
-alias xz='rsync -azvP'
+alias syn='rsync -azvP'
 alias fm='thunar . &>/dev/null &'
 alias ta='tmux attach -t'
 alias tn='tmux new -s'
@@ -120,7 +120,6 @@ fi
 local_zsh_config="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh"
 [[ -r "$local_zsh_config" ]] && source "$local_zsh_config"
 unset local_zsh_config
-export NODE_OPTIONS="--dns-result-order=ipv4first"
 
 proxy_on() {
   sudo systemctl start sing-box.service || return
