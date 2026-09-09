@@ -20,3 +20,6 @@ image/png=imv.desktop
 image/gif=imv.desktop
 image/webp=imv.desktop
 image/bmp=imv.desktop
+x-scheme-handler/clash=clash-verge.desktop;
+x-scheme-handler/clash-verge=clash-verge.desktop;
+x-scheme-handler/baiduyunguanjia=baidunetdisk.desktop

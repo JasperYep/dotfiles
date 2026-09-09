@@ -9,12 +9,11 @@ MODULES=(
   fcitx5 ripgrep vscode xdg scripts tt pi
 )
 STOW_IGNORE_ARGS=(
-  --ignore='(^|/)\.claude($|/)'
   --ignore='(^|/)auth\.json$'
   --ignore='(^|/)node_modules($|/)'
   --ignore='(^|/)__pycache__($|/)'
   --ignore='\.py[cod]$'
-  --ignore='(^|/)host\.(conf|lua)$'
+  --ignore='(^|/)host\.lua$'
   --ignore='(^|/)schedule\.json$'
   --ignore='(^|/)(subscription\.env|installation\.yaml|user\.yaml)$'
   --ignore='(^|/)(sync|generated|.*\.userdb)($|/)'
@@ -141,7 +140,6 @@ manifest_paths_for_kind() {
 
 validate_manifests() {
   local name profile path item previous basename relative valid
-  local top_manifest core_manifest
   local -A seen=() official_items=()
 
   [[ -d "$DOTFILES/pkgs/profiles" ]] || fail "missing profile directory: pkgs/profiles"
@@ -169,12 +167,7 @@ validate_manifests() {
   done < <(find "$DOTFILES/pkgs" -type f -name '*.txt' -print)
 
   for name in "${MANIFEST_NAMES[@]}"; do
-    core_manifest="$DOTFILES/pkgs/core/$name.txt"
-    top_manifest="$DOTFILES/pkgs/$name.txt"
-    validate_manifest_file "$core_manifest"
-    validate_manifest_file "$top_manifest"
-    cmp -s "$top_manifest" "$core_manifest" \
-      || fail "top-level manifest $top_manifest does not match $core_manifest"
+    validate_manifest_file "$DOTFILES/pkgs/core/$name.txt"
 
     seen=()
     while IFS= read -r path; do
@@ -285,7 +278,7 @@ validate_stow_sources() {
     while IFS= read -r -d '' path; do
       relative="${path#"$DOTFILES/"}"
       case "$relative" in
-        */.claude/*|*/__pycache__/*|*.pyc|*.pyo|*/host.conf|*/host.lua|*/schedule.json|*/subscription.env|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
+        */__pycache__/*|*.pyc|*.pyo|*/host.lua|*/schedule.json|*/subscription.env|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
           unsafe+=("$relative")
           ;;
         */.env|*/.env.*)
@@ -325,7 +318,7 @@ validate_public_boundary() {
     for file in "${candidates[@]}"; do
       [[ -f "$DOTFILES/$file" ]] || continue
       case "$file" in
-        */subscription.env|*/schedule.json|*/host.conf|*/host.lua|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
+        */subscription.env|*/schedule.json|*/host.lua|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
           printf '%s\n' "$file"
           ;;
         */.env|*/.env.*)

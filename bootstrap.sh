@@ -9,12 +9,11 @@ MODULES=(
   fcitx5 ripgrep vscode xdg scripts tt pi
 )
 STOW_IGNORE_ARGS=(
-  --ignore='(^|/)\.claude($|/)'
   --ignore='(^|/)auth\.json$'
   --ignore='(^|/)node_modules($|/)'
   --ignore='(^|/)__pycache__($|/)'
   --ignore='\.py[cod]$'
-  --ignore='(^|/)host\.(conf|lua)$'
+  --ignore='(^|/)host\.lua$'
   --ignore='(^|/)schedule\.json$'
   --ignore='(^|/)(subscription\.env|installation\.yaml|user\.yaml)$'
   --ignore='(^|/)(sync|generated|.*\.userdb)($|/)'
@@ -166,7 +165,6 @@ manifest_paths_for_kind() {
 
 validate_manifest_tree() {
   local name profile path item previous basename relative valid
-  local top_manifest core_manifest
   local -A seen=() official_items=()
 
   [[ -d "$DOTFILES/pkgs/profiles" ]] || die "missing profile directory: pkgs/profiles"
@@ -194,12 +192,7 @@ validate_manifest_tree() {
   done < <(find "$DOTFILES/pkgs" -type f -name '*.txt' -print)
 
   for name in "${MANIFEST_NAMES[@]}"; do
-    core_manifest="$DOTFILES/pkgs/core/$name.txt"
-    top_manifest="$DOTFILES/pkgs/$name.txt"
-    validate_manifest_file "$core_manifest"
-    validate_manifest_file "$top_manifest"
-    cmp -s "$top_manifest" "$core_manifest" \
-      || die "top-level manifest $top_manifest does not match $core_manifest"
+    validate_manifest_file "$DOTFILES/pkgs/core/$name.txt"
 
     seen=()
     while IFS= read -r path; do
@@ -365,9 +358,6 @@ deploy_dotfiles() {
   stow --dir="$DOTFILES" --target="$HOME" --no-folding "${STOW_IGNORE_ARGS[@]}" --restow "${MODULES[@]}"
 
   if [[ ! -e "$HOME/.config/hypr/host.lua" ]]; then
-    if [[ -e "$HOME/.config/hypr/host.conf" ]]; then
-      die "legacy host.conf exists; migrate it to ~/.config/hypr/host.lua before restore"
-    fi
     install -Dm0644 "$DOTFILES/hyprland/.config/hypr/host.example.lua" \
       "$HOME/.config/hypr/host.lua"
   fi
