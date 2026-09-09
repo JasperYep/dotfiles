@@ -1,12 +1,26 @@
 [opener]
 play = [
-	{ run = 'mpv "$@"', orphan = true, for = "unix" },
+	{ run = 'mpv %s', orphan = true, for = "unix" },
 ]
 edit = [
-	{ run = 'nvim "$@"', block = true, desc = "Edit with Neovim" }
+	{ run = 'nvim %s', block = true, desc = "Edit with Neovim" }
 ]
 open = [
 	{ run = 'xdg-open %s1', desc = "Open" },
+]
+
+[open]
+rules = [
+	{ url = "*/", use = [ "edit", "open", "reveal" ] },
+	{ mime = "text/*", use = [ "edit", "reveal" ] },
+	{ mime = "image/*", use = [ "open", "reveal" ] },
+	{ mime = "{audio,video}/*", use = [ "play", "reveal" ] },
+	{ mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = [ "extract", "reveal" ] },
+	{ mime = "application/{json,ndjson,json5}", use = [ "edit", "reveal" ] },
+	{ mime = "application/*javascript", use = [ "edit", "reveal" ] },
+	{ mime = "application/{xml,html}", use = [ "edit", "open", "reveal" ] },
+	{ mime = "application/{pdf,postscript}", use = [ "open", "reveal" ] },
+	{ url = "*", use = [ "edit", "reveal" ] },
 ]
 
 [preview]

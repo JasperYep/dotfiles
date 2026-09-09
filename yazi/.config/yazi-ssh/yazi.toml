@@ -3,10 +3,10 @@
 
 [opener]
 edit = [
-	{ run = 'nvim "$@"', block = true, desc = "Edit with Neovim" }
+	{ run = 'nvim %s', block = true, desc = "Edit with Neovim" }
 ]
 open = [
-	{ run = 'nvim "$@"', block = true, desc = "Open in Neovim" },
+	{ run = 'nvim %s', block = true, desc = "Open in Neovim" },
 ]
 
 [preview]
