@@ -17,7 +17,7 @@ export FZF_ALT_C_COMMAND='fd . "$HOME" --hidden --follow --type d --exclude .git
 export FZF_ALT_C_OPTS="--scheme=path --preview 'eza -la --icons --group-directories-first {} 2>/dev/null || ls -la {}'"
 export FZF_CTRL_R_OPTS="--sort"
 
-if [[ -o interactive && "${TERM:-}" != dumb ]]; then
+if [[ -o interactive && -t 0 && -t 1 && -t 2 && "${TERM:-}" != dumb ]]; then
   bindkey -v
   source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
   source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -98,13 +98,13 @@ rp() {
 
 alias vi='nvim'
 alias vim='nvim'
+alias cc='claude'
 alias ls='eza --icons --group-directories-first'
 alias ll='eza --icons --group-directories-first -l --git'
 alias la='eza --icons --group-directories-first -la --git'
 alias lt='eza --icons --tree --level=2'
 alias xz='rsync -azvP'
-alias cpusb='rsync -avP && sync'
-alias fm='nautilus --new-window . &>/dev/null &'
+alias fm='thunar . &>/dev/null &'
 alias ta='tmux attach -t'
 alias tn='tmux new -s'
 alias tm='tmux new-session -A -s'
@@ -120,3 +120,25 @@ fi
 local_zsh_config="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/local.zsh"
 [[ -r "$local_zsh_config" ]] && source "$local_zsh_config"
 unset local_zsh_config
+export NODE_OPTIONS="--dns-result-order=ipv4first"
+
+proxy_on() {
+  sudo systemctl start sing-box.service || return
+  export http_proxy="http://127.0.0.1:2080"
+  export https_proxy="http://127.0.0.1:2080"
+  export HTTP_PROXY="http://127.0.0.1:2080"
+  export HTTPS_PROXY="http://127.0.0.1:2080"
+  export ALL_PROXY="socks5://127.0.0.1:2080"
+  export all_proxy="socks5://127.0.0.1:2080"
+  export NO_PROXY="127.0.0.1,localhost,::1"
+  export no_proxy="127.0.0.1,localhost,::1"
+}
+
+proxy_off() {
+  sudo systemctl stop sing-box.service || print -u2 "warning: failed to stop sing-box.service"
+  unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY all_proxy NO_PROXY no_proxy
+}
+
+cp-usb() {
+    rsync -ah --info=progress2 "$@" && sync && echo "DONE"
+}

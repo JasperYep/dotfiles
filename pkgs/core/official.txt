@@ -25,7 +25,8 @@ fzf
 ghostty
 git
 glow
-gnome-clocks
+greetd
+greetd-tuigreet
 grim
 hyprland
 hyprlock
@@ -43,7 +44,6 @@ libqalculate
 lua-language-server
 mako
 mpv
-nautilus
 neovim
 noto-fonts-emoji
 npm
@@ -75,6 +75,7 @@ slurp
 starship
 stow
 stylua
+thunar
 tmux
 trash-cli
 tree

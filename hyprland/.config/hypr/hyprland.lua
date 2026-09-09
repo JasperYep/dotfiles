@@ -213,11 +213,6 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	match = { class = "org.gnome.Nautilus" },
-	opacity = "0.9",
-})
-
-hl.window_rule({
 	name = "suppress-maximize-events",
 	match = { class = ".*" },
 	suppress_event = "maximize",

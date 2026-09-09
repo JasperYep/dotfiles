@@ -56,10 +56,9 @@ tooltip label {
     opacity: 1;
 }
 
-/* 2. 工作区 (变扁) */
+/* 2. 工作区 */
 #workspaces {
     background-color: @glass-bg;
-    /* 压缩垂直间距 */
     margin: 1px 0;
     padding: 1px 2px;
     border-radius: 10px;
@@ -67,7 +66,8 @@ tooltip label {
 }
 
 #workspaces button {
-    padding: 0 6px; /* 减少左右留白 */
+    min-width: 25px;
+    padding: 0 6px;
     color: @overlay0;
     border-radius: 8px;
     transition: all 0.3s ease;
@@ -81,7 +81,6 @@ tooltip label {
 #workspaces button.active {
     color: #9D8ECE;
     background: rgba(255, 255, 255, 0.8);
-    min-width: 25px;
     box-shadow: 0 2px 3px rgba(0,0,0,0.05);
 }
 
@@ -90,14 +89,14 @@ tooltip label {
     background: @glass-hover;
 }
 
-#workspaces button.empty:not(.active):not(.visible) {
+#workspaces button.empty:not(.active):not(.visible):not(.persistent) {
     min-width: 0;
     margin: 0;
     padding: 0;
     opacity: 0;
 }
 
-#workspaces button.empty:not(.active):not(.visible) .workspace-label {
+#workspaces button.empty:not(.active):not(.visible):not(.persistent) .workspace-label {
     font-size: 0;
 }
 
@@ -133,8 +132,8 @@ tooltip label {
 }
 
 #custom-clock.ime-zh {
-    background-color: #d20f39;
-    box-shadow: 0 2px 4px rgba(210, 15, 57, 0.25);
+    background-color: @mauve;
+    box-shadow: 0 2px 4px rgba(136, 57, 239, 0.25);
 }
 
 /* 6. tt 时间管理 */
@@ -170,7 +169,22 @@ tooltip label {
     color: @subtext1;
 }
 
-/* 7. 托盘 */
+/* 7. 内存 */
+#memory {
+    background-color: @glass-bg;
+    color: @text;
+    margin: 1px 6px 1px 0;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid @glass-border;
+    transition: all 0.3s ease;
+}
+
+#memory:hover {
+    background-color: @glass-hover;
+}
+
+/* 8. 托盘 */
 #tray {
     background-color: @glass-bg;
     /* 压缩垂直间距 */

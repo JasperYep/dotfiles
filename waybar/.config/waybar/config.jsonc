@@ -19,6 +19,7 @@
         "custom/clock"
     ],
     "modules-right": [
+        "memory",
         "tray",
         "custom/tt",
         "pulseaudio"
@@ -55,7 +56,7 @@
         "format": "{icon}",
         "format-icons": {
             "1": "",
-            "2": "",
+            "2": "",
             "3": "󰨞",
             "4": "󰦨",
             "5": "󰐊",
@@ -67,6 +68,11 @@
             "urgent": "",
             "default": ""
         }
+    },
+
+    "memory": {
+        "interval": 1,
+        "format": "RAM {percentage}%"
     },
 
     "pulseaudio": {
