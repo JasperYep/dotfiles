@@ -206,7 +206,6 @@ validate_scripts() {
   bash -n "$DOTFILES/scripts/.local/bin/rofi-files"
   zsh -n "$DOTFILES/zsh/.zshrc"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/away-lock.sh"
-  sh -n "$DOTFILES/hyprland/.config/hypr/scripts/layout-dispatch.sh"
   sh -n "$DOTFILES/hyprland/.config/hypr/scripts/quicknote.sh"
   luac -p \
     "$DOTFILES/hyprland/.config/hypr/hyprland.lua" \

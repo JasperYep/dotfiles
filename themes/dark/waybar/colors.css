@@ -32,3 +32,12 @@
 @define-color glass-bg rgba(36, 39, 58, 0.45);
 @define-color glass-border rgba(255, 255, 255, 0.08);
 @define-color glass-hover rgba(255, 255, 255, 0.12);
+
+/* Waybar theme accents */
+@define-color accent #B2A4D4;
+@define-color arch-shadow rgba(157, 142, 206, 0.35);
+@define-color workspace-active-bg rgba(157, 142, 206, 0.28);
+@define-color workspace-shadow rgba(0, 0, 0, 0.25);
+@define-color clock-text @base;
+@define-color clock-shadow rgba(178, 164, 212, 0.35);
+@define-color break-bg alpha(@peach, 0.10);

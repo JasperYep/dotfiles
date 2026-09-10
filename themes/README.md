@@ -1,6 +1,12 @@
 # Themes
 
-`light/` and `dark/` are the only appearance sources.
+`light/` and `dark/` hold theme-specific appearance settings.
+Waybar shares `waybar.css` through symlinks in both theme directories; its
+`colors.css` import loads the selected theme's palette. Layout and opacity are
+shared; colors remain theme-specific.
+
+Validate both Waybar themes with `/usr/bin/python tests/waybar-css.py` from the
+repository root (requires GTK3/PyGObject).
 
 `theme-switch` stores the selected theme as:
 

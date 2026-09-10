@@ -148,8 +148,8 @@ execBind(mainMod .. " + SPACE", "pkill -x rofi || " .. menu)
 execBind(mainMod .. " + O", "pkill -x rofi || " .. fileSearch)
 execBind(mainMod .. " + C", "pkill -x rofi || " .. calculator)
 
-execBind(mainMod .. " + CTRL + H", "~/.config/hypr/scripts/layout-dispatch.sh shrink-main")
-execBind(mainMod .. " + CTRL + L", "~/.config/hypr/scripts/layout-dispatch.sh grow-main")
+hl.bind(mainMod .. " + CTRL + H", hl.dsp.layout("mfact -0.05"))
+hl.bind(mainMod .. " + CTRL + L", hl.dsp.layout("mfact +0.05"))
 hl.bind(mainMod .. " + CTRL + R", hl.dsp.layout("orientationcycle left top center"))
 hl.bind(mainMod .. " + CTRL + COMMA", hl.dsp.layout("removemaster"))
 hl.bind(mainMod .. " + CTRL + PERIOD", hl.dsp.layout("addmaster"))
@@ -165,13 +165,13 @@ execBind(mainMod .. " + CTRL + SHIFT + Q", "~/.config/hypr/scripts/away-lock.sh"
 hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 
-execBind(mainMod .. " + H", "~/.config/hypr/scripts/layout-dispatch.sh focus-left")
-execBind(mainMod .. " + L", "~/.config/hypr/scripts/layout-dispatch.sh focus-right")
+hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "l" }))
+hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "r" }))
 hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "u" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "d" }))
 
-execBind(mainMod .. " + SHIFT + H", "~/.config/hypr/scripts/layout-dispatch.sh move-left")
-execBind(mainMod .. " + SHIFT + L", "~/.config/hypr/scripts/layout-dispatch.sh move-right")
+hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "l" }))
+hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.move({ direction = "r" }))
 hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "u" }))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
 
@@ -184,7 +184,7 @@ end
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + TAB", hl.dsp.focus({ workspace = "previous" }))
-execBind(mainMod .. " + SHIFT + RETURN", "~/.config/hypr/scripts/layout-dispatch.sh promote-main")
+hl.bind(mainMod .. " + SHIFT + RETURN", hl.dsp.layout("swapwithmaster"))
 
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
