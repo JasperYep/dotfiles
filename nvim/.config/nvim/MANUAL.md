@@ -82,29 +82,23 @@
 为什么终端里不用 `Ctrl-h/j/k/l`：
 
 - `Claude Code`运行在终端中，避免依赖可能冲突的 `Ctrl` 组合
-- 因此终端里统一用 `Ctrl-g + 方向键母`
-
-所以终端里统一用 `Ctrl-g + 方向键母`。
+- 因此终端里统一用`Ctrl-g + h/j/k/l`。
 
 ## 3. 当前插件清单
 
 ### 基础界面
 
 - `catppuccin`
-  - 当前使用 `latte`
-  - 浅色主题
-  - 透明背景
+  - 随桌面主题使用`latte`或`macchiato`
+  - 编辑区沿用终端底色；Ghostty自身不透明
 
 - `which-key.nvim`
   - 用于显示 Leader 键提示
 
 - `mini.statusline`
   - 提供简洁状态栏
-  - 右下角显示 `行:列 | 百分比 | 当前行/总行`
+  - 右下角显示 `行:列`
 
-- `nvim-navic`
-  - 在顶部 `winbar` 显示当前文件的面包屑
-  - 基于 LSP symbol 区分类 / 方法 / 函数等层级
 
 ### 编辑增强
 
@@ -171,12 +165,20 @@
 - `indent-blankline.nvim`
   - 缩进线
 
+- `render-markdown.nvim`
+  - 保留标题、列表等Markdown阅读增强
+  - 禁用LaTeX转换，公式保留源文本；不再维护自定义转换器
+
 ## 4. 当前已删除的东西
+
+### 已删除
 
 以下插件已经移除：
 
 - `bufferline.nvim`
 - `todo-comments.nvim`
+- `nvim-navic`（删除常驻位置导航，结构导航保留Aerial与LSP）
+- 自定义`render_markdown_latex.py`转换器
 
 删除后的替代工作流：
 
@@ -372,7 +374,7 @@ LSP 相关键位：
 - `pyright`
 - `lua_ls`
 
-自动安装工具列表：
+以下工具由Arch软件清单提供，而不是Neovim启动时自动安装；C/C++工具需要`dev` profile：
 
 - `clangd`
 - `pyright`
@@ -570,9 +572,8 @@ Claude Code不是Neovim插件，而是通过现有浮动terminal运行的外部C
 
 ### 外观
 
-- 主题：`catppuccin-latte`
-- 背景：light
-- 透明背景：开启
+- 主题：随桌面切换`catppuccin-latte`／`catppuccin-macchiato`
+- 编辑区背景：沿用终端底色；不是窗口透明
 - 光标行：开启
 - 行号：绝对行号
 
@@ -623,7 +624,7 @@ Claude Code不是Neovim插件，而是通过现有浮动terminal运行的外部C
 
 1. `space sb` 已打开 buffers
 2. `[b` / `]b`
-3. `space .` 最近文件
+3. `space s.` 最近文件
 4. `space space` 重新搜索文件
 
 ### 浏览项目结构时

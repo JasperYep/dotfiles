@@ -36,9 +36,6 @@ return {
                     NvimTreeOpenedFolderName = { bg = "none" },
                     NvimTreeRootFolder = { bg = "none", fg = colors.blue },
 
-                    WinBar = { bg = "none" },
-                    WinBarNC = { bg = "none" },
-
                     TelescopeNormal = { bg = "none" },
                     TelescopeBorder = { bg = "none", fg = colors.surface1 },
                     TelescopePromptNormal = { bg = "none" },

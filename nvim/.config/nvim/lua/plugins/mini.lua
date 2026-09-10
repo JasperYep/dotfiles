@@ -22,6 +22,10 @@ return {
             local statusline = require("mini.statusline")
             statusline.setup({ use_icons = vim.g.have_nerd_font })
 
+            statusline.section_location = function()
+                return "%l:%v"
+            end
+
             local default_section_mode = statusline.section_mode
 
             ---@diagnostic disable-next-line: duplicate-set-field
@@ -45,11 +49,6 @@ return {
                 }
 
                 return labels[mode] or mode, hl
-            end
-
-            ---@diagnostic disable-next-line: duplicate-set-field
-            statusline.section_location = function()
-                return "%2l:%-2v | %3p%% | %l/%L"
             end
         end,
     },

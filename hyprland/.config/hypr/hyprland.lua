@@ -39,30 +39,24 @@ hl.env("QT_QPA_PLATFORM", "wayland")
 
 hl.config({
 	general = {
-		gaps_in = 4,
-		gaps_out = 4,
+		gaps_in = 6,
+		gaps_out = 6,
 		border_size = 2,
 		resize_on_border = false,
 		allow_tearing = false,
 		layout = "master",
 	},
 	decoration = {
-		rounding = 12,
+		rounding = 8,
 		rounding_power = 2,
 		active_opacity = 1.0,
-		inactive_opacity = 0.85,
-		dim_inactive = true,
+		inactive_opacity = 1.0,
+		dim_inactive = false,
 		shadow = {
 			enabled = false,
 		},
 		blur = {
-			enabled = true,
-			size = 5,
-			passes = 1,
-			new_optimizations = true,
-			xray = true,
-			contrast = 1.0,
-			vibrancy = 0.1696,
+			enabled = false,
 		},
 	},
 	animations = {
@@ -98,31 +92,12 @@ hl.config({
 -- Theme colors, GTK settings, and border overrides are managed by theme-switch.
 require(configHome .. "/hypr/theme.lua")
 
-hl.curve("wind", {
-	type = "bezier",
-	points = { { 0.05, 0.9 }, { 0.1, 1.05 } },
-})
-hl.curve("winIn", {
-	type = "bezier",
-	points = { { 0.1, 1.1 }, { 0.1, 1.1 } },
-})
-hl.curve("winOut", {
-	type = "bezier",
-	points = { { 0.3, -0.3 }, { 0, 1 } },
-})
-hl.curve("liner", {
-	type = "bezier",
-	points = { { 1, 1 }, { 1, 1 } },
-})
-
-hl.animation({ leaf = "windows", enabled = true, speed = 6, bezier = "wind", style = "slide" })
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 6, bezier = "winIn", style = "slide" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 5, bezier = "winOut", style = "slide" })
-hl.animation({ leaf = "windowsMove", enabled = true, speed = 5, bezier = "wind", style = "slide" })
-hl.animation({ leaf = "border", enabled = true, speed = 1, bezier = "liner" })
-hl.animation({ leaf = "borderangle", enabled = true, speed = 30, bezier = "liner", style = "loop" })
-hl.animation({ leaf = "fade", enabled = true, speed = 5, bezier = "default" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 5, bezier = "wind" })
+hl.animation({ leaf = "windows", enabled = false })
+hl.animation({ leaf = "border", enabled = false })
+hl.animation({ leaf = "borderangle", enabled = false })
+hl.animation({ leaf = "fade", enabled = true, speed = 1.5, bezier = "default" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 1.5, bezier = "default", style = "slide 10%" })
+hl.animation({ leaf = "layers", enabled = false })
 
 -------------------
 --- KEYBINDINGS ---
@@ -209,7 +184,7 @@ hl.window_rule({
 	match = { class = "^(quicknote)$" },
 	size = { 800, 500 },
 	float = true,
-	opacity = "0.9",
+	opacity = "1.0",
 })
 
 hl.window_rule({
@@ -256,21 +231,6 @@ hl.window_rule({
 -------------------
 --- LAYER RULES ---
 -------------------
-
-hl.layer_rule({
-	name = "waybar_rule",
-	match = { namespace = "waybar" },
-	blur = true,
-	ignore_alpha = 0.5,
-})
-
-hl.layer_rule({
-	name = "rofi",
-	match = { namespace = "rofi" },
-	ignore_alpha = 0.5,
-	blur = true,
-	animation = "fade",
-})
 
 hl.layer_rule({
 	name = "no_anim_for_selection",

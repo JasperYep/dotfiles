@@ -1,9 +1,16 @@
-# Colors
+font=Inter 11
+border-size=1
+border-radius=8
+padding=12
+margin=8
+width=320
+format=<b>%s</b>\n%b
 
+# Colors
 background-color=#eff1f5
 text-color=#4c4f69
-border-color=#bcbcbc
-progress-color=over #ccd0da
+border-color=#bcc0cc
+progress-color=over #DDD5FA
 
 [urgency=high]
 border-color=#fe640b

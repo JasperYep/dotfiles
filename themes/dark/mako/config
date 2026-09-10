@@ -1,9 +1,16 @@
-# Colors — Catppuccin Macchiato
+font=Inter 11
+border-size=1
+border-radius=8
+padding=12
+margin=8
+width=320
+format=<b>%s</b>\n%b
 
+# Colors — Catppuccin Macchiato
 background-color=#24273a
 text-color=#cad3f5
 border-color=#494d64
-progress-color=over #363a4f
+progress-color=over #3d3654
 
 [urgency=high]
 border-color=#f5a97f

@@ -7,14 +7,8 @@ hl.env("GTK_THEME", "adw-gtk3")
 hl.config({
     general = {
         col = {
-            active_border = "rgba(9D8ECEcc)",
+            active_border = "rgba(9D8ECEff)",
             inactive_border = "rgba(bcc0ccff)",
-        },
-    },
-    decoration = {
-        dim_strength = 0.03,
-        blur = {
-            brightness = 0.9,
         },
     },
 })

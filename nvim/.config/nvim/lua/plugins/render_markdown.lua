@@ -7,14 +7,8 @@ return {
     },
     opts = {
         restart_highlighter = true,
-        anti_conceal = {
-            ignore = {
-                latex = true,
-            },
-        },
         latex = {
-            converter = { vim.fn.stdpath('config') .. '/bin/render_markdown_latex.py' },
-            render_modes = true,
+            enabled = false,
         },
     },
     config = function(_, opts)

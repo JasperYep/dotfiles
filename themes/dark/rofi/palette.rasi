@@ -1,10 +1,10 @@
 * {
     bg:          #24273a;   /* Macchiato base */
     bg-input:    #1e2030;   /* Macchiato mantle */
-    border-col:  #494d64;   /* surface1，极淡边框 */
+    border-col:  #494d64;   /* surface1 细边框 */
     fg:          #cad3f5;   /* text */
-    fg-dim:      #6e738d;   /* overlay0 */
-    accent:      #9D8ECE;   /* 紫藤 — prompt 色 */
+    fg-dim:      #a5adcb;   /* overlay0 */
+    accent:      #B2A4D4;   /* 软紫 — prompt 色 */
     selected-bg: #3d3654;   /* 软紫选中底 */
     urgent:      #ed8796;
 }
@@ -13,7 +13,7 @@ window {
     background-color: @bg;
     border:           1px;
     border-color:     @border-col;
-    border-radius:    12px;
+    border-radius:    8px;
     padding:          12px;
     width:            480px;
 }
@@ -26,7 +26,7 @@ mainbox {
 
 inputbar {
     background-color: @bg-input;
-    border-radius:    8px;
+    border-radius:    6px;
     padding:          8px 12px;
     spacing:          8px;
     children:         [prompt, entry];
@@ -47,6 +47,7 @@ entry {
 listview {
     background-color: transparent;
     lines:            8;
+    fixed-height:     true;
     columns:          1;
     scrollbar:        false;
     spacing:          2px;
@@ -54,7 +55,7 @@ listview {
 
 element {
     background-color: transparent;
-    border-radius:    8px;
+    border-radius:    6px;
     padding:          8px 12px;
     spacing:          10px;
     children:         [element-icon, element-text];
