@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.85.1",
   "theme": "wisteria-light/wisteria-dark",
   "defaultProvider": "jasper",
-  "defaultModel": "deepseek-v4-pro",
+  "defaultModel": "glm-5.3-flash",
   "defaultThinkingLevel": "max",
   "terminal": {
     "showTerminalProgress": false
