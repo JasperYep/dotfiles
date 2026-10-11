@@ -31,6 +31,10 @@ type McpServerConfig = {
 	/** Optional tool name prefix. Default: sanitized server name + "_" */
 	prefix?: string;
 	disabled?: boolean;
+	/** Whitelist of tool names to expose (matches raw tool name or prefixed pi name) */
+	includeTools?: string[];
+	/** Blacklist of tool names to exclude */
+	excludeTools?: string[];
 };
 
 type McpConfigFile = {
@@ -48,10 +52,145 @@ const CONFIG_PATH = join(homedir(), ".pi/agent/mcp.json");
 const FIGMA_SOCKET_PORT = 3055;
 const FIGMA_SOCKET_CMD = ["bunx", "cursor-talk-to-figma-socket@latest"];
 
-let connected: ConnectedServer[] = [];
+class McpServerSession {
+	name: string;
+	config: McpServerConfig;
+	client: Client | null = null;
+	transport: StdioClientTransport | null = null;
+	tools: string[] = [];
+	private connectPromise: Promise<Client> | null = null;
+
+	constructor(name: string, config: McpServerConfig) {
+		this.name = name;
+		this.config = config;
+	}
+
+	get isConnected(): boolean {
+		return this.client !== null && this.transport !== null;
+	}
+
+	async connect(): Promise<Client> {
+		if (this.isConnected && this.client) {
+			return this.client;
+		}
+		if (this.connectPromise) {
+			return this.connectPromise;
+		}
+
+		this.connectPromise = (async () => {
+			await this.disconnect();
+
+			const inheritedEnv = { ...process.env } as Record<string, string>;
+			const transport = new StdioClientTransport({
+				command: this.config.command,
+				args: this.config.args ?? [],
+				env: { ...inheritedEnv, ...(this.config.env ?? {}) },
+				cwd: this.config.cwd,
+				stderr: "pipe",
+			});
+
+			transport.stderr?.on("data", (buf: Buffer) => {
+				const line = buf.toString().trim();
+				if (line) console.error(`[mcp:${this.name}] ${line}`);
+			});
+
+			const cleanup = () => {
+				if (this.transport === transport) {
+					this.client = null;
+					this.transport = null;
+					updateStatus();
+				}
+			};
+
+			transport.onclose = cleanup;
+			transport.onerror = (err) => {
+				console.error(`[mcp:${this.name}] transport error:`, err);
+				cleanup();
+			};
+
+			const client = new Client(
+				{ name: "pi-mcp-bridge", version: "0.1.0" },
+				{ capabilities: {} },
+			);
+
+			await client.connect(transport);
+			this.client = client;
+			this.transport = transport;
+			updateStatus();
+			return client;
+		})().finally(() => {
+			this.connectPromise = null;
+		});
+
+		return this.connectPromise;
+	}
+
+	async disconnect(): Promise<void> {
+		const c = this.client;
+		const t = this.transport;
+		this.client = null;
+		this.transport = null;
+
+		if (c) {
+			try {
+				await c.close();
+			} catch {
+				// ignore
+			}
+		}
+		if (t) {
+			try {
+				await t.close();
+			} catch {
+				// ignore
+			}
+		}
+		updateStatus();
+	}
+
+	async callTool(
+		toolName: string,
+		params: Record<string, unknown>,
+		signal?: AbortSignal,
+	): Promise<unknown> {
+		try {
+			const client = await this.connect();
+			return await client.callTool(
+				{ name: toolName, arguments: params },
+				undefined,
+				{ signal },
+			);
+		} catch (err) {
+			if (signal?.aborted) throw err;
+
+			console.warn(`[mcp:${this.name}] callTool failed, reconnecting and retrying:`, err);
+			await this.disconnect();
+			const client = await this.connect();
+			return await client.callTool(
+				{ name: toolName, arguments: params },
+				undefined,
+				{ signal },
+			);
+		}
+	}
+}
+
+const activeServers = new Map<string, McpServerSession>();
 let registeredToolNames = new Set<string>();
 let socketProc: ChildProcess | null = null;
 let socketStartedByUs = false;
+let currentCtx: ExtensionContext | undefined;
+
+function updateStatus(ctx?: ExtensionContext): void {
+	const c = ctx ?? currentCtx;
+	if (!c) return;
+	const connectedList = Array.from(activeServers.values()).filter((s) => s.isConnected);
+	const totalTools = connectedList.reduce((n, s) => n + s.tools.length, 0);
+	c.ui.setStatus(
+		"mcp",
+		connectedList.length ? `mcp:${connectedList.length}/${totalTools}` : undefined,
+	);
+}
 
 function loadConfig(): Record<string, McpServerConfig> {
 	if (!existsSync(CONFIG_PATH)) {
@@ -181,32 +320,36 @@ function jsonSchemaToTypebox(schema: unknown): TSchema {
 }
 
 function toolNameFor(serverName: string, toolName: string, prefix?: string): string {
-	const p = prefix ?? `${sanitizeName(serverName)}_`;
-	const full = `${p}${toolName}`;
+	if (prefix !== undefined) {
+		const full = `${prefix}${toolName}`;
+		return full.replace(/[^a-zA-Z0-9_]/g, "_");
+	}
+	const s = sanitizeName(serverName);
+	if (toolName.startsWith(`${s}_`)) {
+		return toolName.replace(/[^a-zA-Z0-9_]/g, "_");
+	}
+	const full = `${s}_${toolName}`;
 	// keep names model-friendly
 	return full.replace(/[^a-zA-Z0-9_]/g, "_");
 }
 
 async function disconnectAll(): Promise<void> {
-	for (const s of connected) {
+	for (const s of activeServers.values()) {
 		try {
-			await s.client.close();
-		} catch {
-			// ignore
-		}
-		try {
-			await s.transport.close();
+			await s.disconnect();
 		} catch {
 			// ignore
 		}
 	}
-	connected = [];
+	activeServers.clear();
+	updateStatus();
 }
 
 async function connectServers(
 	pi: ExtensionAPI,
 	ctx?: ExtensionContext,
 ): Promise<void> {
+	currentCtx = ctx;
 	await disconnectAll();
 
 	const servers = loadConfig();
@@ -222,8 +365,6 @@ async function connectServers(
 		await ensureFigmaSocket(ctx);
 	}
 
-	const inheritedEnv = { ...process.env } as Record<string, string>;
-
 	for (const [name, cfg] of Object.entries(servers)) {
 		if (cfg.disabled) continue;
 		if (!cfg.command) {
@@ -231,35 +372,31 @@ async function connectServers(
 			continue;
 		}
 
+		const server = new McpServerSession(name, cfg);
+		activeServers.set(name, server);
+
 		try {
-			const transport = new StdioClientTransport({
-				command: cfg.command,
-				args: cfg.args ?? [],
-				env: { ...inheritedEnv, ...(cfg.env ?? {}) },
-				cwd: cfg.cwd,
-				stderr: "pipe",
-			});
-
-			// surface MCP server stderr
-			const stderr = transport.stderr;
-			stderr?.on("data", (buf: Buffer) => {
-				const line = buf.toString().trim();
-				if (line) console.error(`[mcp:${name}] ${line}`);
-			});
-
-			const client = new Client(
-				{ name: "pi-mcp-bridge", version: "0.1.0" },
-				{ capabilities: {} },
-			);
-
-			await client.connect(transport);
-
+			const client = await server.connect();
 			const listed = await client.listTools();
 			const tools = listed.tools ?? [];
 			const registered: string[] = [];
 
 			for (const tool of tools) {
 				const piName = toolNameFor(name, tool.name, cfg.prefix);
+				if (
+					cfg.includeTools &&
+					!cfg.includeTools.includes(tool.name) &&
+					!cfg.includeTools.includes(piName)
+				) {
+					continue;
+				}
+				if (
+					cfg.excludeTools &&
+					(cfg.excludeTools.includes(tool.name) || cfg.excludeTools.includes(piName))
+				) {
+					continue;
+				}
+
 				if (registeredToolNames.has(piName)) {
 					// already registered in a previous connect of this session;
 					// re-bind execute by re-registering with same name (pi allows override)
@@ -285,10 +422,10 @@ async function connectServers(
 					parameters,
 					async execute(_toolCallId, params, signal) {
 						try {
-							const result = await client.callTool(
-								{ name: tool.name, arguments: params as Record<string, unknown> },
-								undefined,
-								{ signal },
+							const result = await server.callTool(
+								tool.name,
+								params as Record<string, unknown>,
+								signal,
 							);
 
 							const content = Array.isArray((result as { content?: unknown }).content)
@@ -344,7 +481,7 @@ async function connectServers(
 				});
 			}
 
-			connected.push({ name, client, transport, tools: registered });
+			server.tools = registered;
 			console.error(`[mcp] connected ${name}: ${registered.length} tools`);
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
@@ -353,42 +490,37 @@ async function connectServers(
 		}
 	}
 
-	const total = connected.reduce((n, s) => n + s.tools.length, 0);
-	if (ctx) {
-		ctx.ui.setStatus(
-			"mcp",
-			connected.length ? `mcp:${connected.length}/${total}` : undefined,
+	updateStatus(ctx);
+	const connectedList = Array.from(activeServers.values()).filter((s) => s.isConnected);
+	if (ctx && connectedList.length) {
+		ctx.ui.notify(
+			`MCP ready: ${connectedList.map((s) => `${s.name}(${s.tools.length})`).join(", ")}`,
+			"info",
 		);
-		if (connected.length) {
-			ctx.ui.notify(
-				`MCP ready: ${connected.map((s) => `${s.name}(${s.tools.length})`).join(", ")}`,
-				"info",
-			);
-		}
 	}
 }
 
 export default function mcpExtension(pi: ExtensionAPI) {
 	pi.on("session_start", async (_event, ctx) => {
+		currentCtx = ctx;
 		await connectServers(pi, ctx);
 	});
 
 	pi.on("session_shutdown", async () => {
 		await disconnectAll();
-		// leave socket running if we started it — useful across sessions;
-		// only kill if you want strict cleanup. Prefer keep-alive for Figma plugin.
 		pi; // keep signature used
 	});
 
 	pi.registerCommand("mcp", {
 		description: "Show connected MCP servers and tools",
 		handler: async (_args, ctx) => {
-			if (!connected.length) {
-				ctx.ui.notify(`No MCP servers connected. Config: ${CONFIG_PATH}`, "warning");
+			if (!activeServers.size) {
+				ctx.ui.notify(`No MCP servers configured. Config: ${CONFIG_PATH}`, "warning");
 				return;
 			}
-			const lines = connected.map(
-				(s) => `${s.name}: ${s.tools.length} tools\n  - ${s.tools.join("\n  - ")}`,
+			const lines = Array.from(activeServers.values()).map(
+				(s) =>
+					`${s.name} [${s.isConnected ? "connected" : "disconnected"}]: ${s.tools.length} tools\n  - ${s.tools.join("\n  - ")}`,
 			);
 			ctx.ui.notify(lines.join("\n\n"), "info");
 		},

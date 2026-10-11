@@ -90,6 +90,17 @@ PY
   pass "script syntax and helpers"
 }
 
+verify_prompt_refiner() {
+  local dir="$DOTFILES/pi/.pi/agent/extensions/prompt-refiner"
+  [[ -d "$dir" ]] || fail "prompt-refiner extension is missing: $dir"
+  [[ -x "$dir/test.sh" ]] || fail "prompt-refiner test runner is not executable"
+  # The tests import pi by package name; test.sh creates the resolver links and
+  # then runs every suite in the directory.
+  "$dir/test.sh" >/dev/null 2>&1 \
+    || fail "prompt-refiner tests failed (run $dir/test.sh for details)"
+  pass "prompt-refiner extension tests"
+}
+
 validate_data_files() {
   jq empty "$DOTFILES/vscode/.config/Code/User/settings.json"
   jq empty "$DOTFILES/hyprland/.config/hypr/.luarc.json"
@@ -164,7 +175,7 @@ validate_public_boundary() {
     for file in "${candidates[@]}"; do
       [[ -f "$DOTFILES/$file" ]] || continue
       case "$file" in
-        */subscription.env|*/schedule.json|*/host.lua|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
+        */subscription.env|*/schedule.json|*/models.json|*/host.lua|*/installation.yaml|*/user.yaml|*.userdb/*|*/sync/*|*/generated/*|*.key|*.pem|*.p12|*.pfx|*.log)
           printf '%s\n' "$file"
           ;;
         */.env|*/.env.*)
@@ -185,6 +196,7 @@ validate_repository() {
   validate_hyprland_lua
   validate_stow_sources
   validate_public_boundary
+  verify_prompt_refiner
 }
 
 verify_pacman_packages() {
@@ -307,11 +319,12 @@ verify_configs() {
   Hyprland --verify-config --config "$HOME/.config/hypr/hyprland.lua" >/dev/null \
     || fail "Hyprland Lua config validation failed"
   ghostty +validate-config >/dev/null || fail "Ghostty config validation failed"
+  foot --check-config >/dev/null || fail "foot config validation failed"
   cmp -s "$DOTFILES/nvim/.config/nvim/lazy-lock.json" \
     "$HOME/.config/nvim/lazy-lock.json" \
     || fail "installed Neovim lockfile differs from repository"
   nvim --headless \
-    '+lua assert(vim.g.colors_name == "catppuccin-latte" or vim.g.colors_name == "catppuccin-macchiato")' \
+    '+lua assert(vim.g.colors_name == "rose-pine")' \
     +qa >/dev/null || fail "Neovim headless startup failed"
   cmp -s "$DOTFILES/nvim/.config/nvim/lazy-lock.json" \
     "$HOME/.config/nvim/lazy-lock.json" \

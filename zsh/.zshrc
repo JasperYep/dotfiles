@@ -5,6 +5,9 @@ export SAVEHIST=100000
 setopt APPEND_HISTORY EXTENDED_HISTORY HIST_EXPIRE_DUPS_FIRST
 setopt HIST_FCNTL_LOCK HIST_IGNORE_DUPS HIST_IGNORE_SPACE SHARE_HISTORY
 
+# Paste-friendly: without this, '#' lines fail to parse in interactive zsh.
+setopt INTERACTIVE_COMMENTS
+
 # Completion and navigation
 autoload -Uz compinit
 compinit
@@ -141,3 +144,7 @@ proxy_off() {
 cp-usb() {
     rsync -ah --info=progress2 "$@" && sync && echo "DONE"
 }
+
+# >>> Codex installer >>>
+export PATH="${HOME}/.local/bin:$PATH"
+# <<< Codex installer <<<

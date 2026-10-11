@@ -1,6 +1,21 @@
-/* Catppuccin Macchiato + soft purple accents */
-@define-color base #24273a;
-@define-color text #cad3f5;
-@define-color subtext1 #a5adcb;
-@define-color surface1 #494d64;
-@define-color accent #B2A4D4;
+/* Rosé Pine Moon — soft-purple (iris) accent */
+@define-color base #232136;
+@define-color surface #2a273f;
+@define-color overlay #393552;
+@define-color muted #6e6a86;
+@define-color subtle #908caa;
+@define-color text #e0def4;
+@define-color love #eb6f92;
+@define-color gold #f6c177;
+@define-color rose #ea9a97;
+@define-color pine #3e8fb0;
+@define-color foam #9ccfd8;
+@define-color iris #c4a7e7;
+@define-color hl_low #2a283e;
+@define-color hl_med #44415a;
+@define-color hl_high #56526e;
+@define-color accent #c4a7e7;
+
+/* back-compat aliases */
+@define-color subtext1 #908caa;
+@define-color surface1 #56526e;

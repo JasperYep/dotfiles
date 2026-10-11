@@ -4,13 +4,17 @@ border-radius=8
 padding=12
 margin=8
 width=320
-format=<b>%s</b>\n%b
+max-icon-size=24
+icon-border-radius=4
 
-# Colors
-background-color=#eff1f5
-text-color=#4c4f69
-border-color=#bcc0cc
-progress-color=over #DDD5FA
+# Hierarchy: source (small/secondary) > summary (bold/primary) > body (secondary).
+format=<span size='small' foreground='#9893a5'>%a</span>\n<b>%s</b>\n<span foreground='#9893a5'>%b</span>
+
+# Rosé Pine Dawn — base / text / subtext1 / surface1 / accent
+background-color=#faf4ed
+text-color=#575279
+border-color=#cecacd
+progress-color=over #907aa9
 
 [urgency=high]
-border-color=#fe640b
+border-color=#ea9d34

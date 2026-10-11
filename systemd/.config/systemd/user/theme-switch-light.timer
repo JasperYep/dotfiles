@@ -1,0 +1,10 @@
+[Unit]
+Description=Switch desktop to light at 07:00
+
+[Timer]
+OnCalendar=*-*-* 07:00:00
+Persistent=true
+Unit=theme-switch-light.service
+
+[Install]
+WantedBy=timers.target

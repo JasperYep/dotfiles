@@ -21,7 +21,7 @@ for theme in ("light", "dark"):
     context.add_provider(provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     found, accent = context.lookup_color("accent")
     assert found, theme
-    expected = "#9D8ECE" if theme == "light" else "#B2A4D4"
+    expected = "#907AA9" if theme == "light" else "#C4A7E7"
     from gi.repository import Gdk
     color = Gdk.RGBA()
     assert color.parse(expected)

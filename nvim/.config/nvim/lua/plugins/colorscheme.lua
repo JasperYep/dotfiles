@@ -9,17 +9,17 @@ if uv.fs_stat(theme) then
 end
 
 return {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "rose-pine/neovim",
+    name = "rose-pine",
     lazy = false,
     priority = 1000,
     config = function()
         vim.o.background = "light"
-        require("catppuccin").setup({
-            flavour = "latte",
-            transparent_background = true,
-            float = { transparent = true },
+        require("rose-pine").setup({
+            variant = "auto",
+            dark_variant = "moon",
+            styles = { transparency = true },
         })
-        vim.cmd.colorscheme("catppuccin-latte")
+        vim.cmd.colorscheme("rose-pine")
     end,
 }

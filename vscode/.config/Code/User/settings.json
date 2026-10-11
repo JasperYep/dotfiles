@@ -6,14 +6,21 @@
     "**/*": "assets/"
   },
   "security.workspace.trust.untrustedFiles": "open",
-  "window.autoDetectColorScheme": true,
-  "workbench.colorTheme": "Light 2026",
-  "workbench.preferredDarkColorTheme": "Light 2026",
   "chatgpt.followUpQueueMode": "steer",
   "chatgpt.composerEnterBehavior": "enter",
   "claudeCode.preferredLocation": "panel",
   "claudeCode.allowDangerouslySkipPermissions": true,
   "claudeCode.disableLoginPrompt": true,
   "claudeCode.environmentVariables": [],
-  "workbench.secondarySideBar.showLabels": false
+  "workbench.secondarySideBar.showLabels": false,
+  "claudeCode.hideOnboarding": true,
+  "workbench.colorCustomizations": {
+    "activityBarBadge.background": "#958BCB",
+    "button.background": "#69689F",
+    "icon.foreground": "#6E75A4"
+  },
+  "workbench.preferredDarkColorTheme": "Rosé Pine Moon",
+  "workbench.iconTheme": "rose-pine-symbols",
+  "workbench.preferredLightColorTheme": "Rosé Pine Dawn",
+  "window.autoDetectColorScheme": true
 }

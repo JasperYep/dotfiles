@@ -1,0 +1,10 @@
+[Unit]
+Description=Switch desktop to dark at 18:00
+
+[Timer]
+OnCalendar=*-*-* 18:00:00
+Persistent=true
+Unit=theme-switch-dark.service
+
+[Install]
+WantedBy=timers.target

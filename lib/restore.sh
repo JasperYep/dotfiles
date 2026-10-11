@@ -1,7 +1,7 @@
 # Shared restore contract. Callers provide DOTFILES and die().
 MODULES=(
-  hyprland waybar rofi ghostty nvim yazi tmux zsh
-  fcitx5 ripgrep vscode xdg scripts tt pi
+  hyprland waybar rofi ghostty foot nvim yazi tmux zsh
+  fcitx5 ripgrep vscode xdg scripts tt pi agents
 )
 STOW_IGNORE_ARGS=(
   --ignore='(^|/)auth\.json$'
@@ -10,6 +10,7 @@ STOW_IGNORE_ARGS=(
   --ignore='\.py[cod]$'
   --ignore='(^|/)host\.lua$'
   --ignore='(^|/)schedule\.json$'
+  --ignore='(^|/)models\.json$'
   --ignore='(^|/)(subscription\.env|installation\.yaml|user\.yaml)$'
   --ignore='(^|/)(sync|generated|.*\.userdb)($|/)'
   --ignore='(^|/)\.env($|\.)'

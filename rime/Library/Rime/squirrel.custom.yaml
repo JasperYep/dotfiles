@@ -1,7 +1,7 @@
 # Squirrel frontend only. Keep this file lean: style + app defaults.
 patch:
   show_notifications_when: never
-  style/color_scheme: wisteria_dream
+  style/color_scheme: rose_pine_dawn
   style/candidate_list_layout: linear
   style/inline_preedit: true
 
@@ -17,8 +17,8 @@ patch:
       ascii_mode: false
 
   preset_color_schemes:
-    wisteria_dream:
-      name: "Wisteria / 紫藤"
+    rose_pine_dawn:
+      name: "Rosé Pine Dawn"
       author: "jasper"
       font_face: "PingFangSC-Regular"
       font_point: 16
@@ -35,15 +35,15 @@ patch:
       hilited_corner_radius: 6
       surrounding_extra_expansion: 2
       color_space: srgb
-      # warm off-white base
-      back_color: 0xF2F4F7
-      border_color: 0xF2F4F7
+      # Rosé Pine Dawn base / overlay
+      back_color: 0xEDF4FA
+      border_color: 0xE1E9F2
       shadow_size: 6
-      candidate_text_color: 0x665555
-      label_color: 0xB0A0A0
-      comment_text_color: 0xD0C0C0
-      # soft wisteria highlight (BGR of #BFA2DB)
-      hilited_candidate_back_color: 0xDBA2BF
-      hilited_candidate_text_color: 0xFFFFFF
-      hilited_candidate_label_color: 0xFFFFFF
-      hilited_comment_text_color: 0xFFEEEE
+      candidate_text_color: 0x795257
+      label_color: 0xA59398
+      comment_text_color: 0xA59398
+      # Rosé Pine Dawn iris highlight
+      hilited_candidate_back_color: 0xA97A90
+      hilited_candidate_text_color: 0xEDF4FA
+      hilited_candidate_label_color: 0xEDF4FA
+      hilited_comment_text_color: 0xE1E9F2

@@ -2,10 +2,11 @@
 
 set -eu
 
-# Search the home directory with fd, then let rofi do the fuzzy matching.
-# Cache/build directories are omitted to keep the list responsive.
+# Search the home directory with fd, pruning hidden and bulky directories while
+# keeping standalone hidden files searchable. Rofi handles fuzzy matching.
 selection="$({
     fd --hidden \
+        --ignore-file <(printf '%s\n' '**/.*/') \
         --type f \
         --type d \
         --exclude .git \

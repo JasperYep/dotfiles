@@ -134,7 +134,7 @@ execBind(mainMod .. " + V", "cliphist list | rofi -dmenu | cliphist decode | wl-
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 execBind(mainMod .. " + S", [[grim -g "$(slurp)" - | wl-copy]])
 execBind(mainMod .. " + SHIFT + S", [[grim -g "$(slurp)" - | satty -f -]])
-hl.bind(mainMod .. " + CTRL + DELETE", hl.dsp.exit())
+execBind(mainMod .. " + CTRL + DELETE", "hyprshutdown")
 execBind(mainMod .. " + CTRL + Q", "hyprlock")
 execBind(mainMod .. " + CTRL + SHIFT + Q", "~/.config/hypr/scripts/away-lock.sh")
 hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.window.float({ action = "toggle" }))
@@ -149,6 +149,9 @@ hl.bind(mainMod .. " + SHIFT + H", hl.dsp.window.move({ direction = "l" }))
 hl.bind(mainMod .. " + SHIFT + L", hl.dsp.window.move({ direction = "r" }))
 hl.bind(mainMod .. " + SHIFT + K", hl.dsp.window.move({ direction = "u" }))
 hl.bind(mainMod .. " + SHIFT + J", hl.dsp.window.move({ direction = "d" }))
+
+hl.bind(mainMod .. " + SHIFT + LEFT", hl.dsp.window.resize({ x = -10, y = 0, relative = true }), { repeating = true })
+hl.bind(mainMod .. " + SHIFT + RIGHT", hl.dsp.window.resize({ x = 10, y = 0, relative = true }), { repeating = true })
 
 for workspace = 1, 10 do
 	local key = workspace % 10
@@ -168,8 +171,8 @@ local mediaRepeat = { locked = true, repeating = true }
 local mediaLocked = { locked = true }
 execBind("XF86AudioRaiseVolume", "wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+", mediaRepeat)
 execBind("XF86AudioLowerVolume", "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-", mediaRepeat)
-execBind("XF86AudioMute", "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle", mediaRepeat)
-execBind("XF86AudioMicMute", "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle", mediaRepeat)
+execBind("XF86AudioMute", "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle", mediaLocked)
+execBind("XF86AudioMicMute", "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle", mediaLocked)
 execBind("XF86AudioNext", "playerctl next", mediaLocked)
 execBind("XF86AudioPause", "playerctl play-pause", mediaLocked)
 execBind("XF86AudioPlay", "playerctl play-pause", mediaLocked)
@@ -182,8 +185,6 @@ execBind("XF86AudioPrev", "playerctl previous", mediaLocked)
 hl.window_rule({
 	name = "quicknote",
 	match = { class = "^(quicknote)$" },
-	size = { 800, 500 },
-	float = true,
 	opacity = "1.0",
 })
 

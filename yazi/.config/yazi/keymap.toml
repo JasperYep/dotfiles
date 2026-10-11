@@ -48,3 +48,8 @@ desc = "Go Desktop"
 on   = [ "g", "l" ]
 run  = 'cd ~/Downloads/'
 desc = "Go Downloads"
+
+[[mgr.prepend_keymap]]
+on   = [ "g", "a" ]
+run  = 'cd ~/code/amp/'
+desc = "Go AMP"

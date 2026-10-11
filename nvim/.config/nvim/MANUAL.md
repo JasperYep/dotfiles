@@ -88,8 +88,8 @@
 
 ### 基础界面
 
-- `catppuccin`
-  - 随桌面主题使用`latte`或`macchiato`
+- `rose-pine`
+  - 随桌面主题使用`Dawn`或`Moon`
   - 编辑区沿用终端底色；Ghostty自身不透明
 
 - `which-key.nvim`
@@ -572,7 +572,7 @@ Claude Code不是Neovim插件，而是通过现有浮动terminal运行的外部C
 
 ### 外观
 
-- 主题：随桌面切换`catppuccin-latte`／`catppuccin-macchiato`
+- 主题：随桌面切换`rose-pine`（dawn／moon）
 - 编辑区背景：沿用终端底色；不是窗口透明
 - 光标行：开启
 - 行号：绝对行号

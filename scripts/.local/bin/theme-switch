@@ -71,6 +71,7 @@ validate_theme() {
   [[ -d "$root" ]] || die "missing theme: $root"
   [[ -f "$root/gsettings.env" ]] || die "missing theme asset: $root/gsettings.env"
   [[ -f "$root/ghostty/theme.ghostty" ]] || die "missing theme asset: $root/ghostty/theme.ghostty"
+  [[ -f "$root/foot/theme.ini" ]] || die "missing theme asset: $root/foot/theme.ini"
   [[ -f "$root/tmux/theme.conf" ]] || die "missing theme asset: $root/tmux/theme.conf"
   [[ -f "$root/nvim/colorscheme.lua" ]] || die "missing theme asset: $root/nvim/colorscheme.lua"
 
@@ -194,6 +195,7 @@ apply_gsettings() {
 }
 
 reload_running_apps() {
+  local theme="${1:-}"
   if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] && command -v hyprctl >/dev/null; then
     hyprctl reload >/dev/null || warn "could not reload Hyprland"
   fi
@@ -229,6 +231,27 @@ reload_running_apps() {
       org.gtk.Actions Activate sava{sv} reload-config 0 0 >/dev/null \
       || warn "could not reload Ghostty"
   fi
+
+  # foot has no config reload; SIGUSR1 selects [colors-dark], SIGUSR2
+  # [colors-light]. A foot --server process covers all its clients.
+  if command -v pkill >/dev/null && pgrep -x foot >/dev/null; then
+    if [[ "$theme" == dark ]]; then
+      pkill -USR1 -x foot || warn "could not switch foot to dark"
+    else
+      pkill -USR2 -x foot || warn "could not switch foot to light"
+    fi
+  fi
+}
+
+reload_wallpaper() {
+  local wall
+  [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]] || return 0
+  command -v hyprctl >/dev/null || return 0
+  pgrep -x hyprpaper >/dev/null || return 0
+  wall="$(readlink -f "$CURRENT/wallpaper.jpg")"
+  [[ -f "$wall" ]] || return 0
+  hyprctl hyprpaper wallpaper ",$wall" >/dev/null \
+    || warn "could not reload wallpaper"
 }
 
 main() {
@@ -245,11 +268,12 @@ main() {
   ensure_asset_links
   apply_gtk_assets "$theme"
   set_current_theme "$theme"
+  reload_wallpaper
 
   if [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]]; then
     apply_gsettings
   fi
-  reload_running_apps
+  reload_running_apps "$theme"
 
   if command -v notify-send >/dev/null && [[ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]]; then
     notify-send "Theme → $theme" "Desktop theme applied" -t 2500 \

@@ -7,9 +7,13 @@ shared; colors remain theme-specific.
 
 Desktop surfaces use opaque backgrounds, restrained borders and 8px outer
 corners. Waybar has no panel container, border or background: its text and
-underline indicators sit on the upper sky of `wallpaper.jpg`. Window focus uses
-a slate border, not opacity or dimming. Light/dark themes share geometry and
-the background image; applications change between mist and slate.
+underline indicators sit on the upper sky of the theme wallpaper. Window focus
+uses a slate border, not opacity or dimming. Light and dark share geometry but
+use different backgrounds: `light/wallpaper.jpg` is the pale misty range,
+`dark/wallpaper.jpg` the nocturnal peak. Both are 3840x2160 with a clean upper
+band so Waybar text stays legible. `theme-switch` reloads the running
+`hyprpaper` so the change is visible immediately; applications change between
+mist and slate.
 
 Validate both Waybar themes with `/usr/bin/python tests/waybar-css.py` from the
 repository root (requires GTK3/PyGObject).
@@ -21,7 +25,11 @@ repository root (requires GTK3/PyGObject).
 ```
 
 Applications either read that directory directly or use stable symlinks managed by
-`theme-switch`. Switching themes must never copy files into this repository.
+`theme-switch`. Ghostty and foot carry both palettes and pick the active one
+from the theme tree: `theme-switch` reloads running Ghostty over D-Bus and tells
+foot which palette to use (SIGUSR1 dark, SIGUSR2 light), while new terminals read
+`~/.config/theme/current/foot/theme.ini` for their initial theme. Switching
+themes must never copy files into this repository.
 
 ```bash
 theme-switch light

@@ -1,11 +1,11 @@
 # Theme: light — sourced by ~/.zshrc
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#9ca0b0'  # Catppuccin Latte overlay0
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#9893a5'  # Rosé Pine Dawn muted
 export FZF_DEFAULT_OPTS="
   --height 40% --layout=reverse --border --inline-info
-  --color='bg:#eff1f5,bg+:#ccd0da,fg:#4c4f69,fg+:#4c4f69,hl:#d20f39,hl+:#d20f39,header:#8839ef,info:#8839ef,pointer:#dc8a78,marker:#dc8a78,prompt:#209fb5,spinner:#179299,border:#bcc0cc'
+  --color='bg:#faf4ed,bg+:#dfdad9,fg:#575279,fg+:#575279,hl:#b4637a,hl+:#b4637a,header:#907aa9,info:#907aa9,pointer:#d7827e,marker:#d7827e,prompt:#286983,spinner:#56949f,border:#cecacd'
 "
 export FZF_CTRL_T_OPTS=$'
   --scheme=path
-  --preview \'if [ -d {} ]; then eza -la --icons --group-directories-first {} 2>/dev/null || ls -la {}; else bat --style=numbers --color=always --theme=GitHub {} 2>/dev/null || file {}; fi\'
+  --preview \'if [ -d {} ]; then eza -la --icons --group-directories-first {} 2>/dev/null || ls -la {}; else bat --style=numbers --color=always --theme=ansi {} 2>/dev/null || file {}; fi\'
   --bind \'ctrl-/:change-preview-window(down|hidden|)\'
 '

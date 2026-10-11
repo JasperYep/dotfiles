@@ -1,6 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
+$os\
 $directory\
 $git_branch\
 $git_status\
@@ -9,18 +10,26 @@ $cmd_duration\
 $line_break\
 $character"""
 
+[os]
+format = "[$symbol]($style)"
+style = "bold blue"
+disabled = false
+
+[os.symbols]
+Arch = " "
+
 [directory]
-style = "bold #cad3f5"
+style = "bold #e0def4"
 truncation_length = 3
 truncate_to_repo = true
 
 [git_branch]
 symbol = " "
-style = "#B2A4D4"
+style = "#c4a7e7"
 format = "[$symbol$branch]($style) "
 
 [git_status]
-style = "#ed8796"
+style = "#eb6f92"
 format = '([$all_status$ahead_behind]($style) )'
 ahead = "⇡${count}"
 behind = "⇣${count}"
@@ -31,14 +40,14 @@ staged = "+${count}"
 
 [python]
 symbol = " "
-style = "#f5a97f"
+style = "#f6c177"
 format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 
 [cmd_duration]
 min_time = 2_000
-style = "#6e738d"
+style = "#6e6a86"
 format = "[$duration]($style) "
 
 [character]
-success_symbol = "[❯](#B2A4D4)"
-error_symbol = "[❯](#ed8796)"
+success_symbol = "[❯](#c4a7e7)"
+error_symbol = "[❯](#eb6f92)"

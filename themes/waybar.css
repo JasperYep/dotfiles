@@ -14,12 +14,12 @@
 /* 顶部无容器、无塑料板，文字直接落在天空上 */
 window#waybar {
     background: transparent;
-    color: #4c4f69;
+    color: @text;
 }
 
 tooltip {
     background: @base;
-    border: 1px solid @surface1;
+    border: 1px solid @hl_high;
     border-radius: 8px;
 }
 tooltip label { color: @text; }
@@ -28,12 +28,13 @@ tooltip label { color: @text; }
     padding: 0 10px;
 }
 
+
 #clock {
     font-weight: 600;
 }
 
 #memory {
-    color: #6c6f85;
+    color: @muted;
 }
 
 #workspaces button {
@@ -41,7 +42,7 @@ tooltip label { color: @text; }
     min-width: 24px;
     padding: 0 5px;
     background: transparent;
-    color: #6c6f85;
+    color: @muted;
     border-bottom: 2px solid transparent;
     transition: color 0.15s ease, border-color 0.15s ease;
 }
@@ -62,7 +63,7 @@ tooltip label { color: @text; }
 }
 
 #workspaces button.urgent {
-    color: #d20f39;
+    color: @love;
 }
 
 #workspaces button.empty:not(.active):not(.visible):not(.persistent) {
@@ -76,5 +77,5 @@ tooltip label { color: @text; }
     font-size: 0;
 }
 
-#custom-tt.tt-work { color: #40a02b; }
-#custom-tt.tt-break { color: #fe640b; }
+#custom-tt.tt-work { color: @pine; }
+#custom-tt.tt-break { color: @gold; }

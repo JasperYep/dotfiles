@@ -4,13 +4,17 @@ border-radius=8
 padding=12
 margin=8
 width=320
-format=<b>%s</b>\n%b
+max-icon-size=24
+icon-border-radius=4
 
-# Colors — Catppuccin Macchiato
-background-color=#24273a
-text-color=#cad3f5
-border-color=#494d64
-progress-color=over #3d3654
+# Hierarchy: source (small/secondary) > summary (bold/primary) > body (secondary).
+format=<span size='small' foreground='#908caa'>%a</span>\n<b>%s</b>\n<span foreground='#908caa'>%b</span>
+
+# Rosé Pine Moon — base / text / subtext1 / surface1 / accent
+background-color=#232136
+text-color=#e0def4
+border-color=#56526e
+progress-color=over #c4a7e7
 
 [urgency=high]
-border-color=#f5a97f
+border-color=#f6c177

@@ -1,0 +1,9 @@
+{
+  "model": "cp",
+  "maxTokens": 2048,
+  "minChars": 0,
+  "maxChars": 8000,
+  "resultMaxChars": 4000,
+  "cacheMax": 100,
+  "cacheTtlMs": 1800000
+}

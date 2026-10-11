@@ -8,18 +8,28 @@ edit = [
 open = [
 	{ run = 'xdg-open %s1', desc = "Open" },
 ]
+extract = [
+	{ run = 'ya pub extract --list %s', desc = "Extract here" },
+]
+office = [
+	{ run = 'onlyoffice-desktopeditors %s', orphan = true, desc = "Open with ONLYOFFICE" },
+]
 
 [open]
 rules = [
 	{ url = "*/", use = [ "edit", "open", "reveal" ] },
+	{ url = "*.{doc,docx,docm,dot,dotx,xls,xlsx,xlsm,ppt,pptx,pptm,pps,ppsx,odt,ods,odp,rtf}", use = [ "office", "open", "reveal" ] },
+	{ mime = "text/html", use = [ "open" ] },
 	{ mime = "text/*", use = [ "edit", "reveal" ] },
 	{ mime = "image/*", use = [ "open", "reveal" ] },
 	{ mime = "{audio,video}/*", use = [ "play", "reveal" ] },
 	{ mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = [ "extract", "reveal" ] },
+	{ url = "*.zip", use = [ "extract", "reveal" ] },
 	{ mime = "application/{json,ndjson,json5}", use = [ "edit", "reveal" ] },
 	{ mime = "application/*javascript", use = [ "edit", "reveal" ] },
 	{ mime = "application/{xml,html}", use = [ "edit", "open", "reveal" ] },
 	{ mime = "application/{pdf,postscript}", use = [ "open", "reveal" ] },
+	{ mime = "application/vnd.*", use = [ "open", "reveal" ] },
 	{ url = "*", use = [ "edit", "reveal" ] },
 ]
 

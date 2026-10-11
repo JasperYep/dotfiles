@@ -1,67 +1,65 @@
 return {
-    "catppuccin/nvim",
-    name = "catppuccin",
+    "rose-pine/neovim",
+    name = "rose-pine",
     lazy = false,
     priority = 1000,
     config = function()
         vim.o.background = "light"
 
-        require("catppuccin").setup({
-            flavour = "latte",
-            transparent_background = true,
-            float = {
-                transparent = true,
+        require("rose-pine").setup({
+            variant = "auto",
+            dark_variant = "moon",
+            styles = {
+                transparency = true,
             },
-            custom_highlights = function(colors)
-                return {
-                    IblIndent = { fg = colors.surface1 },
-                    IblScope = { fg = colors.blue },
+            highlight_groups = {
+                IblIndent = { fg = "highlight_high" },
+                IblScope = { fg = "foam" },
 
-                    MiniStatuslineModeNormal = { fg = colors.base, bg = colors.blue, bold = true },
-                    MiniStatuslineModeInsert = { fg = colors.base, bg = colors.green, bold = true },
-                    MiniStatuslineModeVisual = { fg = colors.base, bg = colors.mauve, bold = true },
-                    MiniStatuslineModeReplace = { fg = colors.base, bg = colors.red, bold = true },
-                    MiniStatuslineModeCommand = { fg = colors.base, bg = colors.peach, bold = true },
-                    MiniStatuslineModeOther = { fg = colors.base, bg = colors.teal, bold = true },
-                    MiniStatuslineDevinfo = { fg = colors.text, bg = colors.surface0 },
-                    MiniStatuslineFilename = { fg = colors.text, bg = colors.mantle, bold = true },
-                    MiniStatuslineFileinfo = { fg = colors.subtext1, bg = colors.surface0 },
-                    MiniStatuslineInactive = { fg = colors.overlay1, bg = colors.mantle },
+                MiniStatuslineModeNormal = { fg = "base", bg = "foam", bold = true },
+                MiniStatuslineModeInsert = { fg = "base", bg = "pine", bold = true },
+                MiniStatuslineModeVisual = { fg = "base", bg = "iris", bold = true },
+                MiniStatuslineModeReplace = { fg = "base", bg = "love", bold = true },
+                MiniStatuslineModeCommand = { fg = "base", bg = "gold", bold = true },
+                MiniStatuslineModeOther = { fg = "base", bg = "rose", bold = true },
+                MiniStatuslineDevinfo = { fg = "text", bg = "highlight_med" },
+                MiniStatuslineFilename = { fg = "text", bg = "highlight_low", bold = true },
+                MiniStatuslineFileinfo = { fg = "subtle", bg = "highlight_med" },
+                MiniStatuslineInactive = { fg = "muted", bg = "highlight_low" },
 
-                    NvimTreeNormal = { bg = "none" },
-                    NvimTreeNormalNC = { bg = "none" },
-                    NvimTreeWinSeparator = { bg = "none", fg = colors.surface1 },
-                    NvimTreeFolderIcon = { bg = "none" },
-                    NvimTreeFolderName = { bg = "none" },
-                    NvimTreeOpenedFolderName = { bg = "none" },
-                    NvimTreeRootFolder = { bg = "none", fg = colors.blue },
+                NvimTreeNormal = { bg = "none" },
+                NvimTreeNormalNC = { bg = "none" },
+                NvimTreeWinSeparator = { bg = "none", fg = "highlight_high" },
+                NvimTreeFolderIcon = { bg = "none" },
+                NvimTreeFolderName = { bg = "none" },
+                NvimTreeOpenedFolderName = { bg = "none" },
+                NvimTreeRootFolder = { bg = "none", fg = "foam" },
 
-                    TelescopeNormal = { bg = "none" },
-                    TelescopeBorder = { bg = "none", fg = colors.surface1 },
-                    TelescopePromptNormal = { bg = "none" },
-                    TelescopePromptBorder = { bg = "none", fg = colors.surface1 },
-                    TelescopeResultsNormal = { bg = "none" },
-                    TelescopeResultsBorder = { bg = "none", fg = colors.surface1 },
-                    TelescopePreviewNormal = { bg = "none" },
-                    TelescopePreviewBorder = { bg = "none", fg = colors.surface1 },
+                TelescopeNormal = { bg = "none" },
+                TelescopeBorder = { bg = "none", fg = "highlight_high" },
+                TelescopePromptNormal = { bg = "none" },
+                TelescopePromptBorder = { bg = "none", fg = "highlight_high" },
+                TelescopeResultsNormal = { bg = "none" },
+                TelescopeResultsBorder = { bg = "none", fg = "highlight_high" },
+                TelescopePreviewNormal = { bg = "none" },
+                TelescopePreviewBorder = { bg = "none", fg = "highlight_high" },
 
-                    WhichKeyFloat = { bg = "none" },
-                    WhichKeyBorder = { bg = "none", fg = colors.surface1 },
+                WhichKeyFloat = { bg = "none" },
+                WhichKeyBorder = { bg = "none", fg = "highlight_high" },
 
-                    LazyNormal = { bg = "none" },
-                    LazyButton = { bg = "none" },
-                    LazyH1 = { bg = "none" },
-                    LazyBorder = { fg = colors.surface1 },
-                    LazyProp = { bg = "none" },
-                    LazyCommit = { bg = "none" },
-                    LazyReasonStart = { bg = "none" },
-                    LazyReasonPlugin = { bg = "none" },
-                    LazyReasonRuntime = { bg = "none" },
-                    LazyReasonKeys = { bg = "none" },
-                }
-            end,
+                LazyNormal = { bg = "none" },
+                LazyButton = { bg = "none" },
+                LazyH1 = { bg = "none" },
+                LazyBorder = { fg = "highlight_high" },
+                LazyProp = { bg = "none" },
+                LazyCommit = { bg = "none" },
+                LazyReasonStart = { bg = "none" },
+                LazyReasonPlugin = { bg = "none" },
+                LazyReasonRuntime = { bg = "none" },
+                LazyReasonKeys = { bg = "none" },
+            },
         })
 
-        vim.cmd.colorscheme("catppuccin-latte")
+        vim.cmd.colorscheme("rose-pine")
     end,
 }

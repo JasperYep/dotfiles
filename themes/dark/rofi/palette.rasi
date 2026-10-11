@@ -1,12 +1,12 @@
 * {
-    bg:          #24273a;   /* Macchiato base */
-    bg-input:    #1e2030;   /* Macchiato mantle */
-    border-col:  #494d64;   /* surface1 细边框 */
-    fg:          #cad3f5;   /* text */
-    fg-dim:      #a5adcb;   /* overlay0 */
-    accent:      #B2A4D4;   /* 软紫 — prompt 色 */
-    selected-bg: #3d3654;   /* 软紫选中底 */
-    urgent:      #ed8796;
+    bg:          #232136;   /* Moon base */
+    bg-input:    #2a283e;   /* Moon hl_low */
+    border-col:  #56526e;   /* hl_high 细边框 */
+    fg:          #e0def4;   /* text */
+    fg-dim:      #908caa;   /* muted */
+    accent:      #c4a7e7;   /* iris — prompt 色 */
+    selected-bg: #44415a;   /* iris 选中底 */
+    urgent:      #eb6f92;
 }
 
 window {

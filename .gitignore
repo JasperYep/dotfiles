@@ -33,6 +33,7 @@ node_modules/
 hyprland/.config/hypr/host.conf
 hyprland/.config/hypr/host.lua
 **/schedule.json
+**/models.json
 **/installation.yaml
 **/user.yaml
 **/*.userdb/
